@@ -6,7 +6,12 @@ This is my experimental completion framework for neovim.
 I'm not gonna compete with deoplete or YCM. I'm writting this for fun, and they
 are different in plugin design.
 
-This plugin offers great flexibility for writing your own completion source.
+This plugin offers great flexibility for writing your own completion source
+(async support).
+
+There's no guarantee that this plugin will be compatible with other completion
+plugin in the same buffer. Use `let g:cm_enable_for_all=0` and `call
+cm#enable_for_buffer()` to use this plugin for specific buffer.
 
 
 ## requirement
