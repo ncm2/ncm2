@@ -4,7 +4,7 @@
 This is my experimental completion framework for neovim.
 
 I'm not gonna compete with deoplete or YCM. I'm writting this for fun, and they
-are different in plugin design.
+are different by design.
 
 This plugin offers great flexibility for writing your own completion source
 (async support).
