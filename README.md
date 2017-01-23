@@ -17,8 +17,8 @@ cm#enable_for_buffer()` to use this plugin for specific buffer.
 ## requirement
 
 The complete manager core itself is pure vimscript currently and has no
-requirements. While the built-in completion sources provided by this plugin
-need some extra functionality to work.
+requirements. While the completion sources provided by this plugin need some
+extra functionality to work.
 
 - [nvim-possible-textchangedi](https://github.com/roxma/nvim-possible-textchangedi)
 
