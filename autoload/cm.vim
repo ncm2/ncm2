@@ -59,6 +59,14 @@ func! cm#register_source(info)
 	let s:sources[a:info['name']] = a:info
 endfunc
 
+func! cm#remove_source(name)
+	try
+		unlet s:sources[a:name]
+	catch
+		return
+	endtry
+endfunc
+
 
 """
 " @param source name of the completion source. 
@@ -113,7 +121,25 @@ augroup cm
 	autocmd!
 	autocmd InsertEnter,InsertLeave * let s:dict_matches = {} | let s:complete_mode = 0 | let s:noclean = 0
 	autocmd CompleteDone * if s:noclean==0 | let s:dict_matches = {} | endif | let s:complete_mode = 0 | let s:noclean = 0
+	autocmd User PossibleTextChangedI call <sid>on_changed()
 augroup end
+
+" on completion context changed
+func! s:on_changed()
+	let l:ctx = cm#context()
+	for l:source in keys(s:sources)
+		let l:info = s:sources[l:source]
+		try
+			if has_key(s:dict_matches,l:info['name']) && (get(l:info,'refresh',0)==0)
+				" no need to refresh candidate, to reduce calculation
+				continue
+			endif
+			call l:info['on_changed'](l:ctx)
+		catch
+			continue
+		endtry
+	endfor
+endfunc
 
 func! s:menu_selected()
 	" when the popup menu is visible, v:completed_item will be the

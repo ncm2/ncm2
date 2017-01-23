@@ -16,10 +16,7 @@ cm#enable_for_buffer()` to use this plugin for specific buffer.
 
 ## requirement
 
-The complete manager core itself is pure vimscript currently and has no
-requirements. While the completion sources provided by this plugin need some
-extra functionality to work.
-
+- neovim python3 support. `:help provider-python`.
 - [nvim-possible-textchangedi](https://github.com/roxma/nvim-possible-textchangedi)
 
 ## How to extend this framework?

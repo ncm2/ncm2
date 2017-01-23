@@ -1,23 +1,17 @@
 
-let s:name = 'cm-ultisnips'
+let s:info = {'name' : 'cm-ultisnips',
+	\ 'priority': 6, 
+	\ 'abbreviation': 'UltiSnips',
+	\ 'refresh': 0, 
+	\ 'on_changed': function('cm#sources#ultisnips#on_changed'),
+	\ }
 
 func! cm#sources#ultisnips#init()
-
-	augroup cm_ultisnips
-
-		" autocmd TextChangedI * call s:on_cursor_moved_i()
-		" use PossibleTextChangedI provided by https://github.com/roxma/nvim-possible-textchangedi
-		autocmd User PossibleTextChangedI call s:on_cursor_moved_i()
-
-	augroup end
-
-	" you need to register this source
-	call cm#register_source({'name' : s:name, 'priority': 6, 'abbreviation': 'ultisnips'})
-
+	" register source
+	call cm#register_source(s:info)
 endfunc
 
-func! s:on_cursor_moved_i()
-
+func! cm#sources#ultisnips#on_changed(ctx)
 
 	" UltiSnips#SnippetsInCurrentScope
 	" {
@@ -73,7 +67,7 @@ func! s:on_cursor_moved_i()
 	endif
 
 	" notify the completion framework after gathering matches calculation
-	call cm#complete(s:name, cm#context(), l:startcol, l:matches)
+	call cm#complete(s:info['name'], a:ctx, l:startcol, l:matches)
 
 endfunc
 
