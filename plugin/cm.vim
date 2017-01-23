@@ -4,7 +4,12 @@
 let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{'ultisnips':{}})
 
 if has_key(s:cm_builtin_sources,'ultisnips')
-	call cm#sources#ultisnips#init()
+	call cm#register_source({'name' : 'cm-ultisnips',
+		\ 'priority': 6, 
+		\ 'abbreviation': 'UltiSnips',
+		\ 'refresh': 0, 
+		\ 'on_changed': function('cm#sources#ultisnips#on_changed'),
+		\ })
 endif
 
 if get(g:,'cm_enable_for_all',1)

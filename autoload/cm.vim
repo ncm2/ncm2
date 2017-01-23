@@ -134,8 +134,9 @@ func! s:on_changed()
 				" no need to refresh candidate, to reduce calculation
 				continue
 			endif
-			call l:info['on_changed'](l:ctx)
+			call l:info.on_changed(l:ctx)
 		catch
+			echom 'error on completion source: ' . l:source . ' ' . v:exception
 			continue
 		endtry
 	endfor

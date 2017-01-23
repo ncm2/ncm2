@@ -1,17 +1,5 @@
 
-let s:info = {'name' : 'cm-ultisnips',
-	\ 'priority': 6, 
-	\ 'abbreviation': 'UltiSnips',
-	\ 'refresh': 0, 
-	\ 'on_changed': function('cm#sources#ultisnips#on_changed'),
-	\ }
-
-func! cm#sources#ultisnips#init()
-	" register source
-	call cm#register_source(s:info)
-endfunc
-
-func! cm#sources#ultisnips#on_changed(ctx)
+func! cm#sources#ultisnips#on_changed(ctx) dict
 
 	" UltiSnips#SnippetsInCurrentScope
 	" {
@@ -66,8 +54,9 @@ func! cm#sources#ultisnips#on_changed(ctx)
 		let l:startcol = l:col - l:kwlen
 	endif
 
+	" echo 'name: ' . self.name
 	" notify the completion framework after gathering matches calculation
-	call cm#complete(s:info['name'], a:ctx, l:startcol, l:matches)
+	call cm#complete(self['name'], a:ctx, l:startcol, l:matches)
 
 endfunc
 
