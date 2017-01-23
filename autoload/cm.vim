@@ -31,7 +31,7 @@ endfunc
 " you could use `l:context != cm#context()` to determine wether the context
 " has changed by yourself
 func! cm#context()
-	return [bufnr('%'), getcurpos(), b:changedtick]
+	return {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
 endfunc
 
 
