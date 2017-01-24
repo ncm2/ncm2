@@ -2,6 +2,10 @@
 " An experimental completion framework
 "
 
+if get(s:,'init','0')
+	finish
+endif
+let s:init = 1
 
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
@@ -15,11 +19,28 @@ func! cm#enable_for_buffer()
 	" no item is selected, an enter key will close the popup menu, change and
 	" move nothong, and then trigger TextChangedI and CursorMovedI
 	" https://github.com/neovim/neovim/issues/5997
-	inoremap <expr> <buffer> <CR> ((pumvisible() && empty(v:completed_item)) ?"\<CR>\<CR>" : "\<CR>")
+	inoremap <expr> <buffer> <CR> ((pumvisible() && empty(v:completed_item)) ?"\<ESC>a\<CR>" : "\<CR>")
 
 	let b:cm_enable = 1
 
+	augroup cm
+		autocmd! * <buffer>
+		autocmd InsertEnter,InsertLeave <buffer> let s:dict_matches = {} | let s:complete_mode = 0 | let s:noclean = 0
+		autocmd CompleteDone <buffer> if s:noclean==0 | let s:dict_matches = {} | endif | let s:complete_mode = 0 | let s:noclean = 0
+	augroup end
+
 endfunc
+
+func! cm#disable_for_buffer()
+	if get(b:,'cm_enable',0)
+		iunmap <buffer> <CR>
+	endif
+	let b:cm_enable = 0
+	augroup cm
+		autocmd! * <buffer>
+	augroup end
+endfunc
+
 
 """
 " before calculating the completion candidates, use this function to get the
@@ -174,13 +195,15 @@ let s:leaving = 0
 augroup cm
 	autocmd!
 	autocmd VimLeavePre * let s:leaving=1
-	autocmd InsertEnter,InsertLeave * let s:dict_matches = {} | let s:complete_mode = 0 | let s:noclean = 0
-	autocmd CompleteDone * if s:noclean==0 | let s:dict_matches = {} | endif | let s:complete_mode = 0 | let s:noclean = 0
 	autocmd User PossibleTextChangedI call <sid>on_changed()
 augroup end
 
 " on completion context changed
 func! s:on_changed()
+
+	if get(b:,'cm_enable',0) == 0
+		return
+	endif
 
 	let l:ctx = cm#context()
 	for l:source in keys(s:sources)

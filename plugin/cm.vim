@@ -1,6 +1,6 @@
 
 if get(g:,'cm_enable_for_all',1)
-	au BufNew,BufNewFile,BufReadPost * call cm#enable_for_buffer()
+	au BufEnter * if exists('b:cm_enable')==0 | call cm#enable_for_buffer() | endif
 endif
 
 " if you don't want built-in sources enabled
