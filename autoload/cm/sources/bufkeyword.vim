@@ -50,7 +50,7 @@ endfunc
 func! s:init()
 	augroup cm_bufkeyword
 		autocmd!
-		autocmd CursorHold,CursorHoldI,BufEnter * call s:bufkeyword.refresh_keyword()
+		autocmd CursorHold,CursorHoldI,BufEnter,BufWritePost * call s:bufkeyword.refresh_keyword()
 		autocmd InsertCharPre * if !(v:char=~'\k') | call s:bufkeyword.refresh_keyword_incr() | end
 	augroup end
 	call cm#register_source(s:bufkeyword)

@@ -64,6 +64,7 @@ class Handler:
                 
                 matches.append(dict(word=word,icase=1))
 
+        matches.sort(key=lambda x: len(x['word']))
         # cm#complete(src, context, startcol, matches)
         ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches)
 
