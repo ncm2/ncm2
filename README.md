@@ -11,7 +11,10 @@ cm#enable_for_buffer()` to use this plugin for specific buffer.
 
 ## requirement
 
-- neovim python3 support. `:help provider-python`.
+- neovim python3 support. `:help provider-python`. For lazy linux users, I
+  recommend This plugin
+  [python-support.nvim](https://github.com/roxma/python-support.nvim).
+  (Note: Self promotion)
 
 ## How to extend this framework?
 
