@@ -66,9 +66,9 @@ class Handler:
 
         matches.sort(key=lambda x: len(x['word']))
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches)
+        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
 
-        logger.info('on changed, current line: %s, typed: %s, matches: %s, ret: %s', line, typed, matches, ret)
+        logger.info('on changed, current line: %s, typed: %s, matches: %s', line, typed, matches)
 
 def main():
 

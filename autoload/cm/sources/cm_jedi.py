@@ -44,7 +44,11 @@ class Handler:
 
         matches = []
 
-        path = self._nvim.eval('expand("%:p")')
+        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
+        if filetype!='python':
+            logger.info('ignore filetype: %s', filetype)
+            return
+
         src = "\n".join(self._nvim.current.buffer[:])
         scr = jedi.Script(src, lnum, len(typed), path)
         completions = scr.completions()
