@@ -77,7 +77,15 @@ endfunc
 "   0 cm accepted
 "	1 ignored for context change
 "   2 async completion has been disabled
-func! cm#complete(source_name, context, startcol, matches)
+func! cm#complete(src, context, startcol, matches)
+
+	if type(a:src)==1
+		" string
+		let l:name = a:src
+	else
+		" dict
+		let l:name = a:src['name']
+	endif
 
 	if get(b:,'cm_enable',0) == 0
 		return 2
@@ -97,7 +105,7 @@ func! cm#complete(source_name, context, startcol, matches)
 	endif
 
 	" update the local store
-	let s:dict_matches[a:source_name] = {'startcol':a:startcol, 'matches':a:matches}
+	let s:dict_matches[l:name] = {'startcol':a:startcol, 'matches':a:matches}
 
 	" menu selected
 	if s:menu_selected()

@@ -56,7 +56,7 @@ func! cm#sources#ultisnips#on_changed(ctx) dict
 
 	" echo 'name: ' . self.name
 	" notify the completion framework after gathering matches calculation
-	call cm#complete(self['name'], a:ctx, l:startcol, l:matches)
+	call cm#complete(self, a:ctx, l:startcol, l:matches)
 
 endfunc
 
