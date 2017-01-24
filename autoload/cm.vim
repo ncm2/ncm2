@@ -57,11 +57,55 @@ endfunc
 " 	7 snippet hint
 " 	9 smart programming language aware completion
 func! cm#register_source(info)
+
+	" if registered before, ignore this call
+	if has_key(s:sources,a:info['name'])
+		return
+	endif
+
 	let s:sources[a:info['name']] = a:info
+
+	for l:channel in get(a:info,'channels',[])
+		if l:channel['type']=='python3'
+			" find script path
+			let l:py3 = get(g:,'python3_host_prog','python3')
+			let l:path = globpath(&rtp,l:channel['path'])
+			if empty(l:path)
+				echom 'cannot find channel path: ' . l:channel['path']
+				continue
+			endif
+
+			let l:opt = {'rpc':1, 'channel': l:channel}
+
+			func l:opt.on_exit()
+				unlet self['channel']['id']
+				if s:leaving
+					return
+				endif
+				echom self['channel']['path'] . ' ' . 'exit'
+				unlet self['channel']
+			endfunc
+
+			" start channel
+			let l:channel['id'] = jobstart([l:py3,l:path],l:opt)
+		endif
+	endfor
 endfunc
+
 
 func! cm#remove_source(name)
 	try
+		let l:info = s:sources[a:name]
+		for l:channel in get(l:info,'channels',[])
+			try
+				if has_key(l:channel,'id')
+					jobstop(l:channel.id)
+				endif
+			catch
+				continue
+			endtry
+		endfor
+		unlet l:info
 		unlet s:sources[a:name]
 	catch
 		return
@@ -125,9 +169,11 @@ let s:sources = {}
 let s:dict_matches = {}
 let s:complete_mode = 0
 let s:noclean = 0 " do not clean d:dict_matches for next CompleteDone event
+let s:leaving = 0
 
 augroup cm
 	autocmd!
+	autocmd VimLeavePre * let s:leaving=1
 	autocmd InsertEnter,InsertLeave * let s:dict_matches = {} | let s:complete_mode = 0 | let s:noclean = 0
 	autocmd CompleteDone * if s:noclean==0 | let s:dict_matches = {} | endif | let s:complete_mode = 0 | let s:noclean = 0
 	autocmd User PossibleTextChangedI call <sid>on_changed()
@@ -144,7 +190,17 @@ func! s:on_changed()
 				" no need to refresh candidate, to reduce calculation
 				continue
 			endif
-			call l:info.on_changed(l:ctx)
+			if has_key(l:info,'on_changed')
+				call l:info.on_changed(l:ctx)
+			endif
+
+			" notify channels
+			for l:channel in get(l:info,'channels',[])
+				if has_key(l:channel,'id')
+					call rpcnotify(l:channel['id'], 'cm_on_changed', l:info, l:ctx)
+				endif
+			endfor
+
 		catch
 			echom 'error on completion source: ' . l:source . ' ' . v:exception
 			continue
@@ -205,7 +261,6 @@ func! s:refresh_popup()
 						let l:add = copy(l:e)
 						let l:add['word'] = l:prefix . l:add['word']
 					endif
-					let l:add['dup'] = 1
 					let l:add['menu'] = get(s:sources[l:source],'abbreviation','unknown')
 					let l:matches = add(l:matches, l:add)
 				catch

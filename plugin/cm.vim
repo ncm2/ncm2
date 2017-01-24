@@ -12,19 +12,14 @@ let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 
 if has_key(s:cm_builtin_sources,'ultisnips')
 	call cm#register_source({'name' : 'cm-ultisnips',
-		\ 'priority': 6, 
+		\ 'priority': 7, 
 		\ 'abbreviation': 'UltiSnips',
 		\ 'refresh': 0, 
 		\ 'on_changed': function('cm#sources#ultisnips#on_changed'),
 		\ })
 endif
 
-" if has_key(s:cm_builtin_sources,'bufkeyword')
-" 	call cm#register_source({'name' : 'cm-bufkeyword',
-" 		\ 'priority': 5, 
-" 		\ 'abbreviation': 'UltiSnips',
-" 		\ 'refresh': 0, 
-" 		\ 'on_changed': function('cm#sources#ultisnips#on_changed'),
-" 		\ })
-" endif
-" 
+if has_key(s:cm_builtin_sources,'bufkeyword')
+	call cm#sources#bufkeyword#init()
+endif
+

@@ -34,7 +34,8 @@ func! cm#sources#ultisnips#on_changed(ctx) dict
 	if l:kwlen>=2
 		for l:name in keys(l:snips)
 			if l:name[0:l:kwlen-1] == l:kw
-				let l:matches = add(l:matches, l:name)
+				" special hint for ultisnips, use dup=1
+				let l:matches = add(l:matches, {'word':l:name,'dup':1})
 			endif
 		endfor
 	endif
