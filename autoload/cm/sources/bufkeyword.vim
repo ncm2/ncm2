@@ -40,11 +40,7 @@ func! s:bufkeyword.refresh_keyword_incr()
 	if !has_key(l:channel,'id')
 		return
 	endif
-	let l:tick = s:tick()
-	if s:lasttick!=l:tick
-		let s:lasttick = l:tick
-		call rpcnotify(l:channel['id'],'refresh_keyword_incr',getline('.'))
-	endif
+	call rpcnotify(l:channel['id'],'refresh_keyword_incr',getline('.'))
 endfunc
 
 func! s:init()
