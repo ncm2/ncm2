@@ -230,7 +230,6 @@ func! s:check_changes()
 		if mode()=='i' && (&paste==0)
 			" only in insert non paste mode
 			call s:on_changed()
-			echom 'changed'
 		endif
 	endif
 endfunc
