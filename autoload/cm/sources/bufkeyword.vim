@@ -35,10 +35,23 @@ func! s:bufkeyword.refresh_keyword()
 	endif
 endfunc
 
+func! s:bufkeyword.refresh_keyword_incr()
+	let l:channel = self['channels'][0]
+	if !has_key(l:channel,'id')
+		return
+	endif
+	let l:tick = s:tick()
+	if s:lasttick!=l:tick
+		let s:lasttick = l:tick
+		call rpcnotify(l:channel['id'],'refresh_keyword_incr',getline('.'))
+	endif
+endfunc
+
 func! s:init()
 	augroup cm_bufkeyword
 		autocmd!
 		autocmd CursorHold,CursorHoldI,BufEnter * call s:bufkeyword.refresh_keyword()
+		autocmd InsertCharPre * if !(v:char=~'\k') | call s:bufkeyword.refresh_keyword_incr() | end
 	augroup end
 	call cm#register_source(s:bufkeyword)
 endfunc

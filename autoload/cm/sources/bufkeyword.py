@@ -18,17 +18,30 @@ class Handler:
         self._nvim = nvim
         self._words = set()
 
+        self._split_pattern = r'[^0-9a-zA-Z_]+'
+        self._kw_pattern = r'[0-9a-zA-Z_]'
+
         self.refresh_keyword()
 
     def refresh_keyword(self):
         logger.info('refresh_keyword')
-        pat = re.compile(r'[^0-9a-zA-Z_]+')
+        pat = re.compile(self._split_pattern)
         self._words = set()
         for line in self._nvim.current.buffer[:]:
             for word in re.split(pat,line):
                 self._words.add(word)
 
         logger.info('keyword refresh complete, count: %s', len(self._words))
+
+    def refresh_keyword_incr(self,line):
+
+        logger.info('refresh_keyword_incr')
+        pat = re.compile(self._split_pattern)
+
+        for word in re.split(pat,line):
+            self._words.add(word)
+
+        logger.info('keyword refresh incr complete, count: %s', len(self._words))
 
     def cm_on_changed(self,info,ctx):
 
@@ -37,7 +50,9 @@ class Handler:
         line = self._nvim.current.buffer[lnum-1]
         txt = line[0 : col-1]
         
-        typed = re.search(r'[0-9a-zA-Z_]*?$',txt).group(0)
+        # self.refresh_keyword_incr(line)
+
+        typed = re.search(self._kw_pattern+r'*?$',txt).group(0)
         if len(typed)<2:
             return
         startcol = col-len(typed)
