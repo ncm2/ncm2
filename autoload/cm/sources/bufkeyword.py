@@ -76,7 +76,7 @@ def main():
     level = logging.INFO
     if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
         # use nvim's logging
-        setup_logging('bufkeyword')
+        setup_logging('cm_bufkeyword')
         l = getattr(logging,
                 os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
                 level)
