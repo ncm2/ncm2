@@ -49,12 +49,13 @@ endfunc
 " @param info  
 "	{'name':'cm-buffer-keyword', 'priority': 5, 'abbreviation': 'bword'}
 "
-" priority shoud be defined 1 to 9:
-"	3 keyword from the otherfiles, from user's openning browsers, etc
+" priority shoud be defined 1 to 9, here's recommended definition:
+"	2 keyword from the otherfiles, from user's openning browsers, etc
 " 	4 keyword from openning buffer
 " 	5 keyword from current buffer
-" 	6 snippet hint
-" 	7 smart programming language aware completion
+" 	6 file path
+" 	7 snippet hint
+" 	9 smart programming language aware completion
 func! cm#register_source(info)
 	let s:sources[a:info['name']] = a:info
 endfunc
@@ -134,6 +135,7 @@ augroup end
 
 " on completion context changed
 func! s:on_changed()
+
 	let l:ctx = cm#context()
 	for l:source in keys(s:sources)
 		let l:info = s:sources[l:source]
@@ -148,6 +150,13 @@ func! s:on_changed()
 			continue
 		endtry
 	endfor
+
+	" TODO
+	" detect popup item selected event then notify sources
+	
+	" TODO
+	" detect real complete done event then notify sources
+
 endfunc
 
 func! s:menu_selected()
