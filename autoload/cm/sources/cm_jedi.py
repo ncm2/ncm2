@@ -28,7 +28,16 @@ class Handler:
 
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
-        if kwtyped=="" and len(typed) and typed[-1]=='.':
+
+        if len(typed)==0:
+            return
+        elif len(kwtyped)>=2:
+            pass
+        elif len(kwtyped):
+            return
+        elif typed[-1]=='.':
+            pass
+        elif (typed[-1]==' ') and (typed[0:5]=='from ' or typed[0:7]=='import '):
             pass
         else:
             return
@@ -37,7 +46,7 @@ class Handler:
 
         path = self._nvim.eval('expand("%:p")')
         src = "\n".join(self._nvim.current.buffer[:])
-        scr = jedi.Script(src, lnum, col-1, path)
+        scr = jedi.Script(src, lnum, len(typed), path)
         completions = scr.completions()
 
         for complete in completions:
@@ -45,9 +54,9 @@ class Handler:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches)
+        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
 
-        logger.info('on changed, current line: %s, typed: %s, matches: %s, ret: %s', line, typed, matches, ret)
+        logger.info('on changed, current line: %s, typed: [%s]', line, typed)
 
 def main():
 
