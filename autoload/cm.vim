@@ -27,6 +27,8 @@ func! cm#enable_for_buffer()
 		autocmd! * <buffer>
 		autocmd InsertEnter,InsertLeave <buffer> let s:dict_matches = {} | let s:complete_mode = 0 | let s:noclean = 0
 		autocmd CompleteDone <buffer> if s:noclean==0 | let s:dict_matches = {} | endif | let s:complete_mode = 0 | let s:noclean = 0
+		autocmd InsertEnter <buffer> call s:change_tick_start()
+		autocmd InsertLeave <buffer> call s:change_tick_stop()
 	augroup end
 
 endfunc
@@ -191,12 +193,47 @@ let s:dict_matches = {}
 let s:complete_mode = 0
 let s:noclean = 0 " do not clean d:dict_matches for next CompleteDone event
 let s:leaving = 0
+let s:change_timer = -1
+let s:lasttick = ''
+
 
 augroup cm
 	autocmd!
 	autocmd VimLeavePre * let s:leaving=1
-	autocmd User PossibleTextChangedI call <sid>on_changed()
+	" autocmd User PossibleTextChangedI call <sid>on_changed()
 augroup end
+
+func! s:change_tick_start()
+	if s:change_timer!=-1
+		return
+	endif
+	let s:lasttick = bufnr('%') . '-' . b:changedtick
+	" check changes every 30ms, which is 0.03s, it should be fast enough
+	let s:change_timer = timer_start(30,function('s:check_changes'),{'repeat':-1})
+endfunc
+
+func! s:change_tick_stop()
+	if s:change_timer==-1
+		return
+	endif
+	let s:lasttick = ''
+	call timer_stop(s:change_timer)
+	let s:lasttick = ''
+	let s:change_timer = -1
+endfunc
+
+
+func! s:check_changes()
+	let l:tick = bufnr('%') . '-' . b:changedtick
+	if l:tick!=s:lasttick
+		let s:lasttick = l:tick
+		if mode()=='i' && (&paste==0)
+			" only in insert non paste mode
+			call s:on_changed()
+			echom 'changed'
+		endif
+	endif
+endfunc
 
 " on completion context changed
 func! s:on_changed()

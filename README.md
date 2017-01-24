@@ -12,7 +12,6 @@ cm#enable_for_buffer()` to use this plugin for specific buffer.
 ## requirement
 
 - neovim python3 support. `:help provider-python`.
-- [nvim-possible-textchangedi](https://github.com/roxma/nvim-possible-textchangedi)
 
 ## How to extend this framework?
 
