@@ -35,7 +35,6 @@ if has_key(s:cm_builtin_sources,'jedi')
 			\ 'name' : 'cm-jedi',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Jedi',
-			\ 'refresh': 1, 
 			\ 'channels': [
 			\   {'type': 'python3', 'path': 'autoload/cm/sources/cm_jedi.py'}
 			\ ],
