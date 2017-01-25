@@ -103,6 +103,9 @@ class Handler:
                     logger.error('wrong startcol: %s', self._matches[name])
                     continue
                 prefix = ctx['typed'][startcol-1 : curstartcol-1]
+
+                tmpmatches = []
+
                 for item in curmatches:
 
                     e = {}
@@ -114,11 +117,18 @@ class Handler:
                     if 'menu' not in e:
                         e['menu'] = self._sources[name].get('abbreviation','')
 
-                    # do the same word filtering as vim's doing
+                    # For now, simply do the same word filtering as vim's doing
+                    # TODO: enable custom config
                     if base.lower() != e['word'][0:len(base)].lower():
                         continue
 
-                    matches.append(e)
+                    tmpmatches.append(e)
+
+                # for now, simply sort them by length
+                # TODO: enable custom config
+                tmpmatches.sort(key=lambda x: len(x['word']))
+                matches += tmpmatches
+
             except Exception as inst:
                 logger.error('_refresh_completions process exception: %s', inst)
                 continue
