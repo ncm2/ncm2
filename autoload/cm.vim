@@ -12,9 +12,6 @@ let s:init = 1
 
 func! cm#enable_for_buffer()
 
-	" TODO this override the global options, any way to fix this?
-	set completeopt=menu,menuone,noinsert,noselect
-
 	" Notice: Workaround for neovim's bug. When the popup menu is visible, and
 	" no item is selected, an enter key will close the popup menu, change and
 	" move nothong, and then trigger TextChangedI and CursorMovedI
@@ -23,12 +20,19 @@ func! cm#enable_for_buffer()
 
 	let b:cm_enable = 1
 
+	let s:saved_completeopt = &completeopt
+	" TODO this override the global options, any way to fix this?
+	set completeopt=menu,menuone,noinsert,noselect
+
 	augroup cm
 		autocmd! * <buffer>
 		autocmd InsertEnter <buffer> call s:notify_core_channel('cm_insert_enter') | let s:dict_matches = {}
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave') | let s:dict_matches = {}
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
+		" save and restore completeopt
+		autocmd BufEnter    <buffer> let s:saved_completeopt = &completeopt
+		autocmd BufLeave    <buffer> let &completeopt = s:saved_completeopt
 	augroup end
 
 endfunc
@@ -38,6 +42,8 @@ func! cm#disable_for_buffer()
 		iunmap <buffer> <CR>
 	endif
 	let b:cm_enable = 0
+	" restore completeopt
+	let &completeopt = s:saved_completeopt
 	augroup cm
 		autocmd! * <buffer>
 	augroup end
