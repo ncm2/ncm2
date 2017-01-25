@@ -9,10 +9,10 @@ plugin in the same buffer. Use `let g:cm_enable_for_all=0` and `call
 cm#enable_for_buffer()` to use this plugin for specific buffer.
 
 
-## requirement
+## Requirements
 
 - neovim python3 support. `:help provider-python`. For lazy linux users, I
-  recommend This plugin
+  recommend this plugin
   [python-support.nvim](https://github.com/roxma/python-support.nvim).
   (Note: Self promotion)
 
