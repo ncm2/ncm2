@@ -53,6 +53,30 @@ class Handler:
         elif re.match(r'[^0-9a-zA-Z_]',ctx['typed'][-1]):
             self._matches = {}
 
+        # do notify_sources_to_refresh
+        refreshes_calls = []
+        refreshes_channels = []
+        for name in srcs:
+            info = srcs[name]
+            try:
+
+                if (info['name'] in self._matches) and (info.get('refresh',0)==0):
+                    # no need to refresh
+                    continue
+
+                if 'cm_refresh' in info:
+                    refreshes_calls.append(name)
+                for channel in info.get('channels',[]):
+                    if 'id' in channel:
+                        refreshes_channels.append(dict(name=name,id=channel['id']))
+            except Exception as inst:
+                logger.error('cm_refresh process exception: %s', inst)
+                continue
+
+        self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, ctx)
+        logger.info('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, ctx)
+
+        # refresh completions candidates
         self._refresh_completions(ctx)
 
     def _refresh_completions(self,ctx):

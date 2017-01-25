@@ -279,42 +279,35 @@ func! s:on_changed()
 	endif
 
 	let l:ctx = cm#context()
-	let l:notified_cnt = 0
-
-	for l:source in keys(s:sources)
-		let l:info = s:sources[l:source]
-		try
-			let l:notified = 0
-			if has_key(s:dict_matches,l:info['name']) && (get(l:info,'refresh',0)==0)
-				" no need to refresh candidate, to reduce calculation
-				continue
-			endif
-			if has_key(l:info,'cm_refresh')
-				call l:info.cm_refresh(l:ctx)
-				let l:notified = 1
-			endif
-
-			" notify channels
-			for l:channel in get(l:info,'channels',[])
-				if has_key(l:channel,'id')
-					call rpcnotify(l:channel['id'], 'cm_refresh', l:info, l:ctx)
-					let l:notified = 1
-				endif
-			endfor
-
-			let l:notified_cnt += l:notified
-
-		catch
-			echom 'error on completion source: ' . l:source . ' ' . v:exception
-			continue
-		endtry
-	endfor
 
 	call s:notify_core_channel('cm_refresh',s:sources,l:ctx)
 
 	" TODO
 	" detect popup item selected event then notify sources
 
+endfunc
+
+func! cm#notify_sources_to_refresh(calls, channels, ctx)
+	for l:name in a:calls
+		try
+			if type(s:sources[l:name].cm_refresh)==2
+				" funcref
+				call s:sources[l:name].cm_refresh(a:ctx)
+			elseif type(s:sources[l:name].cm_refresh)==1
+				"string
+				call call(s:sources[l:name].cm_refresh,[a:ctx],s:sources[l:name])
+			endif
+		catch
+			continue
+		endtry
+	endfor
+	for l:channel in a:channels
+		try
+			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], a:ctx)
+		catch
+			continue
+		endtry
+	endfor
 endfunc
 
 func! s:menu_selected()
