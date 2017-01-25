@@ -25,8 +25,8 @@ func! cm#enable_for_buffer()
 
 	augroup cm
 		autocmd! * <buffer>
-		autocmd InsertEnter,InsertLeave <buffer> let s:dict_matches = {} | let s:complete_mode = 0 | let s:noclean = 0
-		autocmd CompleteDone <buffer> if s:noclean==0 | let s:dict_matches = {} | endif | let s:complete_mode = 0 | let s:noclean = 0
+		autocmd InsertEnter <buffer> call s:notify_core_channel('cm_insert_enter') | let s:dict_matches = {}
+		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave') | let s:dict_matches = {}
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 	augroup end
@@ -54,7 +54,11 @@ endfunc
 " you could use `l:context != cm#context()` to determine wether the context
 " has changed by yourself
 func! cm#context()
-	return {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
+	let l:ret = {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
+	let l:ret['lnum'] = l:ret['curpos'][1]
+	let l:ret['col'] = l:ret['curpos'][2]
+	let l:ret['typed'] = strpart(getline(l:ret['lnum']),0,l:ret['col']-1)
+	return l:ret
 endfunc
 
 
@@ -145,6 +149,7 @@ endfunc
 "   0 cm accepted
 "	1 ignored for context change
 "   2 async completion has been disabled
+"   3 this source has not been registered yet
 func! cm#complete(src, context, startcol, matches)
 
 	if type(a:src)==1
@@ -160,48 +165,81 @@ func! cm#complete(src, context, startcol, matches)
 	endif
 
 	" ignore the request if context has changed
-	if  a:context != cm#context()
+	if  (a:context!=cm#context()) || (mode()!='i')
 		return 1
 	endif
 
-	if mode()!='i'
+	if !has_key(s:sources,l:name)
+		return 3
+	endif
+
+	call s:notify_core_channel('cm_complete',s:sources,l:name,a:context,a:startcol,a:matches)
+
+endfunc
+
+" Note: internal function
+func! cm#core_complete(context, startcol, matches, allmatches)
+
+	if get(b:,'cm_enable',0) == 0
+		return 2
+	endif
+
+	let s:dict_matches = a:allmatches
+
+	" ignore the request if context has changed
+	if  (a:context!=cm#context()) || (mode()!='i')
 		return 1
 	endif
 
-	if empty(a:matches)
-		return 0
-	endif
-
-	" update the local store
-	let s:dict_matches[l:name] = {'startcol':a:startcol, 'matches':a:matches}
-
-	" menu selected
+	" from core channel
+	" something selected by user, do not refresh the menu
 	if s:menu_selected()
 		return 0
 	endif
 
-	" if no item is selected, refresh the popup menu
-	call s:refresh_popup()
+	call complete(a:startcol, a:matches)
 
+	return 0
 endfunc
-
 
 " internal functions and variables
 
 let s:sources = {}
-let s:dict_matches = {}
-let s:complete_mode = 0
-let s:noclean = 0 " do not clean d:dict_matches for next CompleteDone event
 let s:leaving = 0
 let s:change_timer = -1
 let s:lasttick = ''
-
+let s:channel_id = -1
 
 augroup cm
 	autocmd!
 	autocmd VimLeavePre * let s:leaving=1
 	" autocmd User PossibleTextChangedI call <sid>on_changed()
 augroup end
+
+" cm core channel functions
+" {
+func! s:start_core_channel()
+	let l:py3 = get(g:,'python3_host_prog','python3')
+	let l:path = globpath(&rtp,'autoload/cm.py')
+	let s:channel_id = jobstart([l:py3,l:path],{'rpc':1,
+			\ 'on_exit':function('s:on_core_channel_exit')
+			\ })
+endfunc
+
+fun s:on_core_channel_exit()
+	let s:channel_id = -1
+endf
+
+fun s:notify_core_channel(event,...)
+	if s:channel_id==-1
+		return -1
+	endif
+	" forward arguments
+	call call('rpcnotify',[s:channel_id, a:event] + a:000 )
+	return 0
+endf
+" }
+
 
 func! s:change_tick_start()
 	if s:change_timer!=-1
@@ -216,7 +254,6 @@ func! s:change_tick_stop()
 	if s:change_timer==-1
 		return
 	endif
-	let s:lasttick = ''
 	call timer_stop(s:change_timer)
 	let s:lasttick = ''
 	let s:change_timer = -1
@@ -242,23 +279,30 @@ func! s:on_changed()
 	endif
 
 	let l:ctx = cm#context()
+	let l:notified_cnt = 0
+
 	for l:source in keys(s:sources)
 		let l:info = s:sources[l:source]
 		try
+			let l:notified = 0
 			if has_key(s:dict_matches,l:info['name']) && (get(l:info,'refresh',0)==0)
 				" no need to refresh candidate, to reduce calculation
 				continue
 			endif
 			if has_key(l:info,'on_changed')
 				call l:info.on_changed(l:ctx)
+				let l:notified = 1
 			endif
 
 			" notify channels
 			for l:channel in get(l:info,'channels',[])
 				if has_key(l:channel,'id')
 					call rpcnotify(l:channel['id'], 'cm_on_changed', l:info, l:ctx)
+					let l:notified = 1
 				endif
 			endfor
+
+			let l:notified_cnt += l:notified
 
 		catch
 			echom 'error on completion source: ' . l:source . ' ' . v:exception
@@ -266,11 +310,10 @@ func! s:on_changed()
 		endtry
 	endfor
 
+	call s:notify_core_channel('cm_on_changed',s:sources,l:ctx)
+
 	" TODO
 	" detect popup item selected event then notify sources
-	
-	" TODO
-	" detect real complete done event then notify sources
 
 endfunc
 
@@ -281,73 +324,9 @@ func! s:menu_selected()
 	return pumvisible() && !empty(v:completed_item)
 endfunc
 
-func! s:refresh_popup()
-
-	if empty(s:dict_matches)
-		return
-	endif
-
-	let l:sources = sort(keys(s:dict_matches),function('s:compare_source_priority'))
-
-	let l:startcol = s:dict_matches[l:sources[0]]['startcol']
-
-	for l:source in l:sources
-		let l:tmp = s:dict_matches[l:source]['startcol']
-		if l:tmp < l:startcol
-			let l:startcol = l:tmp
-		endif
-	endfor
-
-	let l:matches = []
-
-	let l:col = col('.')
-	let l:line = getline('.')
-	for l:source in l:sources
-
-		try
-
-			let l:s = s:dict_matches[l:source]['startcol']
-			let l:m = s:dict_matches[l:source]['matches']
-
-			let l:prefix = strpart(l:line, l:startcol-1, l:s-l:startcol)
-
-			for l:e in l:m
-				try
-					if type(l:e)==1
-						" string
-						let l:add = {'word': l:prefix . l:e}
-					else
-						let l:add = copy(l:e)
-						let l:add['word'] = l:prefix . l:add['word']
-					endif
-					let l:add['menu'] = get(s:sources[l:source],'abbreviation','unknown')
-					let l:matches = add(l:matches, l:add)
-				catch
-					continue
-				endtry
-			endfor
-		catch
-			continue
-		endtry
-
-	endfor
-
-	if s:complete_mode
-		" if in complete mode, call complete will trigger a CompleteDone event
-		let s:noclean = 1
-	endif
-	call complete(l:startcol, l:matches)
-	" hacky
-	let s:complete_mode = 1
-
-endfunc
-
-func! s:compare_source_priority(source1,source2)
-	let l:p1 = get(get(s:sources,a:source1,{}),'priority',0)
-	let l:p2 = get(get(s:sources,a:source2,{}),'priority',0)
-	if l:p1 > l:p2
-		return -1
-	endif
-	return l:p1!=l:p2
-endfunc
+if v:vim_did_enter
+	call s:start_core_channel()
+else
+	au VimEnter * call s:start_core_channel()
+endif
 
