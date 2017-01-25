@@ -259,12 +259,15 @@ fun s:notify_core_channel(event,...)
 endf
 " }
 
+func! s:changetick()
+	return [b:changedtick , getcurpos()]
+endfunc
 
 func! s:change_tick_start()
 	if s:change_timer!=-1
 		return
 	endif
-	let s:lasttick = bufnr('%') . '-' . b:changedtick
+	let s:lasttick = s:changetick()
 	" check changes every 30ms, which is 0.03s, it should be fast enough
 	let s:change_timer = timer_start(30,function('s:check_changes'),{'repeat':-1})
 	call s:on_changed()
@@ -281,7 +284,7 @@ endfunc
 
 
 func! s:check_changes()
-	let l:tick = bufnr('%') . '-' . b:changedtick
+	let l:tick = s:changetick()
 	if l:tick!=s:lasttick
 		let s:lasttick = l:tick
 		if mode()=='i' && (&paste==0)

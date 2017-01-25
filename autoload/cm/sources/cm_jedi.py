@@ -23,12 +23,9 @@ class Handler:
 
     def cm_refresh(self,info,ctx):
 
-        lnum = ctx['curpos'][1]
-        col = ctx['curpos'][2]
-        line = self._nvim.current.buffer[lnum-1]
-        typed = line[0 : col-1]
-
-        # self.refresh_keyword_incr(line)
+        lnum = ctx['lnum']
+        col = ctx['col']
+        typed = ctx['typed']
 
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
@@ -51,15 +48,17 @@ class Handler:
             signature = signatures[-1]
             params=[param.description for param in signature.params]
             signature_text = signature.name + '(' + ', '.join(params) + ')'
-
         self._nvim.call('airline#extensions#cm_call_signature#set', signature_text, async=True)
 
+        # skip completions
+        skip = False
+
         if len(typed)==0:
-            return
+            skip=True
         elif len(kwtyped)>=2:
             pass
         elif len(kwtyped):
-            return
+            skip=True
         elif typed[-1]=='.':
             # member completion
             pass
@@ -67,6 +66,13 @@ class Handler:
             # from xxx import xxx completion
             pass
         else:
+            skip=True
+
+        if skip:
+            # if skip the completions, show the useful call_signatures
+            if signature_text:
+                matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
+                self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
             return
 
         matches = []
@@ -86,8 +92,6 @@ class Handler:
 
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
-
-        logger.info('on changed, current line: %s, typed: [%s]', line, typed)
 
 def main():
 
