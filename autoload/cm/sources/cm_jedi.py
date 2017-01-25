@@ -53,26 +53,20 @@ class Handler:
         # skip completions
         skip = False
 
-        if len(typed)==0:
-            skip=True
-        elif len(kwtyped)>=2:
-            pass
-        elif len(kwtyped):
-            skip=True
-        elif typed[-1]=='.':
-            # member completion
-            pass
-        elif (typed[-1]==' ') and (typed[0:5]=='from ' or typed[0:7]=='import '):
-            # from xxx import xxx completion
-            pass
+        # completion pattern
+        if (re.search(r'^(import|from)', typed) 
+            or re.search(r'[\w_]{2,}$',typed)
+            or re.search(r'\.[\w_]*$',typed)
+            ):
+            skip = False
         else:
-            skip=True
+            skip = True
 
         if skip:
             # if skip the completions, show the useful call_signatures
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
-                self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+                self._nvim.call('cm#complete', info['name'], ctx, col, matches, async=True)
             return
 
         matches = []
