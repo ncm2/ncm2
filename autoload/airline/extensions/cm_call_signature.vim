@@ -15,12 +15,14 @@ function! airline#extensions#cm_call_signature#apply(...)
 	if g:airline#extensions#cm_call_signature#enabled==0
 		return
 	endif
+
 	" call airline#update_statusline() 
 	" if get(b:,'airline_cm_signature','') changed
 	if get(b:,'airline_cm_signature','')!=''
-		let l:airline_section_c = s:spc.g:airline_left_alt_sep.s:spc.'%{airline#extensions#cm_call_signature#get()}'
+		let l:airline_section_c = s:spc.g:airline_left_alt_sep.s:spc.'%#__accent_red#%{airline#extensions#cm_call_signature#get()}%#__restore__#'
 		call airline#extensions#append_to_section('c', l:airline_section_c)
 	endif
+
 endfunction
 
 function! airline#extensions#cm_call_signature#get()
