@@ -31,7 +31,7 @@ func! cm#enable_for_buffer()
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 		" save and restore completeopt
-		autocmd BufEnter    <buffer> let s:saved_completeopt = &completeopt
+		autocmd BufEnter    <buffer> let s:saved_completeopt = &completeopt | set completeopt=menu,menuone,noinsert,noselect
 		autocmd BufLeave    <buffer> let &completeopt = s:saved_completeopt
 	augroup end
 
