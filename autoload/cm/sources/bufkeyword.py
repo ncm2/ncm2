@@ -21,7 +21,20 @@ class Handler:
         self._split_pattern = r'[^0-9a-zA-Z_]+'
         self._kw_pattern = r'[0-9a-zA-Z_]'
 
+        self._last_ctx = None
+
         self.refresh_keyword()
+
+    def cm_event(self,event,ctx,*args):
+        if event=="TextChangedI":
+            if ctx['typed'] and re.match(self._kw_pattern,ctx['typed'][-1]) is None:
+                self.refresh_keyword_incr(ctx['typed'])
+        elif event in ['CursorHold','CursorHoldI','BufEnter','BufWritePost']:
+            if self._last_ctx == ctx:
+                return
+            self._last_ctx = ctx
+            self.refresh_keyword()
+
 
     def refresh_keyword(self):
         logger.info('refresh_keyword')
@@ -45,30 +58,24 @@ class Handler:
 
     def cm_refresh(self,info,ctx):
 
-        lnum = ctx['curpos'][1]
-        col = ctx['curpos'][2]
-        line = self._nvim.current.buffer[lnum-1]
-        txt = line[0 : col-1]
+        lnum = ctx['lnum']
+        col = ctx['col']
+        typed = ctx['typed']
         
-        # self.refresh_keyword_incr(line)
-
-        typed = re.search(self._kw_pattern+r'*?$',txt).group(0)
-        if len(typed)<2:
+        kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
+        if len(kw)<2:
             return
-        startcol = col-len(typed)
+        startcol = col-len(kw)
 
         matches = []
-        typedLower = typed.lower()
+        lkw = kw.lower()
         for word in self._words:
-            if word.lower().find(typedLower)==0 and word!=typed:
-                
+            if word.lower().find(lkw)==0 and word!=kw:
                 matches.append(dict(word=word,icase=1))
 
         matches.sort(key=lambda x: len(x['word']))
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
-
-        logger.info('on changed, current line: %s, typed: %s, matches: %s', line, typed, matches)
 
 def main():
 

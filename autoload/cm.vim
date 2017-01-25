@@ -131,7 +131,7 @@ func! cm#register_source(info)
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']
 			for l:event in get(l:channel,'events',[])
-				let l:exec =  'if get(b:,"cm_enable",0) | call rpcnotify(' . l:channel['id'] . ', "cm_event", "'.l:event.'") | endif'
+				let l:exec =  'if get(b:,"cm_enable",0) | call rpcnotify(' . l:channel['id'] . ', "cm_event", "'.l:event.'",cm#context()) | endif'
 				if type(l:event)==type('')
 					execute 'au ' . l:event . ' * ' . l:exec
 				elseif type(l:event)==type([])

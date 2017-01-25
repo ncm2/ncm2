@@ -25,7 +25,15 @@ endif
 
 " keyword
 if has_key(s:cm_builtin_sources,'bufkeyword')
-	call cm#sources#bufkeyword#init()
+	call cm#register_source({
+			\ 'name' : 'cm-bufkeyword',
+			\ 'priority': 5, 
+			\ 'abbreviation': 'Word',
+			\ 'refresh': 0, 
+			\ 'channels': [
+			\   {'type': 'python3', 'path': 'autoload/cm/sources/bufkeyword.py', 'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI']}
+			\ ],
+			\ })
 endif
 
 
