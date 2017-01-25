@@ -32,7 +32,7 @@ func! cm#sources#ultisnips#cm_refresh(ctx) dict
 	if has_key(l:snips,l:typed)
 		" python's `#!` is a snippet
 		" this block handles this kind of special case
-		let l:matches = [ l:typed ]
+		let l:matches = [ {"word":l:typed,"dup":1,"icase":1,"menu": "Snips: " . l:snips[l:typed]} ]
 		let l:startcol = 1
 		call cm#complete(self, a:ctx, l:startcol, l:matches)
 		return
@@ -47,7 +47,7 @@ func! cm#sources#ultisnips#cm_refresh(ctx) dict
 	" since the available snippet list is fairly small, we can simply dump the
 	" whole available list, leave the filtering work to cm's standard filter.
 	" This would reduce the work done by vimscript.
-	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1}')
+	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1,"menu": "Snips: " . l:snips[v:val]}')
 	let l:startcol = l:col - l:kwlen
 
 	" notify the completion framework
