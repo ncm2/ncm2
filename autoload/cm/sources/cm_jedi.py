@@ -17,6 +17,10 @@ class Handler:
 
         self._nvim = nvim
 
+    def cm_event(self,event,*args):
+        if event=="InsertLeave":
+            self._nvim.call('airline#extensions#cm_call_signature#set', '', async=True)
+
     def cm_refresh(self,info,ctx):
 
         lnum = ctx['curpos'][1]
@@ -29,6 +33,27 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
+        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
+        if filetype!='python':
+            logger.info('ignore filetype: %s', filetype)
+            return
+
+        src = "\n".join(self._nvim.current.buffer[:])
+        script = jedi.Script(src, lnum, len(typed), path)
+        completions = script.completions()
+        signatures = script.call_signatures()
+        logger.info('signatures: %s', signatures)
+
+        # TODO: optimize
+        # currently simply use the last signature
+        signature_text = ''
+        if len(signatures)>0:
+            signature = signatures[-1]
+            params=[param.description for param in signature.params]
+            signature_text = signature.name + '(' + ', '.join(params) + ')'
+
+        self._nvim.call('airline#extensions#cm_call_signature#set', signature_text, async=True)
+
         if len(typed)==0:
             return
         elif len(kwtyped)>=2:
@@ -36,25 +61,27 @@ class Handler:
         elif len(kwtyped):
             return
         elif typed[-1]=='.':
+            # member completion
             pass
         elif (typed[-1]==' ') and (typed[0:5]=='from ' or typed[0:7]=='import '):
+            # from xxx import xxx completion
             pass
         else:
             return
 
         matches = []
 
-        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
-        if filetype!='python':
-            logger.info('ignore filetype: %s', filetype)
-            return
-
-        src = "\n".join(self._nvim.current.buffer[:])
-        scr = jedi.Script(src, lnum, len(typed), path)
-        completions = scr.completions()
-
         for complete in completions:
-            item = dict(word=kwtyped+complete.complete,icase=1,dup=1,abbr=complete.name)
+            
+            item = dict(word=kwtyped+complete.complete,
+                        icase=1,
+                        dup=1,
+                        menu=complete.description,
+                        info=complete.docstring()
+                        )
+            # Fix the user typed case
+            if item['word'].lower()==complete.name.lower():
+                item['word'] = complete.name
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
@@ -68,7 +95,7 @@ def main():
     level = logging.INFO
     if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
         # TODO this affects the log file name
-        setup_logging('cm_jedi')
+        setup_logging('cm-jedi')
         l = getattr(logging,
                 os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
                 level)

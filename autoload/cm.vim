@@ -93,7 +93,9 @@ func! cm#register_source(info)
 	let s:sources[a:info['name']] = a:info
 
 	for l:channel in get(a:info,'channels',[])
+
 		if l:channel['type']=='python3'
+
 			" find script path
 			let l:py3 = get(g:,'python3_host_prog','python3')
 			let l:path = globpath(&rtp,l:channel['path'])
@@ -105,6 +107,10 @@ func! cm#register_source(info)
 			let l:opt = {'rpc':1, 'channel': l:channel}
 
 			func l:opt.on_exit()
+
+				" delete event group
+				execute 'augroup! cm_channel_' . self['channel']['id']
+
 				unlet self['channel']['id']
 				if s:leaving
 					return
@@ -115,6 +121,18 @@ func! cm#register_source(info)
 
 			" start channel
 			let l:channel['id'] = jobstart([l:py3,l:path],l:opt)
+
+			" events
+			execute 'augroup cm_channel_' . l:channel['id']
+			for l:event in get(l:channel,'events',[])
+				if type(l:event)==type('')
+					execute 'au ' . l:event . ' * call rpcnotify(' . l:channel['id'] . ', "cm_event", "'.l:event.'")'
+				elseif type(l:event)==type([])
+					execute 'au ' . join(l:event,' ') . ' call rpcnotify(' . l:channel['id'] . ', "cm_event", "'.l:event.'")'
+				endif
+			endfor
+			execute 'augroup end'
+
 		endif
 	endfor
 endfunc
@@ -248,6 +266,7 @@ func! s:change_tick_start()
 	let s:lasttick = bufnr('%') . '-' . b:changedtick
 	" check changes every 30ms, which is 0.03s, it should be fast enough
 	let s:change_timer = timer_start(30,function('s:check_changes'),{'repeat':-1})
+	call s:on_changed()
 endfunc
 
 func! s:change_tick_stop()

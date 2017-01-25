@@ -31,12 +31,18 @@ endif
 
 " jedi
 if has_key(s:cm_builtin_sources,'jedi')
+	" refresh 1 for call signatures
 	au FileType python if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
 			\ 'name' : 'cm-jedi',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Jedi',
+			\ 'refresh': 1, 
 			\ 'channels': [
-			\   {'type': 'python3', 'path': 'autoload/cm/sources/cm_jedi.py'}
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_jedi.py',
+			\		'events': ['InsertLeave']
+			\   }
 			\ ],
 			\ }) | endif
 endif
