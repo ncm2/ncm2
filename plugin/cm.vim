@@ -18,7 +18,7 @@ if has_key(s:cm_builtin_sources,'ultisnips')
 		\ 'priority': 7, 
 		\ 'abbreviation': 'UltiSnips',
 		\ 'refresh': 0, 
-		\ 'on_changed': function('cm#sources#ultisnips#on_changed'),
+		\ 'cm_refresh': function('cm#sources#ultisnips#cm_refresh'),
 		\ })
 endif
 

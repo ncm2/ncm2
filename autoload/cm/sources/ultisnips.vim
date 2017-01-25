@@ -1,5 +1,5 @@
 
-func! cm#sources#ultisnips#on_changed(ctx) dict
+func! cm#sources#ultisnips#cm_refresh(ctx) dict
 
 	" UltiSnips#SnippetsInCurrentScope
 	" {

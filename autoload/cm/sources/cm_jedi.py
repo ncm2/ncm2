@@ -17,7 +17,7 @@ class Handler:
 
         self._nvim = nvim
 
-    def cm_on_changed(self,info,ctx):
+    def cm_refresh(self,info,ctx):
 
         lnum = ctx['curpos'][1]
         col = ctx['curpos'][2]

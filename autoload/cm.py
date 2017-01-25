@@ -43,7 +43,7 @@ class Handler:
 
 
     # The completion core itself
-    def cm_on_changed(self,srcs,ctx,*args):
+    def cm_refresh(self,srcs,ctx,*args):
 
         self._sources = srcs
 

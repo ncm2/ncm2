@@ -43,7 +43,7 @@ class Handler:
 
         logger.info('keyword refresh incr complete, count: %s', len(self._words))
 
-    def cm_on_changed(self,info,ctx):
+    def cm_refresh(self,info,ctx):
 
         lnum = ctx['curpos'][1]
         col = ctx['curpos'][2]

@@ -289,15 +289,15 @@ func! s:on_changed()
 				" no need to refresh candidate, to reduce calculation
 				continue
 			endif
-			if has_key(l:info,'on_changed')
-				call l:info.on_changed(l:ctx)
+			if has_key(l:info,'cm_refresh')
+				call l:info.cm_refresh(l:ctx)
 				let l:notified = 1
 			endif
 
 			" notify channels
 			for l:channel in get(l:info,'channels',[])
 				if has_key(l:channel,'id')
-					call rpcnotify(l:channel['id'], 'cm_on_changed', l:info, l:ctx)
+					call rpcnotify(l:channel['id'], 'cm_refresh', l:info, l:ctx)
 					let l:notified = 1
 				endif
 			endfor
@@ -310,7 +310,7 @@ func! s:on_changed()
 		endtry
 	endfor
 
-	call s:notify_core_channel('cm_on_changed',s:sources,l:ctx)
+	call s:notify_core_channel('cm_refresh',s:sources,l:ctx)
 
 	" TODO
 	" detect popup item selected event then notify sources
