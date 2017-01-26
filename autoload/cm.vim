@@ -255,10 +255,11 @@ func! s:start_core_channel()
 endfunc
 
 fun s:on_core_channel_exit()
-	if s:leaving
-		echom 'core channel exit'
-	endif
 	let s:channel_id = -1
+	if s:leaving
+		return
+	endif
+	echom 'cm-core channel exit'
 endf
 
 fun s:notify_core_channel(event,...)
