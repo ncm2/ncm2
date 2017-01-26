@@ -67,7 +67,7 @@ class Handler:
 
         if skip:
             # if skip the completions, show the useful call_signatures
-            if signature_text:
+            if kwtyped=="" and signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 self._nvim.call('cm#complete', info['name'], ctx, col, matches, async=True)
             return
