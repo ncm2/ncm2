@@ -38,16 +38,9 @@ class Handler:
         src = "\n".join(self._nvim.current.buffer[:])
         script = jedi.Script(src, lnum, len(typed), path)
         completions = script.completions()
-        signatures = script.call_signatures()
-        logger.info('signatures: %s', signatures)
+        
+        signature_text = self._get_signature_text(script)
 
-        # TODO: optimize
-        # currently simply use the last signature
-        signature_text = ''
-        if len(signatures)>0:
-            signature = signatures[-1]
-            params=[param.description for param in signature.params]
-            signature_text = signature.name + '(' + ', '.join(params) + ')'
         self._nvim.call('airline#extensions#cm_call_signature#set', signature_text, async=True)
 
         # skip completions
@@ -86,6 +79,18 @@ class Handler:
 
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+
+    def _get_signature_text(self,script):
+        signature_text = ''
+        # TODO: optimize
+        # currently simply use the last signature
+        signatures = script.call_signatures()
+        logger.info('signatures: %s', signatures)
+        if len(signatures)>0:
+            signature = signatures[-1]
+            params=[param.description for param in signature.params]
+            signature_text = signature.name + '(' + ', '.join(params) + ')'
+        return signature_text
 
 def main():
 
