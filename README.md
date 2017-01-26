@@ -1,12 +1,13 @@
+For My Favorite Editor :heart: 
 
-# Complete Manager for My :heart: Favorite Editor 
+# Complete Manager for Neovim
 
 This is my experimental completion framework for neovim, which offers great
 flexibility for writing your own completion plugin, including async support.
 
 ## Requirements
 
-1 Neovim python3 support. `:help provider-python`. For lazy linux users, I
+1. Neovim python3 support. `:help provider-python`. For lazy linux users, I
   recommend this plugin
   [python-support.nvim](https://github.com/roxma/python-support.nvim).
   (Note: Self promotion)
