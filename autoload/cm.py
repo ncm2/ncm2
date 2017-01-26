@@ -21,6 +21,7 @@ class Handler:
         # { '{source_name}': {'startcol': , 'matches'}
         self._matches = {}
         self._sources = {}
+        self._last_matches = []
 
     def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
         self._sources = srcs
@@ -87,7 +88,7 @@ class Handler:
 
         if len(names)==0:
             logger.info('_refresh_completions names: %s, startcol: %s, matches: %s', names, ctx['col'], matches)
-            self._nvim.call('cm#core_complete', ctx, ctx['col'], [], self._matches, async=True)
+            self._complete(ctx, ctx['col'], [])
             return
 
         startcol = min([self._matches[name]['startcol'] for name in names])
@@ -133,6 +134,12 @@ class Handler:
                 continue
 
         logger.info('_refresh_completions names: %s, startcol: %s, matches: %s', names, startcol, matches)
+        self._complete(ctx, startcol, matches)
+
+    def _complete(self, ctx, startcol, matches):
+        if len(matches)==0 and len(self._last_matches)==0:
+            # no need to fire complete message
+            return
         self._nvim.call('cm#core_complete', ctx, startcol, matches, self._matches, async=True)
 
 def main():
