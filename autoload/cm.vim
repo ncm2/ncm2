@@ -234,6 +234,7 @@ let s:leaving = 0
 let s:change_timer = -1
 let s:lasttick = ''
 let s:channel_id = -1
+let s:dir = expand('<sfile>:p:h')
 
 augroup cm
 	autocmd!
@@ -245,7 +246,7 @@ augroup end
 " {
 func! s:start_core_channel()
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let l:path = globpath(&rtp,'autoload/cm.py')
+	let l:path = s:dir . '/cm.py'
 	let s:channel_id = jobstart([l:py3,l:path],{'rpc':1,
 			\ 'on_exit':function('s:on_core_channel_exit')
 			\ })

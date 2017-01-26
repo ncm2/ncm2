@@ -21,7 +21,7 @@ class Handler:
         if event=="InsertLeave":
             self._nvim.call('airline#extensions#cm_call_signature#set', '', async=True)
 
-    def cm_refresh(self,info,ctx):
+    def cm_refresh(self,info,ctx,*args):
 
         lnum = ctx['lnum']
         col = ctx['col']
