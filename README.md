@@ -1,6 +1,6 @@
 For My Favorite Editor :heart: 
 
-# Complete Manager for Neovim
+# A Completion Framework for Neovim
 
 This is my experimental completion framework for neovim, which offers great
 flexibility for writing your own completion plugin, including async support.
@@ -16,13 +16,21 @@ flexibility for writing your own completion plugin, including async support.
   completion in markdown file, you need to install
   [mistune](https://github.com/lepture/mistune)
 
-If you are using
-[python-support.nvim](https://github.com/roxma/python-support.nvim), add the
-following code into your vimrc, to satisfy requirement 1 and requirement 2.
-(I asumming you'r using [vim-plug](https://github.com/junegunn/vim-plug)
+
+## Installation and Configuration
+
+Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 Plug 'roxma/nvim-complete-manager'
+```
+
+If you are using
+[python-support.nvim](https://github.com/roxma/python-support.nvim), add the
+following code into your vimrc, to satisfy requirement 1 and requirement 2.
+
+```vim
+Plug 'roxma/python-support.nvim'
 " for python completions
 let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
 " enable python completions on markdown file
@@ -47,4 +55,11 @@ and `call cm#enable_for_buffer()` to use this plugin for specific buffer.
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
 - For really async completion source, refer to the buffer keyword example:
   [autoload/cm/sources/bufkeyword.py](autoload/cm/sources/bufkeyword.py)
+
+
+## Why?
+
+I'm writing this for fun, feeds my own need, and it's working pleasingly for
+me now. And It seems there's lots of differences between deoplete, YCM, and
+nvim-complete-manager, by design.
 
