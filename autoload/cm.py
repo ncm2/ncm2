@@ -4,17 +4,16 @@
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
 import os
+import sys
 import re
 import logging
-import jedi
 import copy
+import importlib
 from neovim import attach, setup_logging
 
 logger = logging.getLogger(__name__)
 
 class Handler:
-
-    name = 'cm-core'
 
     def __init__(self,nvim):
         self._nvim = nvim
@@ -138,25 +137,68 @@ class Handler:
 
 def main():
 
-    # logging setup
-    level = logging.INFO
-    if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
-        # TODO this affects the log file name
-        setup_logging('cm-core')
-        l = getattr(logging,
-                os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
-                level)
-        if isinstance(l, int):
-            level = l
-    logger.setLevel(level)
+    start_type = sys.argv[1]
 
-    # connect neovim
-    nvim = attach('stdio')
-    nvim_event_loop(nvim)
+    if start_type == 'core':
 
-def nvim_event_loop(nvim):
+        # logging setup
+        level = logging.INFO
+        if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
+            # TODO this affects the log file name
+            setup_logging('cm_core')
+            l = getattr(logging,
+                    os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
+                    level)
+            if isinstance(l, int):
+                level = l
 
-    handler = Handler(nvim)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(level)
+
+        try:
+            # connect neovim
+            nvim = attach('stdio')
+            handler = Handler(nvim)
+            logger.info('starting core, enter event loop')
+            nvim_event_loop(logger,nvim,handler)
+        except Exception as ex:
+            logger.info('Exception: %s',ex)
+
+    elif start_type == 'channel':
+
+        path = sys.argv[2]
+        dir = os.path.dirname(path)
+        name = os.path.splitext(os.path.basename(path))[0]
+
+        # logging setup
+        level = logging.INFO
+        if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
+            # TODO this affects the log file name
+            setup_logging(name)
+            l = getattr(logging,
+                    os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
+                    level)
+            if isinstance(l, int):
+                level = l
+
+        # use the module name here
+        logger = logging.getLogger(name)
+        logger.setLevel(level)
+
+        try:
+            # connect neovim
+            nvim = attach('stdio')
+            sys.path.append(dir)
+            m = importlib.import_module(name)
+            handler = m.Handler(nvim)
+            logger.info('handler created, entering event loop')
+            nvim_event_loop(logger,nvim,handler)
+        except Exception as ex:
+            logger.info('Exception: %s',ex)
+
+def nvim_event_loop(logger,nvim, h):
+
+    handler = h
 
     def on_setup():
         logger.info('on_setup')
@@ -167,9 +209,9 @@ def nvim_event_loop(nvim):
     def on_notification(method, args):
         nonlocal handler
         logger.info('method: %s, args: %s', method, args)
-
         func = getattr(handler,method,None)
         if func is None:
+            logger.info('method: %s not implemented, ignore this message', method)
             return
 
         func(*args)

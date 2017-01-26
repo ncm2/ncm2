@@ -7,7 +7,6 @@
 import os
 import re
 import logging
-from neovim import attach, setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -76,46 +75,4 @@ class Handler:
         matches.sort(key=lambda x: len(x['word']))
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
-
-def main():
-
-    # logging setup
-    level = logging.INFO
-    if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
-        # use nvim's logging
-        setup_logging('cm_bufkeyword')
-        l = getattr(logging,
-                os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
-                level)
-        if isinstance(l, int):
-            level = l
-    logger.setLevel(level)
-
-    # connect neovim
-    nvim = attach('stdio')
-    nvim_event_loop(nvim)
-
-def nvim_event_loop(nvim):
-
-    handler = Handler(nvim)
-
-    def on_setup():
-        logger.info('on_setup')
-
-    def on_request(method, args):
-        raise Exception('Not implemented')
-
-    def on_notification(method, args):
-        nonlocal handler
-        logger.info('method: %s, args: %s', method, args)
-
-        func = getattr(handler,method,None)
-        if func is None:
-            return
-
-        func(*args)
-
-    nvim.run_loop(on_request, on_notification, on_setup)
-
-main()
 

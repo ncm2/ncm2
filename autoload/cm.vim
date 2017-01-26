@@ -126,7 +126,7 @@ func! cm#register_source(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = jobstart([l:py3,l:path],l:opt)
+			let l:channel['id'] = jobstart([l:py3,s:core_py_path,'channel',l:path],l:opt)
 
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']
@@ -235,6 +235,7 @@ let s:change_timer = -1
 let s:lasttick = ''
 let s:channel_id = -1
 let s:dir = expand('<sfile>:p:h')
+let s:core_py_path = s:dir . '/cm.py'
 
 augroup cm
 	autocmd!
@@ -246,13 +247,17 @@ augroup end
 " {
 func! s:start_core_channel()
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let l:path = s:dir . '/cm.py'
-	let s:channel_id = jobstart([l:py3,l:path],{'rpc':1,
-			\ 'on_exit':function('s:on_core_channel_exit')
+	let s:channel_id = jobstart([l:py3,s:core_py_path,'core'],{'rpc':1,
+			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ })
+
+			" \ 'cwd'     : s:dir,
 endfunc
 
 fun s:on_core_channel_exit()
+	if s:leaving
+		echom 'core channel exit'
+	endif
 	let s:channel_id = -1
 endf
 

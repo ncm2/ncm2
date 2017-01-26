@@ -20,3 +20,20 @@ cm#enable_for_buffer()` to use this plugin for specific buffer.
 
 see [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
 
+```vim
+
+    "  don't give |ins-completion-menu| messages.  For example,
+	"	'-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
+    set shortmess+=c
+
+```
+
+## Todo:
+
+- documentation
+
+## Done:
+
+- simply bufkeyword code
+- jedi support markdown
+- simplify plugin framework
