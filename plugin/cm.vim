@@ -40,7 +40,7 @@ endif
 " jedi
 if has_key(s:cm_builtin_sources,'jedi')
 	" refresh 1 for call signatures
-	au FileType python if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
+	au FileType python,markdown if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
 			\ 'name' : 'cm-jedi',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Jedi',
