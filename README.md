@@ -73,7 +73,7 @@ I also added python completion for markdown file, just for fun:
 
 ## Why?
 
-I'm writing this for fun, feeds my own need, and it's working pleasingly for
+I'm writing this for fun, feeding my own need, and it's working pleasingly for
 me now. And It seems there's lots of differences between deoplete, YCM, and
 nvim-complete-manager, by design.
 
