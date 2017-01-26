@@ -57,9 +57,25 @@ and `call cm#enable_for_buffer()` to use this plugin for specific buffer.
   [autoload/cm/sources/bufkeyword.py](autoload/cm/sources/bufkeyword.py)
 
 
+## Demo
+
+Keyword completion demo:
+
+[![asciicast](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
+
+Python completion demo:
+
+[![asciicast](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
+
+I also added python completion for markdown file, just for fun:
+
+[![asciicast](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
+
 ## Why?
 
 I'm writing this for fun, feeds my own need, and it's working pleasingly for
 me now. And It seems there's lots of differences between deoplete, YCM, and
 nvim-complete-manager, by design.
+
+--- TO BE CONTINUED ---
 
