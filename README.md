@@ -1,4 +1,4 @@
-For My Favorite Editor :heart: 
+ :heart: for my favorite editor
 
 # A Completion Framework for Neovim
 
