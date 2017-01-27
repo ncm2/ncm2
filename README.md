@@ -57,6 +57,14 @@ inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
 
+
+## Current Completion Sources
+
+- [Keyword from current buffer](#Keyword from current buffer)
+- [Ultisnips hint](#Ultisnips hint)
+- [File path completion](#File path completion)
+- [Python code completion](#Python code completion)
+
 ## How to extend this framework?
 
 - For really simple, light weight completion candidate calculation, refer to
@@ -67,15 +75,19 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 ## Demo
 
-Keyword completion demo:
+### Keyword from current buffer
 
 [![asciicast buffer keyword completion](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
 
-File path completion:
+### Ultisnips hint
+
+[![asciicast ultisnips hint completion](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde.png)](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde)
+
+### File path completion
 
 [![asciicast file path completion](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41.png)](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41)
 
-Python completion demo:
+### Python code completion
 
 [![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
 
