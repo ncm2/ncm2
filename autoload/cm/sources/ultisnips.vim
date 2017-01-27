@@ -29,16 +29,7 @@ func! cm#sources#ultisnips#cm_refresh(ctx) dict
 	let l:col = col('.')
 	let l:typed = strpart(getline('.'), 0, l:col)
 
-	if has_key(l:snips,l:typed)
-		" python's `#!` is a snippet
-		" this block handles this kind of special case
-		let l:matches = [ {"word":l:typed,"dup":1,"icase":1,"menu": "Snips: " . l:snips[l:typed]} ]
-		let l:startcol = 1
-		call cm#complete(self, a:ctx, l:startcol, l:matches)
-		return
-	endif
-
-	let l:kw = matchstr(l:typed,'\v\k+$')
+	let l:kw = matchstr(l:typed,'\v\S+$')
 	let l:kwlen = len(l:kw)
 	if l:kwlen<2
 		return
