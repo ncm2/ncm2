@@ -60,10 +60,10 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 ## Current Completion Sources
 
-- [Keyword from current buffer](#Keyword from current buffer)
-- [Ultisnips hint](#Ultisnips hint)
-- [File path completion](#File path completion)
-- [Python code completion](#Python code completion)
+- [Keyword from current buffer](#keyword-from-current-buffer)
+- [Ultisnips hint](#ultisnips-hint)
+- [File path completion](#file-path-completion)
+- [Python code completion](#python-code-completion)
 
 ## How to extend this framework?
 
