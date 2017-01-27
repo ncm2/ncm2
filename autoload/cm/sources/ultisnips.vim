@@ -26,8 +26,8 @@ func! cm#sources#ultisnips#cm_refresh(ctx) dict
 
 	let l:matches = []
 
-	let l:col = col('.')
-	let l:typed = strpart(getline('.'), 0, l:col)
+	let l:col = a:ctx['col']
+	let l:typed = a:ctx['typed']
 
 	let l:kw = matchstr(l:typed,'\v\S+$')
 	let l:kwlen = len(l:kw)
