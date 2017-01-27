@@ -110,7 +110,7 @@ the display of popup menu. Of course It will not block the ui.
 There's some hacking done in NCM. It uses a per 30ms timer to detect changes
 even popup menu is visible. NCM uses job_start function to start the
 completion core process by itself, to illiminate the `:UpdateRemotePlugins`
-command after installation, so that it should just work out if the box.
+command after installation, so that it should just work out of the box.
 
 Note that the calling context of nvim's `complete()` function by NCM does not
 meet the requirement in the documentation `:help complete()`, which says:
@@ -118,9 +118,9 @@ meet the requirement in the documentation `:help complete()`, which says:
 > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work after
 > CTRL-O or with an expression mapping.
 
-I work on remote VM quite often. I try to avoid the `CTRL-R =` mapping,
-because this trigger's text inserted on neovim's command line and it's
-potentially slowing down the ui. Luckily It seems it's working by calling this
+I work on remote VM quite often. I tend to avoid the `CTRL-R =` mapping,
+because this triggers text updated on neovim's command line and it's
+potentially slowing down the ui. Luckily it seems it's working by calling this
 function directly. This is why I claimed **it's experimental**. I'm hoping one
 day I can confirm that the calling context is legal.
 
