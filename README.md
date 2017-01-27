@@ -85,9 +85,9 @@ I'm writing this for fun, feeding my own need, and it's working pleasingly for
 me now. And It seems there's lots of differences between deoplete, YCM, and
 nvim-complete-manager, by design.
 
-I haven't read the source of YCM yet. So here I'm describing the main design
-of NCM (from now on, I'm using NCM as short for nvim-complete-manager) and
-some of the differences between deoplete and this plugin.
+I havn't read the source of YCM yet. So here I'm describing the main design of
+NCM (from now on, I'm using NCM as short for nvim-complete-manager) and some
+of the differences between deoplete and this plugin.
 
 Each completion source should be a standalone process, the manager notifies
 the completion source for any text changing, even when popup menu is visible.
