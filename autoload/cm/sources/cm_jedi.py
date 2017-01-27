@@ -35,7 +35,7 @@ class Handler:
             logger.info('ignore filetype: %s', filetype)
             return
 
-        # confirm the context before doning heavy calculation
+        # confirm the context before doing heavy calculation
         if ctx!=curctx:
             return
 
