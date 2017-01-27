@@ -106,7 +106,7 @@ completion core process by itself, to illiminate the `:UpdateRemotePlugins`
 command after installation, so that it should just work out if the box.
 
 Note that the calling context of nvim's `complete()` function by NCM does not
-meet the requirement in the documentation (`:help complete()`), which says:
+meet the requirement in the documentation `:help complete()`, which says:
 
 > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work after
 > CTRL-O or with an expression mapping.
