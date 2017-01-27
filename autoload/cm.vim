@@ -296,7 +296,7 @@ func! s:change_tick_stop()
 endfunc
 
 
-func! s:check_changes()
+func! s:check_changes(timer)
 	let l:tick = s:changetick()
 	if l:tick!=s:lasttick
 		let s:lasttick = l:tick
