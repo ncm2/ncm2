@@ -113,9 +113,9 @@ meet the requirement in the documentation `:help complete()`, which says:
 
 I work on remote VM quite often. I try to avoid the `CTRL-R =` mapping,
 because this trigger's text inserted on neovim's command line and it's
-potentially slow down the ui.  Luckily It seems it's working by calling this
-function directly.  This is why I claimed **it's experimental**. I'm hoping
-one day I can confirm that the calling context is legal.
+potentially slowing down the ui. Luckily It seems it's working by calling this
+function directly. This is why I claimed **it's experimental**. I'm hoping one
+day I can confirm that the calling context is legal.
 
 Deoplete and YCM are mature, legit, they have tons of features I'm not
 offering currently, which should be considered a main difference too.
