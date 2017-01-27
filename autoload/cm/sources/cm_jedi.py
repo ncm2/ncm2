@@ -30,9 +30,13 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
+        path, filetype, curctx = self._nvim.eval('[expand("%:p"),&filetype,cm#context()]')
         if filetype not in ['python','markdown']:
             logger.info('ignore filetype: %s', filetype)
+            return
+
+        # confirm the context before doning heavy calculation
+        if ctx!=curctx:
             return
 
         src = "\n".join(self._nvim.current.buffer[:])
