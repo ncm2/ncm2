@@ -8,6 +8,7 @@ endif
 let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'ultisnips':{},
 		\ 'bufkeyword':{},
+		\ 'filepath':{},
 		\ 'jedi':{},
 		\ })
 
@@ -36,6 +37,22 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 			\ })
 endif
 
+" filepath
+if has_key(s:cm_builtin_sources,'filepath')
+	" refresh 1 for call signatures
+	call cm#register_source({
+			\ 'name' : 'cm-filepath',
+			\ 'priority': 6, 
+			\ 'abbreviation': 'path',
+			\ 'refresh': 0, 
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_filepath.py',
+			\   }
+			\ ],
+			\ })
+endif
 
 " jedi
 if has_key(s:cm_builtin_sources,'jedi')
