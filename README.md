@@ -50,6 +50,13 @@ set shortmess+=c
 other completion plugin in the same buffer. Use `let g:cm_enable_for_all=0`
 and `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 
+**Tab Completion**
+
+```vim
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+```
+
 ## How to extend this framework?
 
 - For really simple, light weight completion candidate calculation, refer to
