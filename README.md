@@ -69,15 +69,19 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 Keyword completion demo:
 
-[![asciicast](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
+[![asciicast buffer keyword completion](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
+
+File path completion:
+
+[![asciicast file path completion](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41.png)](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41)
 
 Python completion demo:
 
-[![asciicast](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
+[![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
 
 I also added python completion for markdown file, just for fun:
 
-[![asciicast](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
+[![asciicast python markdown completion](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
 
 ## Why?
 
