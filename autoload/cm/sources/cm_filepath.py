@@ -64,7 +64,7 @@ class Handler:
         for file in files:
             word = os.path.basename(file)
             menu = file
-            matches.append(dict(word=word,icase=1,menu=menu))
+            matches.append(dict(word=word,icase=1,menu=menu,dup=1))
 
         # simply limit the number of matches here, not to explode neovim
         matches = matches[0:1024]
