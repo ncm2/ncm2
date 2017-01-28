@@ -113,6 +113,7 @@ class Handler:
                         e['word'] = prefix+item
                     else:
                         e = copy.deepcopy(item)
+                        e['word'] = prefix+e['word']
 
                     if 'menu' not in e:
                         e['menu'] = self._sources[name].get('abbreviation','')
@@ -133,7 +134,7 @@ class Handler:
                 logger.error('_refresh_completions process exception: %s', inst)
                 continue
 
-        logger.info('_refresh_completions names: %s, startcol: %s, matches: %s', names, startcol, matches)
+        logger.info('_refresh_completions names: %s, startcol: %s, matches: %s, source matches: %s', names, startcol, matches, self._matches)
         self._complete(ctx, startcol, matches)
 
     def _complete(self, ctx, startcol, matches):
@@ -158,7 +159,7 @@ def main():
             nvim = attach('stdio')
             handler = Handler(nvim)
             logger.info('starting core, enter event loop')
-            nvim_event_loop(logger,nvim,handler)
+            cm_core_event_loop(logger,nvim,handler)
         except Exception as ex:
             logger.info('Exception: %s',ex)
 
@@ -180,7 +181,7 @@ def main():
             m = importlib.import_module(name)
             handler = m.Handler(nvim)
             logger.info('handler created, entering event loop')
-            nvim_event_loop(logger,nvim,handler)
+            cm_channel_event_loop(logger,nvim,handler)
         except Exception as ex:
             logger.info('Exception: %s',ex)
 
@@ -197,7 +198,7 @@ def get_loglevel():
 
 
 
-def nvim_event_loop(logger,nvim, handler):
+def cm_core_event_loop(logger,nvim, handler):
 
     def on_setup():
         logger.info('on_setup')
@@ -207,6 +208,36 @@ def nvim_event_loop(logger,nvim, handler):
 
     def on_notification(method, args):
         logger.info('method: %s, args: %s', method, args)
+        func = getattr(handler,method,None)
+        if func is None:
+            logger.info('method: %s not implemented, ignore this message', method)
+            return
+
+        func(*args)
+
+    nvim.run_loop(on_request, on_notification, on_setup)
+
+def cm_channel_event_loop(logger,nvim,handler):
+
+    def on_setup():
+        logger.info('on_setup')
+
+    def on_request(method, args):
+        raise Exception('Not implemented')
+
+    def on_notification(method, args):
+        logger.info('channel method: %s, args: %s', method, args)
+
+        if method=='cm_refresh':
+            ctx = args[1]
+            curctx = nvim.eval('cm#context()')
+            # The refresh calculation may be heavy, and the notification queue
+            # may have outdated refresh events, it would be  meaningless to
+            # process these event
+            if ctx!=curctx:
+                logger.info('ignoring outdated context (%s), current context (%s)', ctx, curctx)
+                return
+
         func = getattr(handler,method,None)
         if func is None:
             logger.info('method: %s not implemented, ignore this message', method)

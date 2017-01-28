@@ -30,13 +30,9 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        path, filetype, curctx = self._nvim.eval('[expand("%:p"),&filetype,cm#context()]')
+        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
         if filetype not in ['python','markdown']:
             logger.info('ignore filetype: %s', filetype)
-            return
-
-        # confirm the context before doing heavy calculation
-        if ctx!=curctx:
             return
 
         src = "\n".join(self._nvim.current.buffer[:])
@@ -52,6 +48,7 @@ class Handler:
 
         script = jedi.Script(src, lnum, len(typed), path)
         completions = script.completions()
+        logger.info('completions %s', completions)
         
         signature_text = self._get_signature_text(script)
 
@@ -92,7 +89,8 @@ class Handler:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches)
+        logger.info('matches %s, ret %s', matches, ret)
 
     def _get_signature_text(self,script):
         signature_text = ''
