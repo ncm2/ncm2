@@ -73,6 +73,10 @@ class Handler:
                 matches.append(dict(word=word,icase=1))
 
         matches.sort(key=lambda x: len(x['word']))
+
+        # simply limit the number of matches here, not to explode neovim
+        matches = matches[0:1024]
+
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
 
