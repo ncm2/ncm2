@@ -26,14 +26,29 @@ class Handler:
     def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
         self._sources = srcs
 
-        # store matches
-        if name not in self._matches:
-            self._matches[name] = {}
-        if len(matches)==0:
-            del self._matches[name]
-        else:
-            self._matches[name]['startcol'] = startcol
-            self._matches[name]['matches'] = matches
+
+        try:
+
+            # process the matches early to eliminate unnecessary complete function call
+            result = self.process_matches(name,ctx,startcol,matches)
+
+            if (not result) and (not self._matches.get(name,{}).get('last_matches',[])):
+                # not popping up, ignore this request
+                logger.info('Not popping up, not refreshing for cm_complete by %s, startcol %s, matches %s', name, startcol, matches)
+                return
+
+        finally:
+
+            # storing matches
+
+            if name not in self._matches:
+                self._matches[name] = {}
+
+            if len(matches)==0:
+                del self._matches[name]
+            else:
+                self._matches[name]['startcol'] = startcol
+                self._matches[name]['matches'] = matches
 
         self._refresh_completions(ctx)
 
@@ -91,22 +106,50 @@ class Handler:
             self._complete(ctx, ctx['col'], [])
             return
 
-        startcol = min([self._matches[name]['startcol'] for name in names])
+        startcol = ctx['col']
         base = ctx['typed'][startcol-1:]
 
+        # basick processing per source
         for name in names:
 
             try:
                 source_startcol = self._matches[name]['startcol']
-                source_matches = self._matches[name]['matches']
                 if source_startcol>ctx['col']:
-                    logger.error('wrong startcol: %s', self._matches[name])
+                    self._matches[name]['last_matches'] = []
+                    logger.error('ignoring invalid startcol: %s', self._matches[name])
                     continue
+
+                source_matches = self._matches[name]['matches']
+                source_matches = self.process_matches(name,ctx,source_startcol,source_matches)
+
+                self._matches[name]['last_matches'] = source_matches
+
+                if not source_matches:
+                    continue
+
+                # min non empty source_matches's source_startcol as startcol
+                if source_startcol < startcol:
+                    startcol = source_startcol
+
+            except Exception as inst:
+                logger.error('_refresh_completions process exception: %s', inst)
+                continue
+
+        # merge processing results of sources
+        for name in names:
+
+            try:
+                source_startcol = self._matches[name]['startcol']
+                if source_startcol>ctx['col']:
+                    logger.error('ignoring invalid startcol: %s', self._matches[name])
+                    continue
+                source_matches = self._matches[name]['last_matches']
                 prefix = ctx['typed'][startcol-1 : source_startcol-1]
 
-                source_matches = self.process_matches(name,ctx,source_startcol,source_matches)
                 for e in source_matches:
-                    e['word'] = prefix+e['word']
+                    e['word'] = prefix + e['word']
+                    # if 'abbr' in e:
+                    #     e['abbr'] = prefix + e['abbr']
 
                 matches += source_matches
 
