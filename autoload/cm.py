@@ -97,38 +97,18 @@ class Handler:
         for name in names:
 
             try:
-                curstartcol = self._matches[name]['startcol']
-                curmatches = self._matches[name]['matches']
-                if curstartcol>ctx['col']:
+                source_startcol = self._matches[name]['startcol']
+                source_matches = self._matches[name]['matches']
+                if source_startcol>ctx['col']:
                     logger.error('wrong startcol: %s', self._matches[name])
                     continue
-                prefix = ctx['typed'][startcol-1 : curstartcol-1]
+                prefix = ctx['typed'][startcol-1 : source_startcol-1]
 
-                tmpmatches = []
+                source_matches = self.process_matches(name,ctx,source_startcol,source_matches)
+                for e in source_matches:
+                    e['word'] = prefix+e['word']
 
-                for item in curmatches:
-
-                    e = {}
-                    if type(item)==type(''):
-                        e['word'] = prefix+item
-                    else:
-                        e = copy.deepcopy(item)
-                        e['word'] = prefix+e['word']
-
-                    if 'menu' not in e:
-                        e['menu'] = self._sources[name].get('abbreviation','')
-
-                    # For now, simply do the same word filtering as vim's doing
-                    # TODO: enable custom config
-                    if base.lower() != e['word'][0:len(base)].lower():
-                        continue
-
-                    tmpmatches.append(e)
-
-                # for now, simply sort them by length
-                # TODO: enable custom config
-                tmpmatches.sort(key=lambda x: len(x['word']))
-                matches += tmpmatches
+                matches += source_matches
 
             except Exception as inst:
                 logger.error('_refresh_completions process exception: %s', inst)
@@ -136,6 +116,37 @@ class Handler:
 
         logger.info('_refresh_completions names: %s, startcol: %s, matches: %s, source matches: %s', names, startcol, matches, self._matches)
         self._complete(ctx, startcol, matches)
+
+    def process_matches(self,name,ctx,startcol,matches):
+
+        # do some basic filtering and sorting
+        result = []
+        base = ctx['typed'][startcol-1:]
+
+        for item in matches:
+
+            e = {}
+            if type(item)==type(''):
+                e['word'] = item
+            else:
+                e = copy.deepcopy(item)
+
+            if 'menu' not in e:
+                e['menu'] = self._sources[name].get('abbreviation','')
+
+            # For now, simply do the same word filtering as vim's doing
+            # TODO: enable custom config
+            if base.lower() != e['word'][0:len(base)].lower():
+                continue
+
+            result.append(e)
+
+        # for now, simply sort them by length
+        # TODO: enable custom config
+        result.sort(key=lambda e: len(e['word']))
+
+        return result
+
 
     def _complete(self, ctx, startcol, matches):
         if len(matches)==0 and len(self._last_matches)==0:
