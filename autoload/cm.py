@@ -148,19 +148,10 @@ def main():
 
     if start_type == 'core':
 
-        # logging setup
-        level = logging.INFO
-        if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
-            # TODO this affects the log file name
-            setup_logging('cm_core')
-            l = getattr(logging,
-                    os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
-                    level)
-            if isinstance(l, int):
-                level = l
-
+        # use the module name here
+        setup_logging('cm_core')
         logger = logging.getLogger(__name__)
-        logger.setLevel(level)
+        logger.setLevel(get_loglevel())
 
         try:
             # connect neovim
@@ -177,20 +168,10 @@ def main():
         dir = os.path.dirname(path)
         name = os.path.splitext(os.path.basename(path))[0]
 
-        # logging setup
-        level = logging.INFO
-        if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
-            # TODO this affects the log file name
-            setup_logging(name)
-            l = getattr(logging,
-                    os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
-                    level)
-            if isinstance(l, int):
-                level = l
-
         # use the module name here
+        setup_logging(name)
         logger = logging.getLogger(name)
-        logger.setLevel(level)
+        logger.setLevel(get_loglevel())
 
         try:
             # connect neovim
@@ -202,6 +183,19 @@ def main():
             nvim_event_loop(logger,nvim,handler)
         except Exception as ex:
             logger.info('Exception: %s',ex)
+
+def get_loglevel():
+    # logging setup
+    level = logging.INFO
+    if 'NVIM_PYTHON_LOG_LEVEL' in os.environ:
+        l = getattr(logging,
+                os.environ['NVIM_PYTHON_LOG_LEVEL'].strip(),
+                level)
+        if isinstance(l, int):
+            level = l
+    return level
+
+
 
 def nvim_event_loop(logger,nvim, handler):
 
