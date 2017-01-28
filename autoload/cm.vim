@@ -324,6 +324,13 @@ func! s:on_changed()
 endfunc
 
 func! cm#notify_sources_to_refresh(calls, channels, ctx)
+	for l:channel in a:channels
+		try
+			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], a:ctx)
+		catch
+			continue
+		endtry
+	endfor
 	for l:name in a:calls
 		try
 			if type(s:sources[l:name].cm_refresh)==2
@@ -333,13 +340,6 @@ func! cm#notify_sources_to_refresh(calls, channels, ctx)
 				"string
 				call call(s:sources[l:name].cm_refresh,[a:ctx],s:sources[l:name])
 			endif
-		catch
-			continue
-		endtry
-	endfor
-	for l:channel in a:channels
-		try
-			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], a:ctx)
 		catch
 			continue
 		endtry
