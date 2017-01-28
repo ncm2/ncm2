@@ -203,9 +203,7 @@ def main():
         except Exception as ex:
             logger.info('Exception: %s',ex)
 
-def nvim_event_loop(logger,nvim, h):
-
-    handler = h
+def nvim_event_loop(logger,nvim, handler):
 
     def on_setup():
         logger.info('on_setup')
@@ -214,7 +212,6 @@ def nvim_event_loop(logger,nvim, h):
         raise Exception('Not implemented')
 
     def on_notification(method, args):
-        nonlocal handler
         logger.info('method: %s, args: %s', method, args)
         func = getattr(handler,method,None)
         if func is None:
