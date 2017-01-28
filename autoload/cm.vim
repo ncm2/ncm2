@@ -7,6 +7,13 @@ if get(s:,'init','0')
 endif
 let s:init = 1
 
+" options
+
+" wait for a while before popping up, in milliseconds, this would reduce the
+" popup menu flashes when the user is typing very fast, use a interval which
+" is long enough for computer and short enough for human
+let g:cm#complete_delay = get(g:,'complete_delay',250)
+
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
 
@@ -236,6 +243,8 @@ let s:lasttick = ''
 let s:channel_id = -1
 let s:dir = expand('<sfile>:p:h')
 let s:core_py_path = s:dir . '/cm.py'
+" let s:complete_timer
+let s:complete_timer_ctx = {}
 
 augroup cm
 	autocmd!
@@ -314,6 +323,11 @@ func! s:on_changed()
 		return
 	endif
 
+	if exists('s:complete_timer')
+		call timer_stop(s:complete_timer)
+		unlet s:complete_timer
+	endif
+
 	let l:ctx = cm#context()
 
 	call s:notify_core_channel('cm_refresh',s:sources,l:ctx)
@@ -324,6 +338,14 @@ func! s:on_changed()
 endfunc
 
 func! cm#notify_sources_to_refresh(calls, channels, ctx)
+
+	if exists('s:complete_timer')
+		call timer_stop(s:complete_timer)
+		unlet s:complete_timer
+	endif
+	let s:complete_timer = timer_start(g:cm#complete_delay,function('s:complete_timeout'))
+	let s:complete_timer_ctx = a:ctx
+
 	for l:channel in a:channels
 		try
 			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], a:ctx)
@@ -345,6 +367,16 @@ func! cm#notify_sources_to_refresh(calls, channels, ctx)
 		endtry
 	endfor
 endfunc
+
+fun s:complete_timeout(timer)
+	" finished, clean variable
+	unlet s:complete_timer
+	if s:complete_timer_ctx!=cm#context()
+		" outdated
+		return
+	endif
+	call s:notify_core_channel('cm_complete_timeout',s:sources,s:complete_timer_ctx)
+endf
 
 func! s:menu_selected()
 	" when the popup menu is visible, v:completed_item will be the

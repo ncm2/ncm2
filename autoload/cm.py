@@ -22,6 +22,7 @@ class Handler:
         self._matches = {}
         self._sources = {}
         self._last_matches = []
+        self._has_popped_up = False
 
     def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
         self._sources = srcs
@@ -50,17 +51,22 @@ class Handler:
                 self._matches[name]['startcol'] = startcol
                 self._matches[name]['matches'] = matches
 
-        self._refresh_completions(ctx)
+        if self._has_popped_up:
+            self._refresh_completions(ctx)
 
     def cm_insert_enter(self):
         self._matches = {}
         # self._refresh_completions(self,ctx):
 
+    def cm_complete_timeout(self,srcs,ctx,*args):
+        self._refresh_completions(ctx)
+        self._has_popped_up = True
 
     # The completion core itself
     def cm_refresh(self,srcs,ctx,*args):
 
         self._sources = srcs
+        self._has_popped_up = False
 
         # simple complete done
         if ctx['typed'] == '':
@@ -90,9 +96,6 @@ class Handler:
 
         self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, ctx)
         logger.info('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, ctx)
-
-        # refresh completions candidates
-        self._refresh_completions(ctx)
 
     def _refresh_completions(self,ctx):
 
