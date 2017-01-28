@@ -12,7 +12,7 @@ let s:init = 1
 " wait for a while before popping up, in milliseconds, this would reduce the
 " popup menu flashes when the user is typing very fast, use a interval which
 " is long enough for computer and short enough for human
-let g:cm#complete_delay = get(g:,'complete_delay',250)
+let g:cm#complete_delay = get(g:,'complete_delay',100)
 
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
