@@ -42,8 +42,12 @@ class Handler:
         filepath = self._nvim.eval('expand("%:p")')
         curdir = os.path.dirname(filepath)
 
+        bdirs = [ curdir, ]
+        if pkw != './':
+            bdirs.append('/')
+
         files = []
-        for bdir in ['/', curdir]:
+        for bdir in bdirs:
             joined_dir = os.path.join(bdir,dir)
             try:
                 names = os.listdir(joined_dir)
