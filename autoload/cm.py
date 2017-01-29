@@ -51,16 +51,17 @@ class Handler:
                 self._matches[name]['startcol'] = startcol
                 self._matches[name]['matches'] = matches
 
+        # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
             self._refresh_completions(ctx)
 
     def cm_insert_enter(self):
         self._matches = {}
-        # self._refresh_completions(self,ctx):
 
     def cm_complete_timeout(self,srcs,ctx,*args):
-        self._refresh_completions(ctx)
-        self._has_popped_up = True
+        if not self._has_popped_up:
+            self._refresh_completions(ctx)
+            self._has_popped_up = True
 
     # The completion core itself
     def cm_refresh(self,srcs,ctx,*args):
@@ -94,8 +95,13 @@ class Handler:
                 logger.error('cm_refresh process exception: %s', inst)
                 continue
 
-        self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, ctx)
-        logger.info('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, ctx)
+        if not refreshes_calls and not refreshes_channels:
+            logger.info('not notifying any channels, _refresh_completions now')
+            self._refresh_completions(ctx)
+            self._has_popped_up = True
+        else:
+            logger.info('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, ctx)
+            self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, ctx)
 
     def _refresh_completions(self,ctx):
 
