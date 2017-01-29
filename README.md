@@ -73,28 +73,6 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
   [autoload/cm/sources/bufkeyword.py](autoload/cm/sources/bufkeyword.py)
 
 
-## Demo
-
-### Keyword from current buffer
-
-[![asciicast buffer keyword completion](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
-
-### Ultisnips hint
-
-[![asciicast ultisnips hint completion](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde.png)](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde)
-
-### File path completion
-
-[![asciicast file path completion](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41.png)](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41)
-
-### Python code completion
-
-[![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
-
-I also added python completion for markdown file, just for fun:
-
-[![asciicast python markdown completion](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
-
 ## Why?
 
 I'm writing this for fun, feeding my own need, and it's working pleasingly for
@@ -149,4 +127,26 @@ offering currently, which should be considered a main difference too.
 
 Sorry, no plan for that. [#1](https://github.com/roxma/nvim-complete-manager/issues/1)
 
+
+## Demo
+
+### Keyword from current buffer
+
+[![asciicast buffer keyword completion](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
+
+### Ultisnips hint
+
+[![asciicast ultisnips hint completion](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde.png)](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde)
+
+### File path completion
+
+[![asciicast file path completion](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41.png)](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41)
+
+### Python code completion
+
+[![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
+
+I also added python completion for markdown file, just for fun:
+
+[![asciicast python markdown completion](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
 
