@@ -96,8 +96,8 @@ will still be shown quickly if other completion sources works properly. And if
 the user havn't changed anything, the popup menu will be updated later after
 the slow completion source finish the work.
 
-As for deoplete, if I'm not terribly misunderstanding, the completion sources
-of deoplete are gathered with `gather_candidates()` of the `Source` object,
+As the time as of this plugin being created, the completion sources of
+deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course It will not block the ui.
 
