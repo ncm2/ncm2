@@ -38,6 +38,15 @@ class Handler:
 
         src = "\n".join(self._nvim.current.buffer[:])
 
+        # completion pattern
+        if (re.search(r'[\w_]{2,}$',typed)
+            or re.search(r'\.[\w_]*$',typed)
+            ):
+            pass
+        else:
+            return
+
+
         if filetype=='markdown':
             # setup completions for markdown file
             result = get_markdown_python_block_info(src,lnum,col)
@@ -47,16 +56,9 @@ class Handler:
             src = result['src']
             col = result['col']
             lnum = result['lnum']
-
-        # completion pattern
-        if (re.search(r'[\w_]{2,}$',typed)
-            or re.search(r'\.[\w_]*$',typed)
-            ):
-            pass
+            offset = result['pos']
         else:
-            return
-
-        offset = self._nvim.eval('line2byte(line("."))-1+col(".")-1')
+            offset = self._nvim.eval('line2byte(line("."))-1+col(".")-1')
 
         proc = subprocess.Popen(args=['gocode','-f','json','autocomplete','%s' % offset], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         result, errs = proc.communicate(src.encode('utf-8'),timeout=30)
@@ -145,6 +147,7 @@ def get_markdown_python_block_info(doc,lnum,col):
                 if p<=pos and (p+len(line))>=pos:
                     block.cm_current_py_info['lnum'] = idx+1
                     block.cm_current_py_info['col'] = pos-p+1
+                    block.cm_current_py_info['pos'] = pos
                     return block.cm_current_py_info
                 p += len(line)+1
 
