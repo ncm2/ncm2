@@ -11,6 +11,7 @@ let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'filepath':{},
 		\ 'jedi':{},
 		\ 'tern':{},
+		\ 'gocode':{},
 		\ })
 
 
@@ -83,6 +84,21 @@ if has_key(s:cm_builtin_sources,'tern')
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_tern.py',
+			\   }
+			\ ],
+			\ }) | endif
+endif
+
+" gocode
+if has_key(s:cm_builtin_sources,'gocode')
+	au FileType go,markdown if has_key(s:cm_builtin_sources,'gocode') | call cm#register_source({
+			\ 'name' : 'cm-gocode',
+			\ 'priority': 9, 
+			\ 'abbreviation': 'Go',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_gocode.py',
 			\   }
 			\ ],
 			\ }) | endif

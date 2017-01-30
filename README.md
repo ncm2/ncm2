@@ -12,13 +12,14 @@ support.
   recommend this plugin
   [python-support.nvim](https://github.com/roxma/python-support.nvim).
   (Note: Self promotion)
-- For python code completion, you need to install
+- For **python code completion**, you need to install
   [jedi](https://github.com/davidhalter/jedi) library. For python code
   completion in markdown file, you need to install
   [mistune](https://github.com/lepture/mistune)
-- For javascript code completion, you need to instlal nodejs and npm on your
+- For **Javascript code completion**, you need to instlal nodejs and npm on your
   system.
-
+- For **Golang code completion**, you need to install
+  [gocode](https://github.com/nsf/gocode#setup).
 
 ## Installation and Configuration
 
@@ -69,6 +70,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 - [File path completion](#file-path-completion)
 - [Python code completion](#python-code-completion)
 - [Javascript code completion](#javascript-code-completion)
+- [Golang code completion](#golang-code-completion)
 
 ## How to extend this framework?
 
@@ -158,4 +160,8 @@ I also added python completion for markdown file, just for fun:
 ### Javascript code completion
 
 [![asciicast javascript code completion](https://asciinema.org/a/72m5ckw7k1m39kquro2jr0l1i.png)](https://asciinema.org/a/72m5ckw7k1m39kquro2jr0l1i)
+
+### Golang code completion
+
+[![asciicast golang code completion](https://asciinema.org/a/f45w82dwalitn5fyfpe29x3ua.png)](https://asciinema.org/a/f45w82dwalitn5fyfpe29x3ua)
 
