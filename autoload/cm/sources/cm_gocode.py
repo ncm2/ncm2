@@ -56,8 +56,6 @@ class Handler:
             if result is None:
                 return
             src = result['src']
-            col = result['col']
-            lnum = result['lnum']
             offset = result['pos']
         else:
             offset = self._nvim.eval('line2byte(line("."))-1+col(".")-1')
