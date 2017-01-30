@@ -1,0 +1,13 @@
+{
+  "name": "nvim-complete-manager",
+  "license": "MIT",
+  "author": "roxma@qq.com",
+  "description": "complete manager for neovim",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/roxma/nvim-complete-manager.git"
+  },
+  "dependencies": {
+    "tern": ">=0.5"
+  }
+}

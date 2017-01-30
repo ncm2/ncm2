@@ -10,6 +10,7 @@ let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'bufkeyword':{},
 		\ 'filepath':{},
 		\ 'jedi':{},
+		\ 'tern':{},
 		\ })
 
 
@@ -67,6 +68,21 @@ if has_key(s:cm_builtin_sources,'jedi')
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_jedi.py',
 			\		'events': ['InsertLeave']
+			\   }
+			\ ],
+			\ }) | endif
+endif
+
+" tern
+if has_key(s:cm_builtin_sources,'tern')
+	au FileType javascript,javascript.jsx,markdown if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
+			\ 'name' : 'cm-tern',
+			\ 'priority': 9, 
+			\ 'abbreviation': 'Tern',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_tern.py',
 			\   }
 			\ ],
 			\ }) | endif

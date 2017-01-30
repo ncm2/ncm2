@@ -16,6 +16,8 @@ support.
   [jedi](https://github.com/davidhalter/jedi) library. For python code
   completion in markdown file, you need to install
   [mistune](https://github.com/lepture/mistune)
+- For javascript code completion, you need to instlal nodejs and npm on your
+  system.
 
 
 ## Installation and Configuration
@@ -24,6 +26,12 @@ Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 Plug 'roxma/nvim-complete-manager'
+```
+
+For javascript code completion support, use this instead:
+
+```vim
+Plug 'roxma/nvim-complete-manager', {'do': 'npm install'}
 ```
 
 If you are using
@@ -64,6 +72,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 - [Ultisnips hint](#ultisnips-hint)
 - [File path completion](#file-path-completion)
 - [Python code completion](#python-code-completion)
+- [Javascript code completion](#javascript-code-completion)
 
 ## How to extend this framework?
 
@@ -149,4 +158,8 @@ Sorry, no plan for that. [#1](https://github.com/roxma/nvim-complete-manager/iss
 I also added python completion for markdown file, just for fun:
 
 [![asciicast python markdown completion](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
+
+### Javascript code completion
+
+[![asciicast javascript code completion](https://asciinema.org/a/72m5ckw7k1m39kquro2jr0l1i.png)](https://asciinema.org/a/72m5ckw7k1m39kquro2jr0l1i)
 
