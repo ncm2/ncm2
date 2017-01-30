@@ -38,11 +38,11 @@ class Handler:
         if dir=='' and len(nkw)<2:
             return
 
-        # full path of current file
-        filepath = self._nvim.eval('expand("%:p")')
+        # full path of current file, current working dir
+        filepath,cwd = self._nvim.eval('[expand("%:p"),getcwd()]')
         curdir = os.path.dirname(filepath)
 
-        bdirs = [ curdir, ]
+        bdirs = [ curdir, cwd]
         if pkw != './':
             bdirs.append('/')
 
