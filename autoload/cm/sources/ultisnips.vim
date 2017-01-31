@@ -1,5 +1,5 @@
 
-func! cm#sources#ultisnips#cm_refresh(ctx) dict
+func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 
 	" UltiSnips#SnippetsInCurrentScope
 	" {
@@ -42,7 +42,7 @@ func! cm#sources#ultisnips#cm_refresh(ctx) dict
 	let l:startcol = l:col - l:kwlen
 
 	" notify the completion framework
-	call cm#complete(self, a:ctx, l:startcol, l:matches)
+	call cm#complete(a:opt, a:ctx, l:startcol, l:matches)
 
 endfunc
 

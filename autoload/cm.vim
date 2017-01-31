@@ -358,10 +358,10 @@ func! cm#notify_sources_to_refresh(calls, channels, ctx)
 		try
 			if type(s:sources[l:name].cm_refresh)==2
 				" funcref
-				call s:sources[l:name].cm_refresh(a:ctx)
+				call s:sources[l:name].cm_refresh(s:sources[l:name],a:ctx)
 			elseif type(s:sources[l:name].cm_refresh)==1
 				"string
-				call call(s:sources[l:name].cm_refresh,[a:ctx],s:sources[l:name])
+				call call(s:sources[l:name].cm_refresh,[s:sources[l:name],a:ctx],s:sources[l:name])
 			endif
 		catch
 			continue
