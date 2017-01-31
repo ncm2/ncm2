@@ -96,6 +96,7 @@ endfunc
 " 	5 keyword from current buffer
 " 	6 file path
 " 	7 snippet hint
+" 	8 language specific keyword, but not smart
 " 	9 smart programming language aware completion
 func! cm#register_source(info)
 
