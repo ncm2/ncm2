@@ -76,8 +76,8 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 - For really simple, light weight completion candidate calculation, refer to
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
-- For really async completion source, refer to the buffer keyword example:
-  [autoload/cm/sources/bufkeyword.py](autoload/cm/sources/bufkeyword.py)
+- For really async completion source, refer to the file path completion example:
+  [autoload/cm/sources/cm_filepath.py](autoload/cm/sources/cm_filepath.py)
 
 
 ## Why?
