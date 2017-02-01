@@ -3,8 +3,7 @@ if get(g:,'cm_enable_for_all',1)
 	au BufEnter * if exists('b:cm_enable')==0 | call cm#enable_for_buffer() | endif
 endif
 
-" if you don't want built-in sources enabled
-" use `let g:cm_builtin_sources={}`
+" if you don't want built-in sources enabled use `let g:cm_builtin_sources={}`
 let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'ultisnips':{},
 		\ 'bufkeyword':{},
@@ -25,6 +24,11 @@ if has_key(s:cm_builtin_sources,'ultisnips')
 		\ })
 endif
 
+
+" Note: the channels field is required as an array, on most cases only one
+" channel will would be enough. While there may be cases in which you need
+" another thread to do the indexing, caching work, it's easier to use another
+" channel instead of controlling threading on your own.
 
 " keyword
 if has_key(s:cm_builtin_sources,'bufkeyword')
