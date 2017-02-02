@@ -119,9 +119,7 @@ func! cm#register_source(info)
 				continue
 			endif
 
-			" use detach to improve nvim's shutdown speed, the process will
-			" still be killed, because stdin is broken
-			let l:opt = {'rpc':1, 'channel': l:channel, 'detach': 1}
+			let l:opt = {'rpc':1, 'channel': l:channel}
 
 			func l:opt.on_exit()
 
@@ -260,11 +258,8 @@ augroup end
 " {
 func! s:start_core_channel()
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	" use detach to improve nvim's shutdown speed, the process will still be
-	" killed, because stdin is broken
 	let s:channel_id = jobstart([l:py3,s:core_py_path,'core'],{'rpc':1,
 			\ 'on_exit' : function('s:on_core_channel_exit'),
-			\ 'detach': 1,
 			\ })
 
 			" \ 'cwd'     : s:dir,
