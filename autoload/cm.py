@@ -286,6 +286,10 @@ def cm_core_event_loop(logger,nvim, handler):
 
     nvim.run_loop(on_request, on_notification, on_setup)
 
+    func = getattr(handler,'cm_shutdown',None)
+    if func:
+        func()
+
 def cm_channel_event_loop(logger,nvim,handler):
 
     def on_setup():
@@ -315,6 +319,11 @@ def cm_channel_event_loop(logger,nvim,handler):
         func(*args)
 
     nvim.run_loop(on_request, on_notification, on_setup)
+
+    func = getattr(handler,'cm_shutdown',None)
+    if func:
+        func()
+
 
 main()
 
