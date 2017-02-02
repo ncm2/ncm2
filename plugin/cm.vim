@@ -18,7 +18,7 @@ let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 if has_key(s:cm_builtin_sources,'ultisnips')
 	call cm#register_source({'name' : 'cm-ultisnips',
 		\ 'priority': 7, 
-		\ 'abbreviation': 'UltiSnips',
+		\ 'abbreviation': 'Snips',
 		\ 'cm_refresh': function('cm#sources#ultisnips#cm_refresh'),
 		\ })
 endif
@@ -34,7 +34,7 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 	call cm#register_source({
 			\ 'name' : 'cm-bufkeyword',
 			\ 'priority': 5, 
-			\ 'abbreviation': 'Word',
+			\ 'abbreviation': 'Key',
 			\ 'channels': [
 			\   {'type': 'python3', 'path': 'autoload/cm/sources/bufkeyword.py', 'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI']}
 			\ ],
@@ -63,7 +63,7 @@ if has_key(s:cm_builtin_sources,'jedi')
 	au FileType python,markdown if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
 			\ 'name' : 'cm-jedi',
 			\ 'priority': 9, 
-			\ 'abbreviation': 'Jedi',
+			\ 'abbreviation': 'Py',
 			\ 'refresh': 1, 
 			\ 'channels': [
 			\   {
@@ -80,7 +80,7 @@ if has_key(s:cm_builtin_sources,'tern')
 	au FileType javascript,javascript.jsx,markdown if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
 			\ 'name' : 'cm-tern',
 			\ 'priority': 9, 
-			\ 'abbreviation': 'Tern',
+			\ 'abbreviation': 'Js',
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',

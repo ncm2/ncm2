@@ -184,7 +184,13 @@ class Handler:
                 e = copy.deepcopy(item)
 
             if 'menu' not in e:
-                e['menu'] = self._sources[name].get('abbreviation','')
+                if 'info' in e and e['info'] and len(e['info'])<70:
+                    if self._sources[name].get('abbreviation',''):
+                        e['menu'] = self._sources[name]['abbreviation'] + " :" + e['info']
+                    else:
+                        e['menu'] = e['info']
+                else:
+                    e['menu'] = self._sources[name].get('abbreviation','')
 
             # For now, simply do the same word filtering as vim's doing
             # TODO: enable custom config

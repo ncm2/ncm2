@@ -38,7 +38,7 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 	" since the available snippet list is fairly small, we can simply dump the
 	" whole available list, leave the filtering work to cm's standard filter.
 	" This would reduce the work done by vimscript.
-	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1,"menu": "Snips: " . l:snips[v:val]}')
+	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1,"info": l:snips[v:val]}')
 	let l:startcol = l:col - l:kwlen
 
 	" notify the completion framework
