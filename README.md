@@ -26,9 +26,8 @@ support.
 Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
-Plug 'roxma/nvim-complete-manager'
-" For javascript code completion support, use this instead
-" Plug 'roxma/nvim-complete-manager', {'do': 'npm install'}
+" `npm install` For javascript code completion support, use this instead
+Plug 'roxma/nvim-complete-manager', {'do': 'npm install'}
 ```
 
 If you are using
