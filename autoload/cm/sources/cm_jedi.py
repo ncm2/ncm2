@@ -90,7 +90,7 @@ class Handler:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches)
+        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
         logger.info('matches %s, ret %s', matches, ret)
 
     def _get_signature_text(self,script):
