@@ -19,7 +19,6 @@ if has_key(s:cm_builtin_sources,'ultisnips')
 	call cm#register_source({'name' : 'cm-ultisnips',
 		\ 'priority': 7, 
 		\ 'abbreviation': 'UltiSnips',
-		\ 'refresh': 1, 
 		\ 'cm_refresh': function('cm#sources#ultisnips#cm_refresh'),
 		\ })
 endif
@@ -36,7 +35,6 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 			\ 'name' : 'cm-bufkeyword',
 			\ 'priority': 5, 
 			\ 'abbreviation': 'Word',
-			\ 'refresh': 0, 
 			\ 'channels': [
 			\   {'type': 'python3', 'path': 'autoload/cm/sources/bufkeyword.py', 'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI']}
 			\ ],
@@ -50,7 +48,6 @@ if has_key(s:cm_builtin_sources,'filepath')
 			\ 'name' : 'cm-filepath',
 			\ 'priority': 6, 
 			\ 'abbreviation': 'path',
-			\ 'refresh': 0, 
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',
