@@ -48,7 +48,7 @@ class Handler:
 
         files = []
         for bdir in bdirs:
-            joined_dir = os.path.join(bdir,dir)
+            joined_dir = os.path.join(bdir,dir.strip('/'))
             try:
                 names = os.listdir(joined_dir)
                 for name in names:
