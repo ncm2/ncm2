@@ -71,6 +71,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 - [Python code completion](#python-code-completion)
 - [Javascript code completion](#javascript-code-completion)
 - [Golang code completion](#golang-code-completion)
+- [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
 
 ## How to extend this framework?
 
