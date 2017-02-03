@@ -235,7 +235,7 @@ def main():
             nvim = attach('stdio')
             handler = Handler(nvim)
             logger.info('starting core, enter event loop')
-            cm_core_event_loop(logger,nvim,handler)
+            cm_event_loop('core',logger,nvim,handler)
         except Exception as ex:
             logger.info('Exception: %s',ex)
 
@@ -265,7 +265,7 @@ def main():
             m = importlib.import_module(name)
             handler = m.Handler(nvim)
             logger.info('handler created, entering event loop')
-            cm_channel_event_loop(logger,nvim,handler)
+            cm_event_loop('channel',logger,nvim,handler)
         except Exception as ex:
             logger.info('Exception: %s',ex)
 
@@ -281,42 +281,24 @@ def get_loglevel():
     return level
 
 
-
-def cm_core_event_loop(logger,nvim, handler):
+def cm_event_loop(type,logger,nvim,handler):
 
     def on_setup():
         logger.info('on_setup')
 
     def on_request(method, args):
-        raise Exception('Not implemented')
 
-    def on_notification(method, args):
-        logger.info('method: %s, args: %s', method, args)
         func = getattr(handler,method,None)
         if func is None:
-            logger.info('method: %s not implemented, ignore this message', method)
-            return
+            logger.info('method: %s not implemented, ignore this request', method)
+            return None
 
         func(*args)
 
-    nvim.run_loop(on_request, on_notification, on_setup)
-
-    func = getattr(handler,'cm_shutdown',None)
-    if func:
-        func()
-
-def cm_channel_event_loop(logger,nvim,handler):
-
-    def on_setup():
-        logger.info('on_setup')
-
-    def on_request(method, args):
-        raise Exception('Not implemented')
-
     def on_notification(method, args):
-        logger.info('channel method: %s, args: %s', method, args)
+        logger.info('%s method: %s, args: %s', type, method, args)
 
-        if method=='cm_refresh':
+        if type=='channel' and method=='cm_refresh':
             ctx = args[1]
             # The refresh calculation may be heavy, and the notification queue
             # may have outdated refresh events, it would be  meaningless to
@@ -334,6 +316,7 @@ def cm_channel_event_loop(logger,nvim,handler):
 
     nvim.run_loop(on_request, on_notification, on_setup)
 
+    # shutdown
     func = getattr(handler,'cm_shutdown',None)
     if func:
         func()
