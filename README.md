@@ -136,6 +136,9 @@ offering currently, which should be considered a main difference too.
 
 Sorry, no plan for that. [#1](https://github.com/roxma/nvim-completion-manager/issues/1)
 
+## Related Projects
+
+[asyncomplete.vim](https://github.com/prabirshrestha/asyncomplete.vim)
 
 ## Demo
 
