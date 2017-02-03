@@ -28,7 +28,7 @@ Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 ```vim
 " `npm install` For javascript code completion support, use this instead
 Plug 'roxma/nvim-completion-manager', {'do': 'npm install'}
-" For php code completion is moved to a standalone plugin
+" PHP code completion is moved to a standalone plugin
 Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
 ```
 
