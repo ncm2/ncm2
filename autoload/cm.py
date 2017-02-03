@@ -223,6 +223,13 @@ def main():
         logger = logging.getLogger(__name__)
         logger.setLevel(get_loglevel())
 
+        # change proccess title
+        try:
+            import setproctitle
+            setproctitle.setproctitle('nvim-completion-manager core')
+        except:
+            pass
+
         try:
             # connect neovim
             nvim = attach('stdio')
@@ -242,6 +249,14 @@ def main():
         setup_logging(name)
         logger = logging.getLogger(name)
         logger.setLevel(get_loglevel())
+
+        # change proccess title
+        try:
+            import setproctitle
+            setproctitle.setproctitle('nvim-completion-manager channel %s' % name)
+        except:
+            pass
+
 
         try:
             # connect neovim
