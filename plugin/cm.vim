@@ -61,10 +61,11 @@ endif
 " jedi
 if has_key(s:cm_builtin_sources,'jedi')
 	" refresh 1 for call signatures
-	au FileType python,markdown if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
+	call cm#register_source({
 			\ 'name' : 'cm-jedi',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Py',
+			\ 'scopes': ['python','markdown'],
 			\ 'refresh': 1, 
 			\ 'channels': [
 			\   {
@@ -73,36 +74,38 @@ if has_key(s:cm_builtin_sources,'jedi')
 			\		'events': ['InsertLeave']
 			\   }
 			\ ],
-			\ }) | endif
+			\ })
 endif
 
 " tern
 if has_key(s:cm_builtin_sources,'tern')
-	au FileType javascript,javascript.jsx,markdown if has_key(s:cm_builtin_sources,'jedi') | call cm#register_source({
+	call cm#register_source({
 			\ 'name' : 'cm-tern',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Js',
+			\ 'scopes': ['javascript','javascript.jsx','markdown'],
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_tern.py',
 			\   }
 			\ ],
-			\ }) | endif
+			\ })
 endif
 
 " gocode
 if has_key(s:cm_builtin_sources,'gocode')
-	au FileType go,markdown if has_key(s:cm_builtin_sources,'gocode') | call cm#register_source({
+	call cm#register_source({
 			\ 'name' : 'cm-gocode',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Go',
+			\ 'scopes': ['go','markdown'],
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_gocode.py',
 			\   }
 			\ ],
-			\ }) | endif
+			\ })
 endif
 

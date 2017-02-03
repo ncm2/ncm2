@@ -38,10 +38,13 @@ func! cm#enable_for_buffer()
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave') | let s:dict_matches = {}
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
+		autocmd FileType,BufEnter <buffer> call s:check_and_start_all_channels()
 		" save and restore completeopt
 		autocmd BufEnter    <buffer> let s:saved_completeopt = &completeopt | set completeopt=menu,menuone,noinsert,noselect
 		autocmd BufLeave    <buffer> let &completeopt = s:saved_completeopt
 	augroup end
+
+	call s:check_and_start_all_channels()
 
 endfunc
 
@@ -71,6 +74,7 @@ func! cm#context()
 	let l:ret = {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
 	let l:ret['lnum'] = l:ret['curpos'][1]
 	let l:ret['col'] = l:ret['curpos'][2]
+	let l:ret['filetype'] = &filetype
 	let l:ret['typed'] = strpart(getline(l:ret['lnum']),0,l:ret['col']-1)
 	return l:ret
 endfunc
@@ -107,9 +111,50 @@ func! cm#register_source(info)
 
 	let s:sources[a:info['name']] = a:info
 
+	" check and start channels
+	call s:check_and_start_channels(a:info)
+
+endfunc
+
+func! s:check_and_start_all_channels()
+	for l:name in keys(s:sources)
+		call s:check_and_start_channels(s:sources[l:name])
+	endfor
+endfunc
+
+func! s:check_scope(info)
+	" check scopes
+	let l:scopes = get(a:info,'scopes',['*'])
+	let l:cur_scopes = [&filetype]
+	for l:scope in l:scopes
+		if l:scope=='*'
+			" match any scope
+			return 1
+		endif
+		for l:cur in l:cur_scopes
+			if l:scope == l:cur
+				return 1
+			endif
+		endfor
+	endfor
+	return 0
+endfunc
+
+" check and start channels
+func! s:check_and_start_channels(info)
+
+	if s:check_scope(a:info)==0
+		return
+	endif
+
 	for l:channel in get(a:info,'channels',[])
 
 		if l:channel['type']=='python3'
+
+			if get(l:channel, 'id',-1)!=-1
+				" channel already started
+				continue
+			endif
 
 			" find script path
 			let l:py3 = get(g:,'python3_host_prog','python3')
