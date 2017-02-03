@@ -27,7 +27,7 @@ Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 " `npm install` For javascript code completion support, use this instead
-Plug 'roxma/nvim-complete-manager', {'do': 'npm install'}
+Plug 'roxma/nvim-completion-manager', {'do': 'npm install'}
 ```
 
 If you are using
@@ -84,10 +84,10 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 I'm writing this for fun, feeding my own need, and it's working pleasingly for
 me now. And It seems there's lots of differences between deoplete, YCM, and
-nvim-complete-manager, by design.
+nvim-completion-manager, by design.
 
 I havn't read the source of YCM yet. So here I'm describing the main design of
-NCM (from now on, I'm using NCM as short for nvim-complete-manager) and some
+NCM (from now on, I'm using NCM as short for nvim-completion-manager) and some
 of the differences between deoplete and this plugin.
 
 Each completion source should be a standalone process, the manager notifies
@@ -95,7 +95,7 @@ the completion source for any text changing, even when popup menu is visible.
 The completion source notifies the manager if there's any complete matches
 available. After some basic priority sorting between completion sources, and
 some simple filtering, the completion popup menu will be trigger with the
-`complete()` function by the complete manager.
+`complete()` function by the completion manager.
 
 As shown intentionally in the python jedi completion demo, If some of the
 completion source is calculating matches for a long long time, the popup menu
@@ -132,7 +132,7 @@ offering currently, which should be considered a main difference too.
 
 ### Vim 8 support?
 
-Sorry, no plan for that. [#1](https://github.com/roxma/nvim-complete-manager/issues/1)
+Sorry, no plan for that. [#1](https://github.com/roxma/nvim-completion-manager/issues/1)
 
 
 ## Demo
