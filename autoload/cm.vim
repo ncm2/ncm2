@@ -79,6 +79,11 @@ func! cm#context()
 	return l:ret
 endfunc
 
+func! cm#context_changed(ctx)
+	return (b:changedtick!=a:ctx['changedtick']) || (getcurpos()!=a:ctx['curpos'])
+endfunc
+
+
 
 """
 " Use this function to register your completion source and detect the
@@ -244,7 +249,7 @@ func! cm#complete(src, context, startcol, matches)
 	endif
 
 	" ignore the request if context has changed
-	if  (a:context!=cm#context()) || (mode()!='i')
+	if  cm#context_changed(a:context) || (mode()!='i')
 		return 1
 	endif
 
@@ -266,7 +271,7 @@ func! cm#core_complete(context, startcol, matches, allmatches)
 	let s:dict_matches = a:allmatches
 
 	" ignore the request if context has changed
-	if  (a:context!=cm#context()) || (mode()!='i')
+	if  cm#context_changed(a:context) || (mode()!='i')
 		return 1
 	endif
 
@@ -418,8 +423,7 @@ endfunc
 fun s:complete_timeout(timer)
 	" finished, clean variable
 	unlet s:complete_timer
-	if s:complete_timer_ctx!=cm#context()
-		" outdated
+	if cm#context_changed(s:complete_timer_ctx)
 		return
 	endif
 	call s:notify_core_channel('cm_complete_timeout',s:sources,s:complete_timer_ctx)

@@ -318,12 +318,11 @@ def cm_channel_event_loop(logger,nvim,handler):
 
         if method=='cm_refresh':
             ctx = args[1]
-            curctx = nvim.eval('cm#context()')
             # The refresh calculation may be heavy, and the notification queue
             # may have outdated refresh events, it would be  meaningless to
             # process these event
-            if ctx!=curctx:
-                logger.info('ignoring outdated context (%s), current context (%s)', ctx, curctx)
+            if nvim.call('cm#context_changed',ctx):
+                logger.info('context_changed, ignoring context: %s', ctx)
                 return
 
         func = getattr(handler,method,None)
