@@ -9,9 +9,15 @@ import re
 import logging
 import copy
 import importlib
+import threading
+from threading import Thread, RLock
+import urllib
+import json
 from neovim import attach, setup_logging
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 logger = logging.getLogger(__name__)
+
 
 class Handler:
 
@@ -24,9 +30,12 @@ class Handler:
         self._last_matches = []
         self._has_popped_up = False
 
-    def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
-        self._sources = srcs
+        self._file_server = FileServer()
+        self._file_server.start(self._nvim.eval('v:servername'))
 
+    def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
+
+        self._sources = srcs
 
         try:
 
@@ -65,6 +74,10 @@ class Handler:
 
     # The completion core itself
     def cm_refresh(self,srcs,ctx,*args):
+
+        # update file server
+        self._file_server.set_current_context(ctx)
+        logger.info('src url: %s', self._file_server.get_file_url(ctx))
 
         self._sources = srcs
         self._has_popped_up = False
@@ -211,6 +224,122 @@ class Handler:
             # no need to fire complete message
             return
         self._nvim.call('cm#core_complete', ctx, startcol, matches, self._matches, async=True)
+
+    def cm_shutdown(self):
+        self._file_server.shutdown(wait=False)
+
+# Cached file content in memory, and use http protocol to serve files, this
+# would be convinent for supporting language server protocol.
+class FileServer(Thread):
+
+    def __init__(self):
+        self._rlock = RLock()
+        self._current_context = None
+        self._cache_context = None
+        self._cache_src = ""
+        Thread.__init__(self)
+
+    def start(self,nvim_server_name):
+        """
+        Start the file server
+        @type request: str
+        """
+
+        server = self
+
+        class HttpHandler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                try:
+                    server.run_GET(self)
+                except Exception as ex:
+                    self.send_response(500)
+                    self.send_header('Content-type','text/html')
+                    self.end_headers()
+                    message = str(ex)
+                    self.wfile.write(bytes(message, "utf8"))
+
+        # create another connection to avoid synchronization issue?
+        self._nvim = attach('socket',path=nvim_server_name)
+
+        # Server settings
+        # 0 for random port
+        server_address = ('127.0.0.1', 0)
+        self._httpd = HTTPServer(server_address, HttpHandler)
+
+        Thread.start(self)
+
+    def run_GET(self,request):
+        """
+        Process get request. This method, with the `run_` prefix is running on
+        the same thread as `self.run` method.
+        @type request: BaseHTTPRequestHandler
+        """
+
+        params = {}
+        for e in urllib.parse.parse_qsl(urllib.parse.urlparse(request.path).query):
+            params[e[0]] = e[1]
+        
+        logger.info('thread %s processing %s', threading.get_ident(), params)
+
+        context = json.loads(params['context'])
+        src = self.get_src(context)
+        if src is None:
+            src = ""
+
+        request.send_response(200)
+        request.send_header('Content-type','text/html')
+        request.end_headers()
+        request.wfile.write(bytes(src, "utf8"))
+
+    def run(self):
+        logger.info('running server on port %s, thread %s', self._httpd.server_port, threading.get_ident())
+        self._httpd.serve_forever()
+
+    def get_src(self,context):
+
+        with self._rlock:
+
+            # If context does not match current context, check the neovim current
+            # context, if does not match neither, return None
+            if self._context_changed(self._current_context,context):
+                self._current_context = self._nvim.eval('cm#context()')
+            if self._context_changed(self._current_context,context):
+                logger.info('get_src returning None for oudated context: %s', context)
+                return None
+
+            # update cache when necessary
+            if self._context_changed(self._current_context, self._cache_context):
+                logger.info('get_src updating cache for context %s', context)
+                self._cache_context = self._current_context
+                self._cache_src = "\n".join(self._nvim.current.buffer[:])
+
+            return self._cache_src
+
+    # same as cm#context_changed
+    def _context_changed(self,ctx1,ctx2):
+        return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
+
+    def set_current_context(self,context):
+        """
+        This method is running on main thread as cm core
+        """
+        with self._rlock:
+            self._current_context = context
+
+    def get_file_url(self,context):
+        # changedtick and curpos is enough for outdating check
+        stripped = dict(changedtick=context['changedtick'],curpos=context['curpos'])
+        query = urllib.parse.urlencode(dict(context=json.dumps(stripped)))
+        return urllib.parse.urljoin('http://127.0.0.1:%s' % self._httpd.server_port, '?%s' % query)
+
+    def shutdown(self,wait=True):
+        """
+        Shutdown the file server
+        """
+        self._httpd.shutdown()
+        if wait:
+            self.join()
+
 
 def main():
 
