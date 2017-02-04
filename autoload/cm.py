@@ -77,7 +77,7 @@ class Handler:
 
         # update file server
         self._file_server.set_current_context(ctx)
-        logger.info('src url: %s', self._file_server.get_file_url(ctx))
+        ctx['file_url'] = self._file_server.get_file_url(ctx)
 
         self._sources = srcs
         self._has_popped_up = False
@@ -95,6 +95,10 @@ class Handler:
             info = srcs[name]
             try:
 
+                if not self._check_scope(ctx,info):
+                    logger.info('source %s _check_scope failed for context <%s>, ignore it', name, ctx)
+                    continue
+
                 if (info['name'] in self._matches) and (info.get('refresh',0)==0):
                     # no need to refresh
                     continue
@@ -103,7 +107,7 @@ class Handler:
                     refreshes_calls.append(name)
                 for channel in info.get('channels',[]):
                     if 'id' in channel:
-                        refreshes_channels.append(dict(name=name,id=channel['id']))
+                        refreshes_channels.append(dict(name=name,id=channel['id'],context=ctx))
             except Exception as inst:
                 logger.error('cm_refresh process exception: %s', inst)
                 continue
@@ -115,6 +119,17 @@ class Handler:
         else:
             logger.info('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, ctx)
             self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, ctx)
+
+    # almost the same as `s:check_scope` in `autoload/cm.vim`
+    def _check_scope(self,ctx,info):
+        scopes = info.get('scopes',['*'])
+        cur_scope = ctx.get('scope',ctx['filetype'])
+        for scope in scopes:
+            if scope=='*':
+                return True
+            if scope==cur_scope:
+                return True
+        return False
 
     def _refresh_completions(self,ctx):
 
