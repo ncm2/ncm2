@@ -171,7 +171,7 @@ func! s:check_and_start_channels(info)
 
 			let l:opt = {'rpc':1, 'channel': l:channel}
 
-			func l:opt.on_exit()
+			func l:opt.on_exit(job_id, data, event)
 
 				" delete event group
 				execute 'augroup! cm_channel_' . self['channel']['id']
@@ -315,7 +315,7 @@ func! s:start_core_channel()
 			" \ 'cwd'     : s:dir,
 endfunc
 
-fun s:on_core_channel_exit()
+fun s:on_core_channel_exit(job_id, data, event)
 	let s:channel_id = -1
 	if s:leaving
 		return
