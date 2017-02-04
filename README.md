@@ -16,7 +16,7 @@ support.
   [jedi](https://github.com/davidhalter/jedi) library. For python code
   completion in markdown file, you need to install
   [mistune](https://github.com/lepture/mistune)
-- For **Javascript code completion**, you need to instlal nodejs and npm on your
+- For **Javascript code completion**, you need to install nodejs and npm on your
   system.
 - For **Golang code completion**, you need to install
   [gocode](https://github.com/nsf/gocode#setup).
