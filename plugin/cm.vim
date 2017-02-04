@@ -20,7 +20,7 @@ if has_key(s:cm_builtin_sources,'ultisnips')
 	call cm#register_source({'name' : 'cm-ultisnips',
 		\ 'priority': 7, 
 		\ 'abbreviation': 'Snips',
-		\ 'cm_refresh': function('cm#sources#ultisnips#cm_refresh'),
+		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
 		\ })
 endif
 
