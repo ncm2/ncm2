@@ -33,6 +33,7 @@ class Handler:
         self._subscope_detectors = {}
         # builtin detectors
         self._subscope_detectors['markdown'] = [cm.MarkdownScope(),]
+        self._subscope_detectors['html'] = [cm.HtmlScope(),]
 
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
@@ -104,14 +105,17 @@ class Handler:
             scope = ctx['scope']
             if scope in self._subscope_detectors:
                 for detector in self._subscope_detectors[scope]:
-                    sub_ctx = detector.get_subscope_ctx(ctx, self._file_server.get_src(ctx))
-                    if sub_ctx:
-                        # append the subscope for further processing
-                        sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
-                        sub_ctx['src_uri'] = self._file_server.get_src_uri(sub_ctx)
-                        ctx_lists.append(sub_ctx)
-                        logger.info('new sub context: %s', sub_ctx)
-                        # logger.info('new src: %s', self._file_server.get_src(sub_ctx))
+                    try:
+                        sub_ctx = detector.get_subscope_ctx(ctx, self._file_server.get_src(ctx))
+                        if sub_ctx:
+                            # append the subscope for further processing
+                            sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
+                            sub_ctx['src_uri'] = self._file_server.get_src_uri(sub_ctx)
+                            ctx_lists.append(sub_ctx)
+                            logger.info('new sub context: %s', sub_ctx)
+                            # logger.info('new src: %s', self._file_server.get_src(sub_ctx))
+                    except Exception as ex:
+                        logger.error("exception on scope processing: %s", ex)
 
             i += 1
 

@@ -23,15 +23,27 @@ def get_src(ctx):
         conn.close()
     return None
 
+# convert (lnum, col) to pos
+def get_pos(ctx,src):
+
+    lnum = ctx['lnum']
+    col = ctx['col']
+
+    # curpos
+    lines = src.split('\n')
+    pos = 0
+    for i in range(lnum-1):
+        pos += len(lines[i])+1
+    pos += col-1
+
+    return pos
+
+
+
 
 class MarkdownScope:
 
     def get_subscope_ctx(self,ctx,src):
-
-        new_ctx = copy.deepcopy(ctx)
-
-        lnum = ctx['lnum']
-        col = ctx['col']
 
         try:
 
@@ -101,12 +113,7 @@ class MarkdownScope:
             block = HackBlockLexer()
             block.cm_scope_info = None
 
-            # curpos
-            lines = src.split('\n')
-            pos = 0
-            for i in range(lnum-1):
-                pos += len(lines[i])+1
-            pos += col-1
+            pos = get_pos(ctx,src)
 
             block.cm_cur_pos = pos
             mistune.markdown(src,block=block)
@@ -135,5 +142,72 @@ class MarkdownScope:
         except Exception as ex:
             logger.info('exception, %s', ex)
             return None
+
+class HtmlScope:
+
+    def get_subscope_ctx(self,ctx,src):
+
+        lnum = ctx['lnum']
+        col = ctx['col']
+        from html.parser import HTMLParser
+
+        class MyHTMLParser(HTMLParser):
+
+            # num, col. num is one based. col is zero based.
+            last_script_start = None
+            last_data_start = None
+            last_data = None
+
+            scope_info = None
+
+            def handle_starttag(self, tag, attrs):
+                if tag.lower()=='script':
+                    self.last_script_start = self.getpos()
+                else:
+                    self.last_script_start = None
+            def handle_endtag(self, tag):
+                if tag!='script':
+                    return
+                startpos = self.last_data_start
+                endpos = self.getpos()
+                if ((startpos[0]<lnum 
+                    or (startpos[0]==lnum
+                        and startpos[1]+1<=col))
+                    and
+                    (endpos[0]>lnum
+                     or (endpos[0]==lnum
+                         and endpos[1]>=col))
+                    ):
+
+                    self.scope_info = {}
+                    self.scope_info['lnum'] = lnum-startpos[0]+1
+                    if lnum==startpos[0]:
+                        self.scope_info['col'] = col-(startpos[1]+1)+1
+                    else:
+                        self.scope_info['col']=col
+                    self.scope_info['scope']='javascript'
+                    self.scope_info['scope_offset']=get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
+                    self.scope_info['scope_len']=len(self.last_data)
+
+                    # print('['+self.last_data+']')
+                    # print(self.last_data_start)
+                    # print(self.scope_info)
+
+            def handle_data(self, data):
+                self.last_data = data
+                self.last_data_start = self.getpos()
+
+        parser = MyHTMLParser()
+        parser.feed(src)
+        if not parser.scope_info:
+            return None
+
+        new_ctx = copy.deepcopy(ctx)
+        new_ctx['scope'] = parser.scope_info['scope']
+        new_ctx['lnum'] = parser.scope_info['lnum']
+        new_ctx['col'] = parser.scope_info['col']
+        new_ctx['scope_offset'] = parser.scope_info['scope_offset']
+        new_ctx['scope_len'] = parser.scope_info['scope_len']
+        return new_ctx
 
 
