@@ -12,7 +12,7 @@ import subprocess
 import logging
 from urllib import request
 import json
-import cm_utils
+import cm
 
 logger = logging.getLogger(__name__)
 
@@ -95,22 +95,9 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
-        if filetype not in ['javascript','javascript.jsx','markdown']:
-            logger.info('ignore filetype: %s', filetype)
-            return
+        path = self._nvim.eval('expand("%:p")')
 
-        src = "\n".join(self._nvim.current.buffer[:])
-
-        if filetype=='markdown':
-            # setup completions for markdown file
-            result = cm_utils.check_markdown_code_block(src, ['javascript', 'javascript.jsx'], lnum, col)
-            logger.info('try markdown, %s,%s,%s, result: %s', src, col, col, result)
-            if result is None:
-                return
-            src = result['src']
-            col = result['col']
-            lnum = result['lnum']
+        src = cm.get_src(ctx)
 
         # completion pattern
         if (re.search(r'[\w_]{2,}$',typed)

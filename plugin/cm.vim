@@ -65,7 +65,7 @@ if has_key(s:cm_builtin_sources,'jedi')
 			\ 'name' : 'cm-jedi',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Py',
-			\ 'scopes': ['python','markdown'],
+			\ 'scopes': ['python'],
 			\ 'refresh': 1, 
 			\ 'channels': [
 			\   {
@@ -83,7 +83,7 @@ if has_key(s:cm_builtin_sources,'tern')
 			\ 'name' : 'cm-tern',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Js',
-			\ 'scopes': ['javascript','javascript.jsx','markdown'],
+			\ 'scopes': ['javascript','javascript.jsx'],
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',
@@ -99,7 +99,7 @@ if has_key(s:cm_builtin_sources,'gocode')
 			\ 'name' : 'cm-gocode',
 			\ 'priority': 9, 
 			\ 'abbreviation': 'Go',
-			\ 'scopes': ['go','markdown'],
+			\ 'scopes': ['go'],
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',

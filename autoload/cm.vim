@@ -294,7 +294,7 @@ let s:change_timer = -1
 let s:lasttick = ''
 let s:channel_id = -1
 let s:dir = expand('<sfile>:p:h')
-let s:core_py_path = s:dir . '/cm.py'
+let s:core_py_path = s:dir . '/cm_core.py'
 " let s:complete_timer
 let s:complete_timer_ctx = {}
 
@@ -400,19 +400,20 @@ func! cm#notify_sources_to_refresh(calls, channels, ctx)
 
 	for l:channel in a:channels
 		try
-			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], a:ctx)
+			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], l:channel['context'])
 		catch
 			continue
 		endtry
 	endfor
-	for l:name in a:calls
+	for l:call in a:calls
+		let l:name = l:call['name']
 		try
 			if type(s:sources[l:name].cm_refresh)==2
 				" funcref
-				call s:sources[l:name].cm_refresh(s:sources[l:name],a:ctx)
+				call s:sources[l:name].cm_refresh(s:sources[l:name],l:call['context'])
 			elseif type(s:sources[l:name].cm_refresh)==1
 				"string
-				call call(s:sources[l:name].cm_refresh,[s:sources[l:name],a:ctx],s:sources[l:name])
+				call call(s:sources[l:name].cm_refresh,[s:sources[l:name],l:call['context']],s:sources[l:name])
 			endif
 		catch
 			continue

@@ -13,7 +13,7 @@ import logging
 from urllib import request
 import json
 
-import cm_utils
+import cm
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +33,8 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
-        if filetype not in ['go','golang','markdown']:
-            logger.info('ignore filetype: %s', filetype)
-            return
-
-        src = "\n".join(self._nvim.current.buffer[:])
+        logger.info('ctx: %s',json.dumps(ctx))
+        src = cm.get_src(ctx)
 
         # completion pattern
         if (re.search(r'[\w_]{2,}$',typed)
@@ -48,17 +44,18 @@ class Handler:
         else:
             return
 
+        # compute offset
+        offset = 0
+        for i,line in enumerate(src.split("\n")):
+            if i+1==lnum:
+                offset += col-1
+                break
+            else:
+                # 1 for \n character
+                offset += len(line)+1
+        # offset = self._nvim.eval('line2byte(line("."))-1+col(".")-1')
 
-        if filetype=='markdown':
-            # setup completions for markdown file
-            result = cm_utils.check_markdown_code_block(src,['go','golang'],lnum,col)
-            logger.info('try markdown, %s,%s,%s, result: %s', src, col, col, result)
-            if result is None:
-                return
-            src = result['src']
-            offset = result['pos']
-        else:
-            offset = self._nvim.eval('line2byte(line("."))-1+col(".")-1')
+        logger.info('src[%s] offset [%s] lnum[%s] col[%s]', src, offset, lnum, col)
 
         proc = subprocess.Popen(args=['gocode','-f','json','autocomplete','%s' % offset], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         result, errs = proc.communicate(src.encode('utf-8'),timeout=30)

@@ -8,7 +8,7 @@ import re
 import logging
 import jedi
 from neovim import attach, setup_logging
-import cm_utils
+import cm
 
 logger = logging.getLogger(__name__)
 
@@ -31,22 +31,15 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        path, filetype = self._nvim.eval('[expand("%:p"),&filetype]')
-        if filetype not in ['python','markdown']:
-            logger.info('ignore filetype: %s', filetype)
+        path = self._nvim.eval('expand("%:p")')
+
+        src = cm.get_src(ctx)
+        if not src.strip():
+            # empty src may possibly block jedi execution, don't know why
+            logger.info('ignore empty src [%s]', src)
             return
 
-        src = "\n".join(self._nvim.current.buffer[:])
-
-        if filetype=='markdown':
-            result = cm_utils.check_markdown_code_block(src,['python'],lnum, col)
-            logger.info('try markdown, %s,%s,%s, result: %s', src, col, col, result)
-            if result is None:
-                return
-            src = result['src']
-            col = result['col']
-            lnum = result['lnum']
-
+        # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
         script = jedi.Script(src, lnum, len(typed), path)
         completions = script.completions()
         logger.info('completions %s', completions)
