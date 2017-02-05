@@ -73,6 +73,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 - [Javascript code completion](#javascript-code-completion)
 - [Golang code completion](#golang-code-completion)
 - [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
+- [Language specific completion for markdown](#language-specific-completion-for-markdown)
 
 ## How to extend this framework?
 
@@ -112,9 +113,9 @@ the display of popup menu. Of course It will not block the ui.
 
 I write markdown file with code blocks quite often, so I've also implemented
 [language specific completion for markdown
-file](language-specific-completion-for-markdown). This is a framework feature,
-which is called scoping. It should work for any markdown code block whose
-language completion source is avaible to NCM.
+file](#language-specific-completion-for-markdown). This is a framework
+feature, which is called scoping. It should work for any markdown code block
+whose language completion source is avaible to NCM.
 
 Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
 changes even popup menu is visible. NCM uses job_start function to start the
