@@ -24,11 +24,12 @@ class Tern:
                                 stderr=subprocess.DEVNULL
         )
         line = proc.stdout.readline().decode('utf8')
+        logger.info('read line: %s', line)
+
         match = re.match(r'Listening on port (\d+)', line)
 
         self._port = match.group(1)
-
-        logger.info('line %s [%s]', line, match.group(1))
+        logger.info('port [%s]', self._port)
 
         self._opener = request.build_opener()
 
