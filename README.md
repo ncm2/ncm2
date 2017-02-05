@@ -115,7 +115,7 @@ I write markdown file with code blocks quite often, so I've also implemented
 [language specific completion for markdown
 file](#language-specific-completion-for-markdown). This is a framework
 feature, which is called scoping. It should work for any markdown code block
-whose language completion source is avaible to NCM. It can easily supports
+whose language completion source is avaible to NCM. It can easily support
 javascript completion in html files, too, and I just have implemented that
 feature.
 
