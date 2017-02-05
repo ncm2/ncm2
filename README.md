@@ -158,11 +158,11 @@ Sorry, no plan for that. [#1](https://github.com/roxma/nvim-completion-manager/i
 
 [![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
 
-I've also added python completion **for markdown file**, just for fun. **Note that this is a
-framework feature**, It should work for any markdown code block whose language
-completion source is added to NCM.
+I've also added python completion **for markdown file**, just for fun. **Note
+that this is a framework feature, which is called scoping**, It should work
+for any markdown code block whose language completion source is added to NCM.
 
-[![asciicast python markdown completion](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc.png)](https://asciinema.org/a/87jrqlcg3r8qyijcuo3pazcmc)
+[![asciicast python markdown completion](https://asciinema.org/a/3nfnefl6sjvnsnaja1ffpob5j.png)](https://asciinema.org/a/3nfnefl6sjvnsnaja1ffpob5j)
 
 ### Javascript code completion
 
