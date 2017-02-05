@@ -163,7 +163,7 @@ func! s:check_and_start_channels(info)
 
 			" find script path
 			let l:py3 = get(g:,'python3_host_prog','python3')
-			let l:path = globpath(&rtp,l:channel['path'])
+			let l:path = globpath(&rtp,l:channel['path'],1)
 			if empty(l:path)
 				echom 'cannot find channel path: ' . l:channel['path']
 				continue
