@@ -110,13 +110,19 @@ deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course It will not block the ui.
 
-There's some hacking done in NCM. It uses a per 30ms timer to detect changes
-even popup menu is visible. NCM uses job_start function to start the
+I write markdown file with code blocks quite often, so I've also implemented
+[language specific completion for markdown
+file](language-specific-completion-for-markdown). This is a framework feature,
+which is called scoping. It should work for any markdown code block whose
+language completion source is avaible to NCM.
+
+Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
+changes even popup menu is visible. NCM uses job_start function to start the
 completion core process by itself, to illiminate the `:UpdateRemotePlugins`
 command after installation, so that it should just work out of the box.
 
-Note that the calling context of nvim's `complete()` function by NCM does not
-meet the requirement in the documentation `:help complete()`, which says:
+Also Note that the calling context of nvim's `complete()` function by NCM does
+not meet the requirement in the documentation `:help complete()`, which says:
 
 > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work after
 > CTRL-O or with an expression mapping.
@@ -157,6 +163,8 @@ Sorry, no plan for that. [#1](https://github.com/roxma/nvim-completion-manager/i
 ### Python code completion
 
 [![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
+
+### Language specific completion for markdown
 
 I've also added python completion **for markdown file**, just for fun. **Note
 that this is a framework feature, which is called scoping**, It should work
