@@ -80,8 +80,8 @@ class Handler:
     def __init__(self,nvim):
 
         self._nvim = nvim
-        logger.info('eval for tern: %s', 'split(globpath(&rtp,"node_modules/tern/bin/tern"),"\\n")[0]')
-        path = nvim.eval('split(globpath(&rtp,"node_modules/tern/bin/tern"),"\\n")[0]')
+        logger.info('eval for tern: %s', 'split(globpath(&rtp,"node_modules/tern/bin/tern",1),"\\n")[0]')
+        path = nvim.eval('split(globpath(&rtp,"node_modules/tern/bin/tern",1),"\\n")[0]')
         self._tern = Tern(path)
         logger.info('eval result: %s', path)
 
