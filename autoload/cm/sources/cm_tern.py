@@ -80,7 +80,10 @@ class Handler:
     def __init__(self,nvim):
 
         self._nvim = nvim
-        self._tern = Tern(nvim.eval('split(globpath(&rtp,"node_modules/tern/bin/tern"),"\n")[0]'))
+        logger.info('eval for tern: %s', 'split(globpath(&rtp,"node_modules/tern/bin/tern"),"\\n")[0]')
+        path = nvim.eval('split(globpath(&rtp,"node_modules/tern/bin/tern"),"\\n")[0]')
+        self._tern = Tern(path)
+        logger.info('eval result: %s', path)
 
     def cm_refresh(self,info,ctx,*args):
 
