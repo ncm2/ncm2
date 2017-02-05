@@ -33,7 +33,6 @@ class Handler:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        logger.info('ctx: %s',json.dumps(ctx))
         src = cm.get_src(ctx)
 
         # completion pattern

@@ -125,12 +125,6 @@ class MarkdownScope:
                     new_ctx['col'] = new_pos-p+1
                     new_ctx['scope_offset'] = block.cm_scope_info['scope_offset']
                     new_ctx['scope_len'] = len(new_src)
-                    new_ctx['_new_pos'] = new_pos
-                    new_ctx['_line_cnt'] = len(new_src.split("\n"))
-                    new_ctx['_line'] = line
-                    new_ctx['_len'] = len(line)
-                    new_ctx['_p'] = p
-                    new_ctx['_src'] = new_src
                     return new_ctx
                 else:
                     p += len(line)+1
