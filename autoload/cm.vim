@@ -42,7 +42,7 @@ func! cm#enable_for_buffer()
 		" save and restore completeopt
 		autocmd BufEnter    <buffer> let s:saved_completeopt = &completeopt | set completeopt=menu,menuone,noinsert,noselect
 		autocmd BufLeave    <buffer> let &completeopt = s:saved_completeopt
-	augroup end
+	augroup END
 
 	call s:check_and_start_all_channels()
 
@@ -57,7 +57,7 @@ func! cm#disable_for_buffer()
 	let &completeopt = s:saved_completeopt
 	augroup cm
 		autocmd! * <buffer>
-	augroup end
+	augroup END
 endfunc
 
 
@@ -147,12 +147,20 @@ endfunc
 
 " check and start channels
 func! s:check_and_start_channels(info)
-
 	if s:check_scope(a:info)==0
 		return
 	endif
+	call cm#start_channels(a:info)
+endfunc
 
-	for l:channel in get(a:info,'channels',[])
+" called from cm_core.py
+func! cm#start_channels(info)
+	let l:info = a:info
+	if type(a:info)==type("")
+		" parameter is a name
+		let l:info = s:sources[a:info]
+	endif
+	for l:channel in get(l:info,'channels',[])
 
 		if l:channel['type']=='python3'
 
@@ -177,6 +185,8 @@ func! s:check_and_start_channels(info)
 				execute 'augroup! cm_channel_' . self['channel']['id']
 
 				unlet self['channel']['id']
+				" mark it
+				let self['channel']['has_terminated'] = 1
 				if s:leaving
 					return
 				endif
@@ -197,10 +207,11 @@ func! s:check_and_start_channels(info)
 					execute 'au ' . join(l:event,' ') .' ' .  l:exec
 				endif
 			endfor
-			execute 'augroup end'
+			execute 'augroup END'
 
 		endif
 	endfor
+	return l:info
 endfunc
 
 
@@ -302,7 +313,7 @@ augroup cm
 	autocmd!
 	autocmd VimLeavePre * let s:leaving=1
 	" autocmd User PossibleTextChangedI call <sid>on_changed()
-augroup end
+augroup END
 
 " cm core channel functions
 " {

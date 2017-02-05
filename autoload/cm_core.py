@@ -134,6 +134,16 @@ class Handler:
 
                     if 'cm_refresh' in info:
                         refreshes_calls.append(dict(name=name,context=ctx))
+
+                    # start channels on demand here
+                    if info.get('channels',None):
+                        channel = info['channels'][0]
+                        if 'id' not in channel:
+                            if channel.get('has_terminated',0)==0:
+                                logger.info('starting channels for %s',name)
+                                # has not been started yet, start it now
+                                info = self._nvim.call('cm#start_channels',name)
+
                     for channel in info.get('channels',[]):
                         if 'id' in channel:
                             refreshes_channels.append(dict(name=name,id=channel['id'],context=ctx))
