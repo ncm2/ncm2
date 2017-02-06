@@ -480,7 +480,7 @@ def main():
             logger.info('handler created, entering event loop')
             cm_event_loop('channel',logger,nvim,handler)
         except Exception as ex:
-            logger.info('Exception: %s',ex)
+            logger.exception('Exception: %s',ex)
             exit(1)
         finally:
             # terminate here

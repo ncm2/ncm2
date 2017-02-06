@@ -12,6 +12,7 @@ let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'jedi':{},
 		\ 'tern':{},
 		\ 'gocode':{},
+		\ 'tmux':{},
 		\ })
 
 
@@ -46,6 +47,25 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 			\ ],
 			\ })
 endif
+
+
+" tmux
+if has_key(s:cm_builtin_sources,'tmux') || $TMUX!=""
+	call cm#register_source({
+			\ 'name' : 'cm-tmux',
+			\ 'priority': 4, 
+			\ 'abbreviation': 'Tmux',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_tmux.py',
+			\		'events':['CursorHold','CursorHoldI','FocusGained','BufEnter'],
+			\		'detach':1,
+			\	}
+			\ ],
+			\ })
+endif
+
 
 " filepath
 if has_key(s:cm_builtin_sources,'filepath')

@@ -10,6 +10,7 @@ support. For more information, please read the **[Why](#why) section**
 ## Current Completion Sources
 
 - [Keyword from current buffer](#keyword-from-current-buffer)
+- Keyword from tmux session
 - [Ultisnips hint](#ultisnips-hint)
 - [File path completion](#file-path-completion)
 - [Python code completion](#python-code-completion)
