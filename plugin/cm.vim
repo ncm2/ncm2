@@ -37,7 +37,12 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 			\ 'priority': 5, 
 			\ 'abbreviation': 'Key',
 			\ 'channels': [
-			\   {'type': 'python3', 'path': 'autoload/cm/sources/bufkeyword.py', 'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI']}
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/bufkeyword.py',
+			\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
+			\		'detach':1,
+			\	}
 			\ ],
 			\ })
 endif
@@ -53,6 +58,7 @@ if has_key(s:cm_builtin_sources,'filepath')
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_filepath.py',
+			\		'detach': 1,
 			\   }
 			\ ],
 			\ })
@@ -71,7 +77,8 @@ if has_key(s:cm_builtin_sources,'jedi')
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_jedi.py',
-			\		'events': ['InsertLeave']
+			\		'events': ['InsertLeave'],
+			\		'detach': 1,
 			\   }
 			\ ],
 			\ })
@@ -88,6 +95,7 @@ if has_key(s:cm_builtin_sources,'tern')
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_tern.py',
+			\		'detach': 1,
 			\   }
 			\ ],
 			\ })
@@ -104,6 +112,7 @@ if has_key(s:cm_builtin_sources,'gocode')
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_gocode.py',
+			\		'detach': 1,
 			\   }
 			\ ],
 			\ })
