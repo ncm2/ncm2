@@ -270,8 +270,25 @@ class Handler:
                 else:
                     e['menu'] = self._sources[name].get('abbreviation','')
 
-            # For now, simply do the same word filtering as vim's doing
+            if len(base)>len(e['word']):
+                continue
+
+            # For now, do the simple smart case filtering
             # TODO: enable custom config
+            skip = False
+            for a,b in zip(base,e['word']):
+                if a.isupper() :
+                    if a!=b:
+                        skip=True
+                        break
+                elif a!=b.lower():
+                    skip=True
+                    break
+
+            if skip:
+                continue
+
+
             if base.lower() != e['word'][0:len(base)].lower():
                 continue
 
