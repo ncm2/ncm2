@@ -4,7 +4,20 @@
 
 This is my **experimental** completion framework for neovim, which offers
 great flexibility for writing your own completion plugin, including async
-support.
+support. For more information, please read the **[Why](#why) section**
+
+
+## Current Completion Sources
+
+- [Keyword from current buffer](#keyword-from-current-buffer)
+- [Ultisnips hint](#ultisnips-hint)
+- [File path completion](#file-path-completion)
+- [Python code completion](#python-code-completion)
+- [Javascript code completion](#javascript-code-completion)
+- [Golang code completion](#golang-code-completion)
+- [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
+- [Language specific completion for markdown](#language-specific-completion-for-markdown)
+
 
 ## Requirements
 
@@ -62,18 +75,6 @@ and `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
-
-
-## Current Completion Sources
-
-- [Keyword from current buffer](#keyword-from-current-buffer)
-- [Ultisnips hint](#ultisnips-hint)
-- [File path completion](#file-path-completion)
-- [Python code completion](#python-code-completion)
-- [Javascript code completion](#javascript-code-completion)
-- [Golang code completion](#golang-code-completion)
-- [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
-- [Language specific completion for markdown](#language-specific-completion-for-markdown)
 
 ## How to extend this framework?
 
