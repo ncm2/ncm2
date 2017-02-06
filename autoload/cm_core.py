@@ -33,7 +33,11 @@ class Handler:
         self._subscope_detectors = {}
         # builtin detectors
         self._subscope_detectors['markdown'] = [cm.MarkdownScope(),]
-        self._subscope_detectors['html'] = [cm.HtmlScope(),]
+        htmlScope = cm.HtmlScope()
+        self._subscope_detectors['html'] = [htmlScope,]
+        self._subscope_detectors['blade'] = [htmlScope,]
+        self._subscope_detectors['jinja'] = [htmlScope,]
+        self._subscope_detectors['jinja2'] = [htmlScope,]
 
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
