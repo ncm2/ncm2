@@ -93,6 +93,8 @@ I havn't read the source of YCM yet. So here I'm describing the main design of
 NCM (from now on, I'm using NCM as short for nvim-completion-manager) and some
 of the differences between deoplete and this plugin.
 
+### Async architecture
+
 Each completion source should be a standalone process, the manager notifies
 the completion source for any text changing, even when popup menu is visible.
 The completion source notifies the manager if there's any complete matches
@@ -103,28 +105,32 @@ some simple filtering, the completion popup menu will be trigger with the
 As shown intentionally in the python jedi completion demo, If some of the
 completion source is calculating matches for a long long time, the popup menu
 will still be shown quickly if other completion sources works properly. And if
-the user havn't changed anything, the popup menu will be updated later after
-the slow completion source finish the work.
+the user havn't changed anything, the popup menu will be updated after the
+slow completion source finish the work.
 
 As the time as of this plugin being created, the completion sources of
 deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course It will not block the ui.
 
+### Scoping
+
 I write markdown file with code blocks quite often, so I've also implemented
 [language specific completion for markdown
 file](#language-specific-completion-for-markdown). This is a framework
 feature, which is called scoping. It should work for any markdown code block
-whose language completion source is avaible to NCM. It can easily support
-javascript completion in html files, too, and I just have implemented that
-feature.
+whose language completion source is avaible to NCM. I've also added support
+for javascript completion in script tag of html files.
 
-Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
-changes even popup menu is visible. NCM uses job_start function to start the
-completion core process by itself, to illiminate the `:UpdateRemotePlugins`
-command after installation, so that it should just work out of the box.
+### Experimental hacks
 
-Also Note that the calling context of nvim's `complete()` function by NCM does
+Note that there's some hacks done in NCM. It uses a per 30ms timer to detect
+changes even popup menu is visible, instead of using the `TextChangedI` event,
+which only triggers when no popup menu is visible. This is important for
+implementing the async architecture. I'm hoping one day neovim will offer
+better option rather than a timer or the limited `TextChangedI`.
+
+Also note that the calling context of nvim's `complete()` function by NCM does
 not meet the requirement in the documentation `:help complete()`, which says:
 
 > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work after
