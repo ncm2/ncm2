@@ -183,7 +183,9 @@ func! cm#start_channels(info)
 			func l:opt.on_exit(job_id, data, event)
 
 				" delete event group
-				execute 'augroup! cm_channel_' . self['channel']['id']
+				execute 'augroup cm_channel_' . self['channel']['id']
+				execute 'autocmd!'
+				execute 'augroup END'
 
 				unlet self['channel']['id']
 				" mark it
