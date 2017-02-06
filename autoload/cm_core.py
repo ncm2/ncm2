@@ -279,7 +279,9 @@ class Handler:
 
         # for now, simply sort them by length
         # TODO: enable custom config
-        result.sort(key=lambda e: len(e['word']))
+        # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
+        # sorting before 'A'
+        result.sort(key=lambda e: ( len(e['word']), e['word'].swapcase() ) )
 
         return result
 
