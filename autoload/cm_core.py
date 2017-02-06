@@ -49,7 +49,7 @@ class Handler:
 
             if (not result) and (not self._matches.get(name,{}).get('last_matches',[])):
                 # not popping up, ignore this request
-                logger.info('Not popping up, not refreshing for cm_complete by %s, startcol %s, matches %s', name, startcol, matches)
+                logger.info('Not popping up, not refreshing for cm_complete by %s, startcol %s', name, startcol)
                 return
 
         finally:
@@ -113,9 +113,8 @@ class Handler:
                             sub_ctx['src_uri'] = self._file_server.get_src_uri(sub_ctx)
                             ctx_lists.append(sub_ctx)
                             logger.info('new sub context: %s', sub_ctx)
-                            # logger.info('new src: %s', self._file_server.get_src(sub_ctx))
                     except Exception as ex:
-                        logger.error("exception on scope processing: %s", ex)
+                        logger.exception("exception on scope processing: %s", ex)
 
             i += 1
 
@@ -129,7 +128,7 @@ class Handler:
                 try:
 
                     if not self._check_scope(ctx,info):
-                        logger.debug('source %s _check_scope failed for context <%s>, ignore it', name, ctx)
+                        logger.info('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
                         continue
 
                     if (info['name'] in self._matches) and (info.get('refresh',0)==0):
@@ -152,7 +151,7 @@ class Handler:
                         if 'id' in channel:
                             refreshes_channels.append(dict(name=name,id=channel['id'],context=ctx))
                 except Exception as inst:
-                    logger.error('cm_refresh process exception: %s', inst)
+                    logger.exception('cm_refresh process exception: %s', inst)
                     continue
 
         if not refreshes_calls and not refreshes_channels:
@@ -160,7 +159,8 @@ class Handler:
             self._refresh_completions(root_ctx)
             self._has_popped_up = True
         else:
-            logger.info('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, root_ctx)
+            logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
+            logger.debug('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, root_ctx)
             self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
     # almost the same as `s:check_scope` in `autoload/cm.vim`
@@ -183,7 +183,8 @@ class Handler:
         names = sorted(self._matches.keys(),key=lambda x: self._sources[x]['priority'], reverse=True)
 
         if len(names)==0:
-            logger.info('_refresh_completions names: %s, startcol: %s, matches: %s', names, ctx['col'], matches)
+            # empty
+            logger.info('_refresh_completions names: %s, startcol: %s, matches: %s', names, ctx['col'], [])
             self._complete(ctx, ctx['col'], [])
             return
 
@@ -213,7 +214,7 @@ class Handler:
                     startcol = source_startcol
 
             except Exception as inst:
-                logger.error('_refresh_completions process exception: %s', inst)
+                logger.exception('_refresh_completions process exception: %s', inst)
                 continue
 
         # merge processing results of sources
@@ -235,10 +236,11 @@ class Handler:
                 matches += source_matches
 
             except Exception as inst:
-                logger.error('_refresh_completions process exception: %s', inst)
+                logger.exception('_refresh_completions process exception: %s', inst)
                 continue
 
-        logger.info('_refresh_completions names: %s, startcol: %s, matches: %s, source matches: %s', names, startcol, matches, self._matches)
+        logger.info('_refresh_completions names: %s, startcol: %s, matches cnt: %s', names, startcol, len(matches))
+        logger.debug('_refresh_completions names: %s, startcol: %s, matches: %s, source matches: %s', names, startcol, matches, self._matches)
         self._complete(ctx, startcol, matches)
 
     def process_matches(self,name,ctx,startcol,matches):
@@ -319,6 +321,7 @@ class FileServer(Thread):
                 try:
                     server.run_GET(self)
                 except Exception as ex:
+                    logger.exception('exception on FileServer: %s', ex)
                     self.send_response(500)
                     self.send_header('Content-type','text/html')
                     self.end_headers()
@@ -439,7 +442,11 @@ def main():
             logger.info('starting core, enter event loop')
             cm_event_loop('core',logger,nvim,handler)
         except Exception as ex:
-            logger.info('Exception: %s',ex)
+            logger.exception('Exception when running channel: %s',ex)
+            exit(1)
+        finally:
+            # terminate here
+            exit(0)
 
     elif start_type == 'channel':
 
@@ -455,7 +462,7 @@ def main():
         # change proccess title
         try:
             import setproctitle
-            setproctitle.setproctitle('nvim-completion-manager channel %s' % name)
+            setproctitle.setproctitle('nvim-completion-manager %s' % name)
         except:
             pass
 
@@ -470,6 +477,10 @@ def main():
             cm_event_loop('channel',logger,nvim,handler)
         except Exception as ex:
             logger.info('Exception: %s',ex)
+            exit(1)
+        finally:
+            # terminate here
+            exit(0)
 
 def get_loglevel():
     # logging setup
@@ -498,7 +509,7 @@ def cm_event_loop(type,logger,nvim,handler):
         func(*args)
 
     def on_notification(method, args):
-        logger.info('%s method: %s, args: %s', type, method, args)
+        logger.debug('%s method: %s, args: %s', type, method, args)
 
         if type=='channel' and method=='cm_refresh':
             ctx = args[1]
@@ -516,7 +527,7 @@ def cm_event_loop(type,logger,nvim,handler):
 
         func(*args)
 
-        logger.info('%s method %s completed', type, method)
+        logger.debug('%s method %s completed', type, method)
 
     nvim.run_loop(on_request, on_notification, on_setup)
 
