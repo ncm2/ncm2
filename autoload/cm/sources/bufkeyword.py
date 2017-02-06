@@ -74,7 +74,7 @@ class Handler:
 
         matches.sort(key=lambda x: len(x['word']))
 
-        # simply limit the number of matches here, not to explode neovim
+        # simply limit the number of matches here, avoid overwhelming neovim
         matches = matches[0:1024]
 
         # cm#complete(src, context, startcol, matches)
