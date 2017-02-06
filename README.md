@@ -7,7 +7,9 @@ great flexibility for writing your own completion plugin, including async
 support. For more information, please read the **[Why](#why) section**
 
 
-## Current Completion Sources
+## Available Completion Sources
+
+plugin builtin sources:
 
 - [Keyword from current buffer](#keyword-from-current-buffer)
 - Keyword from tmux session
@@ -16,8 +18,11 @@ support. For more information, please read the **[Why](#why) section**
 - [Python code completion](#python-code-completion)
 - [Javascript code completion](#javascript-code-completion)
 - [Golang code completion](#golang-code-completion)
-- [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
 - [Language specific completion for markdown](#language-specific-completion-for-markdown)
+
+extra sources:
+
+- [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
 
 
 ## Requirements
