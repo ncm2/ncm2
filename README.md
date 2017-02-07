@@ -19,13 +19,18 @@ plugin builtin sources:
 - [Python code completion](#python-code-completion)
 - [Javascript code completion](#javascript-code-completion)
 - [Golang code completion](#golang-code-completion)
+
+scoping features:
+
 - [Language specific completion for markdown](#language-specific-completion-for-markdown)
+- Javascript code completion in html script tag
+- Css code completion in html style tag
 
 extra sources:
 
 - [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
   (experimental plugin for [language server
-  ](https://github.com/neovim/neovim/issues/5522)) support.
+  ](https://github.com/neovim/neovim/issues/5522 support))
 
 
 ## Requirements
