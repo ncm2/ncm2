@@ -451,6 +451,14 @@ def main():
     except:
         pass
 
+    # psutil ionice
+    try:
+        import psutil
+        p = psutil.Process(os.getpid())
+        p.ionice(psutil.IOPRIO_CLASS_IDLE)
+    except:
+        pass
+
     if start_type == 'core':
 
         # use the module name here
