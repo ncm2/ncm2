@@ -67,7 +67,7 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 
 " utils, optional
 let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'proctitle')
+let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
 ```
 
