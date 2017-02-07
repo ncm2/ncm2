@@ -307,7 +307,7 @@ class Handler:
         if len(matches)==0 and len(self._last_matches)==0:
             # no need to fire complete message
             return
-        self._nvim.call('cm#core_complete', ctx, startcol, matches, self._matches, async=True)
+        self._nvim.call('cm#core_complete', ctx, startcol, matches, async=True)
 
     def cm_shutdown(self):
         self._file_server.shutdown(wait=False)

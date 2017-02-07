@@ -34,8 +34,8 @@ func! cm#enable_for_buffer()
 
 	augroup cm
 		autocmd! * <buffer>
-		autocmd InsertEnter <buffer> call s:notify_core_channel('cm_insert_enter') | let s:dict_matches = {}
-		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave') | let s:dict_matches = {}
+		autocmd InsertEnter <buffer> call s:notify_core_channel('cm_insert_enter')
+		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave')
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 		autocmd FileType,BufWinEnter <buffer> call s:check_and_start_all_channels()
@@ -281,13 +281,11 @@ func! cm#complete(src, context, startcol, matches)
 endfunc
 
 " Note: internal function
-func! cm#core_complete(context, startcol, matches, allmatches)
+func! cm#core_complete(context, startcol, matches)
 
 	if get(b:,'cm_enable',0) == 0
 		return 2
 	endif
-
-	let s:dict_matches = a:allmatches
 
 	" ignore the request if context has changed
 	if  cm#context_changed(a:context) || (mode()!='i')
