@@ -2,9 +2,9 @@
 
 # A Completion Framework for Neovim
 
-This is my **experimental** completion framework for neovim, which offers
-great flexibility for writing your own completion plugin, including async
-support. For more information, please read the **[Why](#why) section**
+This is an auto-completion framework for neovim, which offers great
+flexibility for writing your own completion plugin, including async support.
+For more information, please read the **[Why](#why) section**.
 
 
 ## Available Completion Sources
@@ -137,20 +137,8 @@ which only triggers when no popup menu is visible. This is important for
 implementing the async architecture. I'm hoping one day neovim will offer
 better option rather than a timer or the limited `TextChangedI`.
 
-Also note that the calling context of nvim's `complete()` function by NCM does
-not meet the requirement in the documentation `:help complete()`, which says:
-
-> You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work after
-> CTRL-O or with an expression mapping.
-
-I work on remote VM quite often. I tend to avoid the `CTRL-R =` mapping,
-because this triggers text updated on neovim's command line and it's
-potentially slowing down the ui. Luckily it seems it's working by calling this
-function directly. This is why I claimed **it's experimental**. I'm hoping one
-day I can confirm that the calling context is legal.
-
-Deoplete and YCM are mature, legit, they have tons of features I'm not
-offering currently, which should be considered a main difference too.
+Deoplete and YCM are mature, they have tons of features I'm not offering
+currently, which should be considered a main difference too.
 
 ## FAQ
 

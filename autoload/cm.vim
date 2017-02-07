@@ -7,6 +7,17 @@ if get(s:,'init','0')
 endif
 let s:init = 1
 
+" use silent mapping that doesn't slower the terminal ui
+inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
+" <nop> for preventing context changing
+nnoremap <silent> <Plug>(cm_complete) <nop>
+onoremap <silent> <Plug>(cm_complete) <nop>
+" visual and select
+vnoremap <silent> <Plug>(cm_complete) <nop>
+snoremap <silent> <Plug>(cm_complete) <nop>
+cnoremap <silent> <Plug>(cm_complete) <nop>
+tnoremap <silent> <Plug>(cm_complete) <nop>
+
 " options
 
 " wait for a while before popping up, in milliseconds, this would reduce the
@@ -281,27 +292,52 @@ func! cm#complete(src, context, startcol, matches)
 endfunc
 
 " Note: internal function
-func! cm#core_complete(context, startcol, matches)
+func! cm#_core_complete(context, startcol, matches)
 
 	if get(b:,'cm_enable',0) == 0
-		return 2
+		return
 	endif
 
 	" ignore the request if context has changed
-	if  cm#context_changed(a:context) || (mode()!='i')
-		return 1
+	if  cm#context_changed(a:context)
+		return
 	endif
 
 	" from core channel
 	" something selected by user, do not refresh the menu
 	if s:menu_selected()
-		return 0
+		return
 	endif
 
-	call complete(a:startcol, a:matches)
+	let s:context = a:context
+	let s:startcol = a:startcol
+	let s:matches = a:matches
 
-	return 0
+	" Note: `:help complete()` says:
+	" > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
+	" > after CTRL-O or with an expression mapping.
+	call feedkeys("\<Plug>(cm_complete)")
+
 endfunc
+
+" Note: internal function
+func! cm#_complete()
+
+	" ignore the request if context has changed
+	if  cm#context_changed(s:context)
+		return ''
+	endif
+
+	" from core channel
+	" something selected by user, do not refresh the menu
+	if s:menu_selected()
+		return ''
+	endif
+
+	call complete(s:startcol, s:matches)
+	return ''
+endfunc
+
 
 " internal functions and variables
 
