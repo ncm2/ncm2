@@ -312,16 +312,11 @@ class Handler:
     def cm_shutdown(self):
         self._file_server.shutdown(wait=False)
 
-# Cached file content in memory, and use http protocol to serve files, this
-# would be convinent for supporting language server protocol. FileServer is
-# also important in implementing the scoping feature, for example, language
-# specific completion inside markdown code fences.
-# 
-# However, some language server doesn't support http protocol, for example,
-# https://github.com/felixfbecker/php-language-server.  If I switch to file
-# protocol, then the file content won't be generated on demand, and it would be
-# difficult to implement the scoping feature. I'll stick to http protocol for
-# now.
+
+# Cached file content in memory, and use http protocol to serve files, instead
+# of asking vim for file every time.  FileServer is important in implementing
+# the scoping feature, for example, language specific completion inside
+# markdown code fences.
 class FileServer(Thread):
 
     def __init__(self):
