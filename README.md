@@ -24,6 +24,7 @@ plugin builtin sources:
 extra sources:
 
 - [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
+  (experimental plugin for language server implementation)
 
 
 ## Requirements
