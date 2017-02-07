@@ -467,27 +467,47 @@ func! cm#notify_sources_to_refresh(calls, channels, ctx)
 	for l:call in a:calls
 		let l:name = l:call['name']
 		try
-			if type(s:sources[l:name].cm_refresh)==2
+			let l:type = type(s:sources[l:name].cm_refresh)
+			if l:type==2
 				" funcref
 				call s:sources[l:name].cm_refresh(s:sources[l:name],l:call['context'])
-			elseif type(s:sources[l:name].cm_refresh)==1
+			elseif l:type==1
 				"string
 				call call(s:sources[l:name].cm_refresh,[s:sources[l:name],l:call['context']],s:sources[l:name])
+			elseif l:type==4 && has_key(s:sources[l:name].cm_refresh,'omnifunc')
+				" dict
+				call s:cm_refresh_omni(s:sources[l:name],l:call['context'])
 			endif
 		catch
+			echom "cm completion source " . l:name . " exception caught: " . v:exception
 			continue
 		endtry
 	endfor
 endfunc
 
-fun s:complete_timeout(timer)
+
+" omni completion wrapper for cm_refresh
+func! s:cm_refresh_omni(opt,ctx)
+	" omni function's startcol is zero based, convert it to one based
+	let l:startcol = call(a:opt['cm_refresh']['omnifunc'],[1,'']) + 1
+	let l:typed = a:ctx['typed']
+	let l:base = l:typed[l:startcol-1:]
+	let l:matches = call(a:opt['cm_refresh']['omnifunc'],[0, l:base])
+	if type(l:matches)!=type([])
+		return
+	endif
+	" echom a:opt['name'] . ", col: " . l:startcol . " matches: " . json_encode(l:matches)
+	call cm#complete(a:opt, a:ctx, l:startcol, l:matches)
+endfunc
+
+func! s:complete_timeout(timer)
 	" finished, clean variable
 	unlet s:complete_timer
 	if cm#context_changed(s:complete_timer_ctx)
 		return
 	endif
 	call s:notify_core_channel('cm_complete_timeout',s:sources,s:complete_timer_ctx)
-endf
+endfunc
 
 func! s:menu_selected()
 	" when the popup menu is visible, v:completed_item will be the

@@ -7,6 +7,7 @@ endif
 " if you don't want built-in sources enabled use `let g:cm_builtin_sources={}`
 let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'ultisnips':{},
+		\ 'css':{},
 		\ 'bufkeyword':{},
 		\ 'filepath':{},
 		\ 'jedi':{},
@@ -22,6 +23,18 @@ if has_key(s:cm_builtin_sources,'ultisnips')
 		\ 'priority': 7, 
 		\ 'abbreviation': 'Snips',
 		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
+		\ })
+endif
+
+
+" css
+" the omnifunc pattern is PCRE
+if has_key(s:cm_builtin_sources,'css')
+	call cm#register_source({'name' : 'cm-css',
+		\ 'priority': 9, 
+		\ 'scopes': ['css'],
+		\ 'abbreviation': 'css',
+		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS', 'patterns':['\w{2,}$',':\s+\w*$'] },
 		\ })
 endif
 

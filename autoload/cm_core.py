@@ -140,7 +140,9 @@ class Handler:
                         continue
 
                     if 'cm_refresh' in info:
-                        refreshes_calls.append(dict(name=name,context=ctx))
+                        # check patterns when necessary
+                        if self._check_patterns(ctx['typed'],info['cm_refresh']):
+                            refreshes_calls.append(dict(name=name,context=ctx))
 
                     # start channels on demand here
                     if info.get('channels',None):
@@ -166,6 +168,18 @@ class Handler:
             logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
             logger.debug('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, root_ctx)
             self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
+
+    # check patterns for dict, if non dict, return True
+    def _check_patterns(self,typed,opt):
+        if type(opt)!=type({}):
+            return True
+        patterns = opt.get('patterns',None)
+        if patterns is None:
+            return True
+        for pattern in patterns:
+            if re.search(pattern,typed):
+                return True
+        return False
 
     # almost the same as `s:check_scope` in `autoload/cm.vim`
     def _check_scope(self,ctx,info):
