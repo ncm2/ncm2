@@ -62,8 +62,13 @@ following code into your vimrc, to satisfy requirement 1 and requirement 2.
 Plug 'roxma/python-support.nvim'
 " for python completions
 let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
-" enable python completions on markdown file
+" language specific completions on markdown file
 let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
+
+" utils, optional
+let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
+let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'proctitle')
+
 ```
 
 Add this to supress the annoying completion messages:
