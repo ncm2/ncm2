@@ -38,12 +38,13 @@ func! cm#enable_for_buffer()
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave') | let s:dict_matches = {}
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
-		autocmd FileType,BufEnter <buffer> call s:check_and_start_all_channels()
+		autocmd FileType,BufWinEnter <buffer> call s:check_and_start_all_channels()
 		" save and restore completeopt
-		autocmd BufEnter    <buffer> let s:saved_completeopt = &completeopt | set completeopt=menu,menuone,noinsert,noselect
-		autocmd BufLeave    <buffer> let &completeopt = s:saved_completeopt
+		autocmd BufWinEnter    <buffer> let s:saved_completeopt = &completeopt | set completeopt=menu,menuone,noinsert,noselect
+		autocmd BufWinLeave    <buffer> let &completeopt = s:saved_completeopt
 	augroup END
 
+	call s:start_core_channel()
 	call s:check_and_start_all_channels()
 
 endfunc
@@ -117,6 +118,10 @@ func! cm#register_source(info)
 	let s:sources[a:info['name']] = a:info
 
 	" check and start channels
+	if get(b:,'cm_enable',0) == 0
+		return
+	endif
+
 	call s:check_and_start_channels(a:info)
 
 endfunc
@@ -307,6 +312,7 @@ let s:leaving = 0
 let s:change_timer = -1
 let s:lasttick = ''
 let s:channel_id = -1
+let s:channel_started = 0
 let s:dir = expand('<sfile>:p:h')
 let s:core_py_path = s:dir . '/cm_core.py'
 " let s:complete_timer
@@ -321,13 +327,16 @@ augroup END
 " cm core channel functions
 " {
 func! s:start_core_channel()
+	if s:channel_started
+		return
+	endif
 	let l:py3 = get(g:,'python3_host_prog','python3')
 	let s:channel_id = jobstart([l:py3,s:core_py_path,'core'],{'rpc':1,
 			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ 'detach'  : 1,
 			\ })
 
-			" \ 'cwd'     : s:dir,
+	let s:channel_started = 1
 endfunc
 
 fun s:on_core_channel_exit(job_id, data, event)
@@ -451,10 +460,4 @@ func! s:menu_selected()
 	" if v:completed_item is empty, no item is selected
 	return pumvisible() && !empty(v:completed_item)
 endfunc
-
-if v:vim_did_enter
-	call s:start_core_channel()
-else
-	au VimEnter * call s:start_core_channel()
-endif
 
