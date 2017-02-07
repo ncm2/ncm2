@@ -444,6 +444,13 @@ def main():
 
     start_type = sys.argv[1]
 
+    # the default nice is inheriting from parent neovim process.  Increment it
+    # so that heavy calculation will not block the ui.
+    try:
+        os.nice(1)
+    except:
+        pass
+
     if start_type == 'core':
 
         # use the module name here
