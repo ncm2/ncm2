@@ -139,7 +139,7 @@ I write markdown file with code blocks quite often, so I've also implemented
 file](#language-specific-completion-for-markdown). This is a framework
 feature, which is called scoping. It should work for any markdown code block
 whose language completion source is avaible to NCM. I've also added support
-for javascript completion in script tag of html files, or css completion in
+for javascript completion in script tag of html files, and css completion in
 style tag.
 
 ### Experimental hacks
