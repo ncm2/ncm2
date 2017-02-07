@@ -13,6 +13,7 @@ information, please read the **[Why](#why) section**.
 plugin builtin sources:
 
 - [Keyword from current buffer](#keyword-from-current-buffer)
+- Tag completion. (`:help 'tags'`, `:help tagfiles()`)
 - Keyword from tmux session
 - [Ultisnips hint](#ultisnips-hint)
 - [File path completion](#file-path-completion)

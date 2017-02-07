@@ -9,6 +9,7 @@ let s:cm_builtin_sources = get(g:, 'cm_builtin_sources',{
 		\ 'ultisnips':{},
 		\ 'css':{},
 		\ 'bufkeyword':{},
+		\ 'tags':{},
 		\ 'filepath':{},
 		\ 'jedi':{},
 		\ 'tern':{},
@@ -55,6 +56,24 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
 			\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
+			\		'detach':1,
+			\	}
+			\ ],
+			\ })
+endif
+
+
+" tags
+if has_key(s:cm_builtin_sources,'tags')
+	call cm#register_source({
+			\ 'name' : 'cm-tags',
+			\ 'priority': 6, 
+			\ 'abbreviation': 'Tag',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_tags.py',
+			\		'events':['BufWinEnter'],
 			\		'detach':1,
 			\	}
 			\ ],
