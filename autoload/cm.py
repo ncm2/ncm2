@@ -153,45 +153,56 @@ class HtmlScope:
 
         class MyHTMLParser(HTMLParser):
 
-            # num, col. num is one based. col is zero based.
-            last_script_start = None
             last_data_start = None
             last_data = None
 
             scope_info = None
 
-            def handle_starttag(self, tag, attrs):
-                if tag.lower()=='script':
-                    self.last_script_start = self.getpos()
-                else:
-                    self.last_script_start = None
             def handle_endtag(self, tag):
-                if tag!='script':
-                    return
-                startpos = self.last_data_start
-                endpos = self.getpos()
-                if ((startpos[0]<lnum 
-                    or (startpos[0]==lnum
-                        and startpos[1]+1<=col))
-                    and
-                    (endpos[0]>lnum
-                     or (endpos[0]==lnum
-                         and endpos[1]>=col))
-                    ):
 
-                    self.scope_info = {}
-                    self.scope_info['lnum'] = lnum-startpos[0]+1
-                    if lnum==startpos[0]:
-                        self.scope_info['col'] = col-(startpos[1]+1)+1
-                    else:
-                        self.scope_info['col']=col
-                    self.scope_info['scope']='javascript'
-                    self.scope_info['scope_offset']=get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
-                    self.scope_info['scope_len']=len(self.last_data)
+                if tag=='script':
+                    startpos = self.last_data_start
+                    endpos = self.getpos()
+                    if ((startpos[0]<lnum 
+                        or (startpos[0]==lnum
+                            and startpos[1]+1<=col))
+                        and
+                        (endpos[0]>lnum
+                         or (endpos[0]==lnum
+                             and endpos[1]>=col))
+                        ):
 
-                    # print('['+self.last_data+']')
-                    # print(self.last_data_start)
-                    # print(self.scope_info)
+                        self.scope_info = {}
+                        self.scope_info['lnum'] = lnum-startpos[0]+1
+                        if lnum==startpos[0]:
+                            self.scope_info['col'] = col-(startpos[1]+1)+1
+                        else:
+                            self.scope_info['col']=col
+                        self.scope_info['scope']='javascript'
+                        self.scope_info['scope_offset']=get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
+                        self.scope_info['scope_len']=len(self.last_data)
+
+                elif tag=='style':
+                    startpos = self.last_data_start
+                    endpos = self.getpos()
+                    if ((startpos[0]<lnum 
+                        or (startpos[0]==lnum
+                            and startpos[1]+1<=col))
+                        and
+                        (endpos[0]>lnum
+                         or (endpos[0]==lnum
+                             and endpos[1]>=col))
+                        ):
+
+                        self.scope_info = {}
+                        self.scope_info['lnum'] = lnum-startpos[0]+1
+                        if lnum==startpos[0]:
+                            self.scope_info['col'] = col-(startpos[1]+1)+1
+                        else:
+                            self.scope_info['col']=col
+                        self.scope_info['scope']='css'
+                        self.scope_info['scope_offset']=get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
+                        self.scope_info['scope_len']=len(self.last_data)
 
             def handle_data(self, data):
                 self.last_data = data

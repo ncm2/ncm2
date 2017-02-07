@@ -35,6 +35,7 @@ class Handler:
         self._subscope_detectors['markdown'] = [cm.MarkdownScope(),]
         htmlScope = cm.HtmlScope()
         self._subscope_detectors['html'] = [htmlScope,]
+        self._subscope_detectors['php'] = [htmlScope,]
         self._subscope_detectors['blade'] = [htmlScope,]
         self._subscope_detectors['jinja'] = [htmlScope,]
         self._subscope_detectors['jinja2'] = [htmlScope,]
