@@ -40,7 +40,7 @@ if has_key(s:cm_builtin_sources,'bufkeyword')
 			\ 'channels': [
 			\   {
 			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/bufkeyword.py',
+			\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
 			\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
 			\		'detach':1,
 			\	}
