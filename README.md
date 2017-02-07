@@ -99,7 +99,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 - For omni completion ([highly
   discoraged](https://github.com/roxma/nvim-completion-manager/issues/9)),
   refer to this [block of
-  code)(https://github.com/roxma/nvim-completion-manager/commit/0b316b057dd2ef4b6566f6e7768b78b93f031700#diff-94213b48127982c914ef94803281f5dfR30)
+  code](https://github.com/roxma/nvim-completion-manager/commit/0b316b057dd2ef4b6566f6e7768b78b93f031700#diff-94213b48127982c914ef94803281f5dfR30)
 
 
 ## Why?
