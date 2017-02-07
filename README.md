@@ -148,9 +148,9 @@ whose language completion source is avaible to NCM. I've also added support
 for javascript completion in script tag of html files, and css completion in
 style tag.
 
-### Experimental hacks
+### Experimental hacking
 
-Note that there's some hacks done in NCM. It uses a per 30ms timer to detect
+Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
 changes even popup menu is visible, instead of using the `TextChangedI` event,
 which only triggers when no popup menu is visible. This is important for
 implementing the async architecture. I'm hoping one day neovim will offer
