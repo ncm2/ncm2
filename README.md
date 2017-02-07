@@ -2,9 +2,10 @@
 
 # A Completion Framework for Neovim
 
-This is an auto-completion framework for neovim, which offers great
-flexibility for writing your own completion plugin, including async support.
-For more information, please read the **[Why](#why) section**.
+This is an auto-completion framework for
+[neovim](https://github.com/neovim/neovim), which offers great flexibility for
+writing your own completion plugin, including async support.  For more
+information, please read the **[Why](#why) section**.
 
 
 ## Available Completion Sources
