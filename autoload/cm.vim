@@ -87,6 +87,7 @@ func! cm#context()
 	let l:ret['lnum'] = l:ret['curpos'][1]
 	let l:ret['col'] = l:ret['curpos'][2]
 	let l:ret['filetype'] = &filetype
+	let l:ret['filepath'] = expand('%:p')
 	let l:ret['typed'] = strpart(getline(l:ret['lnum']),0,l:ret['col']-1)
 	return l:ret
 endfunc
