@@ -27,11 +27,11 @@ class Handler:
         lnum = ctx['lnum']
         col = ctx['col']
         typed = ctx['typed']
+        path = ctx['filepath']
 
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        path = self._nvim.eval('expand("%:p")')
 
         src = cm.get_src(ctx)
         if not src.strip():
@@ -39,33 +39,38 @@ class Handler:
             logger.info('ignore empty src [%s]', src)
             return
 
-        # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
-        script = jedi.Script(src, lnum, len(typed), path)
-        completions = script.completions()
-        logger.info('completions %s', completions)
-        
-        signature_text = self._get_signature_text(script)
-
-        self._nvim.call('airline#extensions#cm_call_signature#set', signature_text, async=True)
-
-        # skip completions
-        skip = False
+        skip_completions = False
+        show_sig = False
 
         # completion pattern
         if (re.search(r'^(import|from)', typed) 
             or re.search(r'[\w_]{2,}$',typed)
             or re.search(r'\.[\w_]*$',typed)
             ):
-            skip = False
+            skip_completions = False
         else:
-            skip = True
+            skip_completions = True
+            if kwtyped=="":
+                show_sig = True
+            else:
+                # skip and no show sig, no need to process
+                return
 
-        if skip:
-            # if skip the completions, show the useful call_signatures
-            if kwtyped=="" and signature_text:
+        # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
+        script = jedi.Script(src, lnum, len(typed), path)
+
+        if show_sig:
+            signature_text = self._get_signature_text(script)
+            if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 self._nvim.call('cm#complete', info['name'], ctx, col, matches, async=True)
             return
+
+        if skip_completions:
+            return
+
+        completions = script.completions()
+        logger.info('completions %s', completions)
 
         matches = []
 
