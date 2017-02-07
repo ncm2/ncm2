@@ -91,11 +91,10 @@ class Handler:
         lnum = ctx['lnum']
         col = ctx['col']
         typed = ctx['typed']
+        path = ctx['filepath']
 
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
-
-        path = self._nvim.eval('expand("%:p")')
 
         src = cm.get_src(ctx)
 

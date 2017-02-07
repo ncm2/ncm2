@@ -29,6 +29,7 @@ class Handler:
         lnum = ctx['lnum']
         col = ctx['col']
         typed = ctx['typed']
+        filepath = ctx['filepath']
  
         pkw = re.search(self._path_kw_pattern+r'*?$',typed).group(0)
         nkw = re.search(self._name_kw_pattern+r'*?$',typed).group(0)
@@ -39,7 +40,7 @@ class Handler:
             return
 
         # full path of current file, current working dir
-        filepath,cwd = self._nvim.eval('[expand("%:p"),getcwd()]')
+        cwd = self._nvim.call('getcwd')
         curdir = os.path.dirname(filepath)
 
         bdirs = [ curdir, cwd]
