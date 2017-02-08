@@ -166,6 +166,9 @@ with neovim's syntax api. It's very likely that vim-syntax-compl-pop doesn't
 work, for example, javascript completion in markdown or html script tag.  So I
 use custom parser in NCM to implement the scoping features.
 
+IMHO, NCM is potentially faster 'cause all completion sources runs in
+parallel.
+
 ### Experimental hacking
 
 Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
