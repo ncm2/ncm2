@@ -148,6 +148,13 @@ whose language completion source is avaible to NCM. I've also added support
 for javascript completion in script tag of html files, and css completion in
 style tag.
 
+The idea was originated in
+[vim-syntax-compl-pop](https://github.com/roxma/vim-syntax-compl-pop). Since
+it's pure vimscript implementation, and there're some limitation currently
+with neovim's syntax api. It's very likely that vim-syntax-compl-pop doesn't
+work, for example, javascript completion in markdown or html script tag.  So I
+use custom parser in NCM to implement the scoping features.
+
 ### Experimental hacking
 
 Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
