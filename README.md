@@ -12,18 +12,18 @@ information, please read the **[Why](#why) section**.
 
 plugin builtin sources:
 
-- [Keyword from current buffer](#keyword-from-current-buffer)
+- Keyword from current buffer
 - Tag completion. (`:help 'tags'`, `:help tagfiles()`)
 - Keyword from tmux session
-- [Ultisnips hint](#ultisnips-hint)
-- [File path completion](#file-path-completion)
-- [Python code completion](#python-code-completion)
-- [Javascript code completion](#javascript-code-completion)
-- [Golang code completion](#golang-code-completion)
+- Ultisnips hint
+- File path completion
+- Python code completion
+- Javascript code completion
+- Golang code completion
 
 scoping features:
 
-- [Language specific completion for markdown](#language-specific-completion-for-markdown)
+- Language specific completion for markdown
 - Javascript code completion in html script tag
 - Css code completion in html style tag
 
