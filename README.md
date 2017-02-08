@@ -148,8 +148,7 @@ deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course It will not block the ui.
 
-IMHO, NCM is potentially faster 'cause all completion sources runs in
-parallel.
+IMHO, NCM is potentially faster 'cause all completion sources run in parallel.
 
 ### Scoping
 
