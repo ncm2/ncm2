@@ -1,13 +1,37 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# For debugging
+# If you're implementing your own completion source, add the setup code like
+# this into you vimrc, or plugin/source.vim
+#
+# autocmd User CmSetup call cm#register_source({
+# 			\ 'name' : 'cm-filepath',
+# 			\ 'priority': 6, 
+# 			\ 'abbreviation': 'path',
+# 			\ 'channels': [
+# 			\   {
+# 			\		'type': 'python3',
+# 			\		'path': 'autoload/cm/sources/cm_filepath.py',
+# 			\		'detach': 1,
+# 			\   }
+# 			\ ],
+# 			\ })
+#
+#
+# An autocmd will avoid error when nvim-completion-manager is not installed
+# yet. And it also avoid the loading of autoload/cm.vim on neovim startup, so
+# that nvim-completion-manager won't affect neovim's startup time.
+#
+
+# For debugging, use this command to start neovim:
+#
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
+
 
 import os
 import re
 import logging
 from neovim.api import Nvim
+import cm
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +54,12 @@ class Handler:
         col = ctx['col']
         typed = ctx['typed']
         filepath = ctx['filepath']
+
+        # Note:
+        # 
+        # If you'r implementing you own source, and you want to get the content
+        # of the file, Please use `cm.get_src()` instead of
+        # `"\n".join(self._nvim.current.buffer[:])`
  
         pkw = re.search(self._path_kw_pattern+r'*?$',typed).group(0)
         nkw = re.search(self._name_kw_pattern+r'*?$',typed).group(0)

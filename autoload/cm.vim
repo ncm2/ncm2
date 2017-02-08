@@ -593,7 +593,6 @@ func! s:register_builtin_sources()
 
 
 	" filepath
-	" refresh 1 for call signatures
 	call cm#register_source({
 			\ 'name' : 'cm-filepath',
 			\ 'priority': 6, 
