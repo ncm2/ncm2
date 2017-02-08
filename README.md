@@ -181,7 +181,9 @@ currently, which should be considered a main difference too.
 
 ### Vim 8 support?
 
-Sorry, no plan for that. [#1](https://github.com/roxma/nvim-completion-manager/issues/1)
+Currently not available. Refer to
+[#14](https://github.com/roxma/nvim-completion-manager/issues/14) for
+discussion.
 
 ## Related Projects
 
