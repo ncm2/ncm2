@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # If you're implementing your own completion source, add the setup code like
-# this into you vimrc, or plugin/source.vim
+# this into your vimrc, or plugin/foo.vim
 #
 # autocmd User CmSetup call cm#register_source({
 # 			\ 'name' : 'cm-filepath',
