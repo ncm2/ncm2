@@ -31,7 +31,10 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 
 	let l:kw = matchstr(l:typed,'\v\S+$')
 	let l:kwlen = len(l:kw)
-	if l:kwlen<2
+	if l:kwlen==0
+		return
+	endif
+	if l:kwlen<2 && !has_key(l:snips,l:kwlen)
 		return
 	endif
 
