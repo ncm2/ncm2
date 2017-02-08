@@ -110,8 +110,9 @@ add the following code into your vimrc to remove builtin tag completion:
 " remove the builtin tag completion
 "
 " An autocmd will avoid error when nvim-completion-manager is not installed
+" yet.
 "
-" yet. And it also avoid the loading of autoload/cm.vim on neovim startup, so
+" And it also avoid the loading of autoload/cm.vim on neovim startup, so
 " that nvim-completion-manager won't affect neovim's startup time.
 autocmd User CmSetup call cm#remove_source('cm-tags')
 ```
