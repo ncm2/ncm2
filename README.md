@@ -36,7 +36,7 @@ extra sources:
 
 ## Screenshots
 
-If you have a completion source, please upload your screenshot
+If you have a new completion source, please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12).
 
 ![animation](https://cloud.githubusercontent.com/assets/4538941/22722971/9ca06230-edf5-11e6-93be-a1d7cf1fdedd.gif)
