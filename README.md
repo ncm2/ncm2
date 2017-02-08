@@ -3,9 +3,8 @@
 # A Completion Framework for Neovim
 
 This is a **Fast! Easily Extensible! Async! completion framework** for
-[neovim](https://github.com/neovim/neovim), which offers great flexibility for
-writing your own completion plugin, including async support.  For more
-information, please read the **[Why](#why) section**.
+[neovim](https://github.com/neovim/neovim).  For more information, please read
+the **[Why](#why) section**.
 
 
 ## Available Completion Sources
