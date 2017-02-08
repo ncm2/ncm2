@@ -36,10 +36,10 @@ extra sources:
 
 ## Screenshots
 
-![animation](https://cloud.githubusercontent.com/assets/4538941/22722971/9ca06230-edf5-11e6-93be-a1d7cf1fdedd.gif)
+If you have a completion source, please upload your screenshot
+[here](https://github.com/roxma/nvim-completion-manager/issues/12).
 
-**If you have a completion source, please upload your screenshot
-[here](https://github.com/roxma/nvim-completion-manager/issues/12).**
+![animation](https://cloud.githubusercontent.com/assets/4538941/22722971/9ca06230-edf5-11e6-93be-a1d7cf1fdedd.gif)
 
 ## Requirements
 
@@ -113,6 +113,10 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
   discoraged](https://github.com/roxma/nvim-completion-manager/issues/9)),
   refer to this [block of
   code](https://github.com/roxma/nvim-completion-manager/commit/0b316b057dd2ef4b6566f6e7768b78b93f031700#diff-94213b48127982c914ef94803281f5dfR30)
+
+Please upload your screenshot
+[here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
+created the extension.
 
 
 ## Why?
