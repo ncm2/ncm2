@@ -34,6 +34,11 @@ extra sources:
   ](https://github.com/neovim/neovim/issues/5522 support))
 
 
+## Screenshots
+
+![animation](https://cloud.githubusercontent.com/assets/4538941/22722971/9ca06230-edf5-11e6-93be-a1d7cf1fdedd.gif)
+
+
 ## Requirements
 
 1. Neovim python3 support. `:help provider-python`. For lazy linux users, I
@@ -175,38 +180,4 @@ Sorry, no plan for that. [#1](https://github.com/roxma/nvim-completion-manager/i
 ## Related Projects
 
 [asyncomplete.vim](https://github.com/prabirshrestha/asyncomplete.vim)
-
-## Demo
-
-### Keyword from current buffer
-
-[![asciicast buffer keyword completion](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t.png)](https://asciinema.org/a/7kb5ihp73jvk8vytdjghwyu4t)
-
-### Ultisnips hint
-
-[![asciicast ultisnips hint completion](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde.png)](https://asciinema.org/a/3swl7vylxhjyg2yyd8vdu0tde)
-
-### File path completion
-
-[![asciicast file path completion](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41.png)](https://asciinema.org/a/2me1ahjfahko8a1xnblls1k41)
-
-### Python code completion
-
-[![asciicast ppython completion](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo.png)](https://asciinema.org/a/5esfmuse51cfouikm7ik75hqo)
-
-### Language specific completion for markdown
-
-I've also added python completion **for markdown file**, just for fun. **Note
-that this is a framework feature, which is called scoping**, It should work
-for any markdown code block whose language completion source is added to NCM.
-
-[![asciicast python markdown completion](https://asciinema.org/a/3nfnefl6sjvnsnaja1ffpob5j.png)](https://asciinema.org/a/3nfnefl6sjvnsnaja1ffpob5j)
-
-### Javascript code completion
-
-[![asciicast javascript code completion](https://asciinema.org/a/72m5ckw7k1m39kquro2jr0l1i.png)](https://asciinema.org/a/72m5ckw7k1m39kquro2jr0l1i)
-
-### Golang code completion
-
-[![asciicast golang code completion](https://asciinema.org/a/f45w82dwalitn5fyfpe29x3ua.png)](https://asciinema.org/a/f45w82dwalitn5fyfpe29x3ua)
 
