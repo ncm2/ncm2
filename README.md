@@ -185,6 +185,11 @@ Currently not available. Refer to
 [#14](https://github.com/roxma/nvim-completion-manager/issues/14) for
 discussion.
 
+### Why Python?
+
+YouCompleteMe has [good
+explanation](https://github.com/Valloric/YouCompleteMe#why-isnt-ycm-just-written-in-plain-vimscript-ffs).
+
 ## Related Projects
 
 [asyncomplete.vim](https://github.com/prabirshrestha/asyncomplete.vim)
