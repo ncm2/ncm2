@@ -22,7 +22,7 @@ class Handler:
         self._nvim = nvim
 
         self._name_kw_pattern = r'[0-9a-zA-Z_\-\.]'
-        self._path_kw_pattern = r'[0-9a-zA-Z_\-\.\/]'
+        self._path_kw_pattern = r'[0-9a-zA-Z_\-\.\/~\$]'
 
     def cm_refresh(self,info,ctx):
 
@@ -36,6 +36,8 @@ class Handler:
         startcol = col-len(nkw)
 
         dir = os.path.dirname(pkw)
+        dir = os.path.expandvars(dir)
+        dir = os.path.expanduser(dir)
         if dir=='' and len(nkw)<2:
             return
 
