@@ -152,7 +152,7 @@ class Handler:
                             if channel.get('has_terminated',0)==0:
                                 logger.info('starting channels for %s',name)
                                 # has not been started yet, start it now
-                                info = self._nvim.call('cm#start_channels',name)
+                                info = self._nvim.call('cm#_start_channels',name)
 
                     for channel in info.get('channels',[]):
                         if 'id' in channel:
@@ -167,8 +167,8 @@ class Handler:
             self._has_popped_up = True
         else:
             logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
-            logger.debug('cm#notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, root_ctx)
-            self._nvim.call('cm#notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
+            logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, root_ctx)
+            self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
     # check patterns for dict, if non dict, return True
     def _check_patterns(self,typed,opt):
