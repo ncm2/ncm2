@@ -62,7 +62,7 @@ class Handler:
         typed = ctx['typed']
         
         kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
-        if len(kw)<2:
+        if len(kw)<3:
             return
         startcol = col-len(kw)
 
