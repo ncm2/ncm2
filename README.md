@@ -2,7 +2,7 @@
 
 # A Completion Framework for Neovim
 
-This is a **fast, easily extensible auto completion framework** for
+This is a **Fast! Easily Extensible! Async! completion framework** for
 [neovim](https://github.com/neovim/neovim), which offers great flexibility for
 writing your own completion plugin, including async support.  For more
 information, please read the **[Why](#why) section**.
