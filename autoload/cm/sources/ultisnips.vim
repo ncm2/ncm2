@@ -1,4 +1,20 @@
 
+" If you're implementing your own completion source, add the setup code like
+" this into your vimrc, or plugin/foo.vim
+"
+" autocmd User CmSetup call cm#register_source({'name' : 'cm-ultisnips',
+"		\ 'priority': 7, 
+"		\ 'abbreviation': 'Snips',
+"		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
+"		\ })
+"
+" An autocmd will avoid error when nvim-completion-manager is not installed
+" yet. And it also avoid the loading of autoload/cm.vim on neovim startup, so
+" that nvim-completion-manager won't affect neovim's startup time.
+"
+
+
+
 func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 
 	" UltiSnips#SnippetsInCurrentScope
