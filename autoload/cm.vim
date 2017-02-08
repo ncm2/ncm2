@@ -6,6 +6,7 @@ if get(s:,'init','0')
 	finish
 endif
 let s:init = 1
+let s:already_setup = 0
 
 " use silent mapping that doesn't slower the terminal ui
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
@@ -29,7 +30,16 @@ let g:cm#complete_delay = get(g:,'complete_delay',50)
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
 
+" do nothing, place it here only to avoid the message 'No matching autocommands'
+autocmd User CmSetup silent 
+
 func! cm#enable_for_buffer()
+
+	if s:already_setup == 0
+		call s:register_builtin_sources()
+		doautocmd User CmSetup
+		let s:already_setup = 1
+	endif
 
 	" Notice: Workaround for neovim's bug. When the popup menu is visible, and
 	" no item is selected, an enter key will close the popup menu, change and
@@ -137,6 +147,143 @@ func! cm#register_source(info)
 	call s:check_and_start_channels(a:info)
 
 endfunc
+
+func! s:register_builtin_sources()
+
+	call cm#register_source({'name' : 'cm-ultisnips',
+		\ 'priority': 7, 
+		\ 'abbreviation': 'Snips',
+		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
+		\ })
+
+	" css
+	" the omnifunc pattern is PCRE
+	call cm#register_source({'name' : 'cm-css',
+		\ 'priority': 9, 
+		\ 'scopes': ['css'],
+		\ 'abbreviation': 'css',
+		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS', 'patterns':['\w{2,}$',':\s+\w*$'] },
+		\ })
+
+
+	" Note: the channels field is required as an array, on most cases only one
+	" channel will would be enough. While there may be cases in which you need
+	" another thread to do the indexing, caching work, it's easier to use another
+	" channel instead of controlling threading on your own.
+
+	" keyword
+	call cm#register_source({
+			\ 'name' : 'cm-bufkeyword',
+			\ 'priority': 5, 
+			\ 'abbreviation': 'Key',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
+			\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
+			\		'detach':1,
+			\	}
+			\ ],
+			\ })
+
+	" tags
+	call cm#register_source({
+			\ 'name' : 'cm-tags',
+			\ 'priority': 6, 
+			\ 'abbreviation': 'Tag',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_tags.py',
+			\		'events':['WinEnter'],
+			\		'detach':1,
+			\	}
+			\ ],
+			\ })
+
+
+	" tmux
+	call cm#register_source({
+			\ 'name' : 'cm-tmux',
+			\ 'priority': 4, 
+			\ 'abbreviation': 'Tmux',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_tmux.py',
+			\		'events':['CursorHold','CursorHoldI','FocusGained','BufEnter'],
+			\		'detach':1,
+			\	}
+			\ ],
+			\ })
+
+
+	" filepath
+	" refresh 1 for call signatures
+	call cm#register_source({
+			\ 'name' : 'cm-filepath',
+			\ 'priority': 6, 
+			\ 'abbreviation': 'path',
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_filepath.py',
+			\		'detach': 1,
+			\   }
+			\ ],
+			\ })
+
+	" jedi
+	" refresh 1 for call signatures
+	" detach 0, jedi enters infinite loops sometime, don't know why.
+	call cm#register_source({
+			\ 'name' : 'cm-jedi',
+			\ 'priority': 9, 
+			\ 'abbreviation': 'Py',
+			\ 'scopes': ['python'],
+			\ 'refresh': 1, 
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_jedi.py',
+			\		'events': ['InsertLeave'],
+			\		'detach': 0,
+			\   }
+			\ ],
+			\ })
+
+	" gocode
+	call cm#register_source({
+			\ 'name' : 'cm-gocode',
+			\ 'priority': 9, 
+			\ 'abbreviation': 'Go',
+			\ 'scopes': ['go'],
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_gocode.py',
+			\		'detach': 1,
+			\   }
+			\ ],
+			\ })
+
+	" tern
+	call cm#register_source({
+			\ 'name' : 'cm-tern',
+			\ 'priority': 9, 
+			\ 'abbreviation': 'Js',
+			\ 'scopes': ['javascript','javascript.jsx'],
+			\ 'channels': [
+			\   {
+			\		'type': 'python3',
+			\		'path': 'autoload/cm/sources/cm_tern.py',
+			\		'detach': 1,
+			\   }
+			\ ],
+			\ })
+
+endfunc
+
 
 func! s:check_and_start_all_channels()
 	for l:name in keys(s:sources)
