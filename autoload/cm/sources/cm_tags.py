@@ -20,7 +20,7 @@ class Handler:
         self._files = self._nvim.call('tagfiles')
 
     def cm_event(self,event,ctx,*args):
-        if event=="BufWinEnter":
+        if event=="WinEnter":
             self._files = self._nvim.call('tagfiles')
 
     def cm_refresh(self,info,ctx):

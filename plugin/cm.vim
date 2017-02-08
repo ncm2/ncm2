@@ -73,7 +73,7 @@ if has_key(s:cm_builtin_sources,'tags')
 			\   {
 			\		'type': 'python3',
 			\		'path': 'autoload/cm/sources/cm_tags.py',
-			\		'events':['BufWinEnter'],
+			\		'events':['WinEnter'],
 			\		'detach':1,
 			\	}
 			\ ],
