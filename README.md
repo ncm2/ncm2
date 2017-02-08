@@ -103,6 +103,19 @@ inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
 
+If you want to disable some of the builtin source of this plugin, for example,
+add the following code into your vimrc to remove builtin tag completion:
+
+```vim
+" remove the builtin tag completion
+"
+" An autocmd will avoid error when nvim-completion-manager is not installed
+"
+" yet. And it also avoid the loading of autoload/cm.vim on neovim startup, so
+" that nvim-completion-manager won't affect neovim's startup time.
+autocmd User CmSetup call cm#remove_source('cm-tags')
+```
+
 ## How to extend this framework?
 
 - For really simple, light weight completion candidate calculation, refer to
