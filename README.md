@@ -149,6 +149,9 @@ deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course It will not block the ui.
 
+IMHO, NCM is potentially faster 'cause all completion sources runs in
+parallel.
+
 ### Scoping
 
 I write markdown file with code blocks quite often, so I've also implemented
@@ -165,9 +168,6 @@ it's pure vimscript implementation, and there're some limitation currently
 with neovim's syntax api. It's very likely that vim-syntax-compl-pop doesn't
 work, for example, javascript completion in markdown or html script tag.  So I
 use custom parser in NCM to implement the scoping features.
-
-IMHO, NCM is potentially faster 'cause all completion sources runs in
-parallel.
 
 ### Experimental hacking
 
