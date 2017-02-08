@@ -138,11 +138,10 @@ available. After some basic priority sorting between completion sources, and
 some simple filtering, the completion popup menu will be trigger with the
 `complete()` function by the completion manager.
 
-As shown intentionally in the python jedi completion demo, If some of the
-completion source is calculating matches for a long long time, the popup menu
-will still be shown quickly if other completion sources works properly. And if
-the user havn't changed anything, the popup menu will be updated after the
-slow completion source finish the work.
+If some of the completion source is calculating matches for a long long time,
+the popup menu will still be shown quickly if other completion sources works
+properly. And if the user havn't changed anything, the popup menu will be
+updated after the slow completion source finish the work.
 
 As the time as of this plugin being created, the completion sources of
 deoplete are gathered with `gather_candidates()` of the `Source` object,
