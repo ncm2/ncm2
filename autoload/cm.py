@@ -8,6 +8,11 @@ import copy
 
 logger = logging.getLogger(__name__)
 
+def context_outdated(ctx1,ctx2):
+    # same as cm#context_changed
+    return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
+
+
 def get_src(ctx):
     src_uri = ctx['src_uri']
     parsed = urllib.parse.urlparse(src_uri)

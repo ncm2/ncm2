@@ -43,7 +43,13 @@ class Handler:
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
 
+        self._ctx = None
+
     def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
+
+        # if cm.context_outdated(self._ctx,ctx):
+        #     logger.info('ignore outdated context from [%s]', name)
+        #     return
 
         self._sources = srcs
 
@@ -86,6 +92,7 @@ class Handler:
     def cm_refresh(self,srcs,root_ctx,*args):
 
         # update file server
+        self._ctx = root_ctx
         self._file_server.set_current_ctx(root_ctx)
 
         # initial scope
@@ -410,14 +417,14 @@ class FileServer(Thread):
 
             # If context does not match current context, check the neovim current
             # context, if does not match neither, return None
-            if self._context_changed(self._current_context,context):
+            if cm.context_outdated(self._current_context,context):
                 self._current_context = self._nvim.eval('cm#context()')
-            if self._context_changed(self._current_context,context):
+            if cm.context_outdated(self._current_context,context):
                 logger.info('get_src returning None for oudated context: %s', context)
                 return None
 
             # update cache when necessary
-            if self._context_changed(self._current_context, self._cache_context):
+            if cm.context_outdated(self._current_context, self._cache_context):
                 logger.info('get_src updating cache for context %s', context)
                 self._cache_context = self._current_context
                 self._cache_src = "\n".join(self._nvim.current.buffer[:])
@@ -425,10 +432,6 @@ class FileServer(Thread):
             scope_offset = context.get('scope_offset',0)
             scope_len = context.get('scope_len',len(self._cache_src))
             return self._cache_src[scope_offset:scope_offset+scope_len]
-
-    # same as cm#context_changed
-    def _context_changed(self,ctx1,ctx2):
-        return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
 
     def set_current_ctx(self,context):
         """
