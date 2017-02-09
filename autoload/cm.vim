@@ -45,7 +45,7 @@ func! cm#enable_for_buffer()
 	" no item is selected, an enter key will close the popup menu, change and
 	" move nothong, and then trigger TextChangedI and CursorMovedI
 	" https://github.com/neovim/neovim/issues/5997
-	inoremap <expr> <buffer> <CR> ((pumvisible() && empty(v:completed_item)) ?"\<ESC>a\<CR>" : "\<CR>")
+	inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 
 	let b:cm_enable = 1
 
