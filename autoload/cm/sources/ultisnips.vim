@@ -50,7 +50,7 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 	if l:kwlen==0
 		return
 	endif
-	if l:kwlen<2 && !has_key(l:snips,l:kwlen)
+	if l:kwlen<2 && !has_key(l:snips,l:kw)
 		return
 	endif
 
