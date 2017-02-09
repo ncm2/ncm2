@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 class Handler:
 
     def __init__(self,nvim):
+
         self._nvim = nvim
 
         # { '{source_name}': {'startcol': , 'matches'}
@@ -32,19 +33,37 @@ class Handler:
         # should be True for supporting display menu directly without cm_refresh
         self._has_popped_up = True
         self._subscope_detectors = {}
-        # builtin detectors
-        self._subscope_detectors['markdown'] = [cm.MarkdownScope(),]
-        htmlScope = cm.HtmlScope()
-        self._subscope_detectors['html'] = [htmlScope,]
-        self._subscope_detectors['php'] = [htmlScope,]
-        self._subscope_detectors['blade'] = [htmlScope,]
-        self._subscope_detectors['jinja'] = [htmlScope,]
-        self._subscope_detectors['jinja2'] = [htmlScope,]
+
+        scoper_paths = self._nvim.eval("globpath(&rtp,'autoload/cm/scopers/*.py')").split("\n")
+
+        # loading scopers
+        for path in scoper_paths:
+            if not path:
+                continue
+            try:
+                dir = os.path.dirname(path)
+                if dir not in sys.path:
+                    sys.path.append(dir)
+                name = os.path.splitext(os.path.basename(path))[0]
+                m = importlib.import_module(name)
+
+                scoper = m.Scoper()
+                for scope in scoper.scopes:
+                    if scope not in self._subscope_detectors:
+                        self._subscope_detectors[scope] = []
+                    self._subscope_detectors[scope].append(scoper)
+                    logger.info('scoper <%s> imported for %s', name, scope)
+
+
+            except Exception as ex:
+                logger.exception('importing scoper <%s> failed: %s', name, ex)
+
+        logger.info('_subscope_detectors: %s', self._subscope_detectors)
 
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
 
-        self._matcher = cm.smart_case_matcher
+        self._matcher = cm.smart_case_prefix_matcher
         self._sorter = cm.alnum_sorter
 
         self._ctx = None
