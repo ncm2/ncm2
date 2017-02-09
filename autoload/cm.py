@@ -43,7 +43,20 @@ def get_pos(ctx,src):
 
     return pos
 
+def smart_case_matcher(base,item):
+    for a,b in zip(base,item['word']):
+        if a.isupper() :
+            if a!=b:
+                return False
+        elif a!=b.lower():
+            return False
+    return True
 
+def alnum_sorter(base,startcol,matches):
+    # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
+    # sorting before 'A'
+    matches.sort(key=lambda e: e['word'].swapcase())
+    return matches
 
 
 class MarkdownScope:

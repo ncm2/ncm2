@@ -44,6 +44,9 @@ class Handler:
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
 
+        self._matcher = cm.smart_case_matcher
+        self._sorter = cm.alnum_sorter
+
         self._ctx = None
 
     def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
@@ -270,6 +273,8 @@ class Handler:
                 logger.exception('_refresh_completions process exception: %s', inst)
                 continue
 
+        if not matches:
+            startcol=len(ctx['typed']) or 1
         logger.info('_refresh_completions names: %s, startcol: %s, matches cnt: %s', names, startcol, len(matches))
         logger.debug('_refresh_completions names: %s, startcol: %s, matches: %s, source matches: %s', names, startcol, matches, self._matches)
         self._complete(ctx, startcol, matches)
@@ -290,6 +295,9 @@ class Handler:
             else:
                 e = copy.deepcopy(item)
 
+            if not self._matcher(base=base,item=e):
+                continue
+
             if 'menu' not in e:
                 if 'info' in e and e['info'] and len(e['info'])<50:
                     if abbr:
@@ -307,40 +315,23 @@ class Handler:
             if len(base)>len(e['word']):
                 continue
 
-            # For now, do the simple smart case filtering
-            # TODO: enable custom config
-            skip = False
-            for a,b in zip(base,e['word']):
-                if a.isupper() :
-                    if a!=b:
-                        skip=True
-                        break
-                elif a!=b.lower():
-                    skip=True
-                    break
-
-            if skip:
-                continue
-
-
             if base.lower() != e['word'][0:len(base)].lower():
                 continue
 
             result.append(e)
 
-        # TODO: enable custom config
-        # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
-        # sorting before 'A'
-        result.sort(key=lambda e: e['word'].swapcase())
+        result = self._sorter(base,startcol,result)
 
         return result
 
 
     def _complete(self, ctx, startcol, matches):
-        if len(matches)==0 and len(self._last_matches)==0:
+        if not matches and not self._last_matches:
             # no need to fire complete message
+            logger.info('matches==0, _last_matches==0, ignore')
             return
         self._nvim.call('cm#_core_complete', ctx, startcol, matches, async=True)
+        self._last_matches = matches
 
     def cm_shutdown(self):
         self._file_server.shutdown(wait=False)
