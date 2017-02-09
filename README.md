@@ -3,8 +3,12 @@
 # A Completion Framework for Neovim
 
 This is a **Fast! Easily Extensible! Async! completion framework** for
-[neovim](https://github.com/neovim/neovim).  For more information, please read
-the **[Why](#why) section**.
+[neovim](https://github.com/neovim/neovim).  For more information about plugin
+implementation, please read the **[Why](#why) section**.
+
+**Future updates, announcements will be post
+[here](https://github.com/roxma/nvim-completion-manager/issues/12). Subscribe
+it if you are interested.**
 
 
 ## Available Completion Sources
@@ -91,7 +95,7 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 
 ## Configuration Tips:
 
-- Add this to supress the annoying completion messages:
+- Supress the annoying completion messages:
 
 ```vim
 " don't give |ins-completion-menu| messages.  For example,
@@ -99,14 +103,14 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 set shortmess+=c
 ```
 
-- Add this to your vimrc for **Tab Completion**
+- **Tab Completion**
 
 ```vim
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
 
-- Triggering Ultisnips or show popup hints [with the same
+- Trigger Ultisnips or show popup hints [with the same
   key](https://github.com/roxma/nvim-completion-manager/issues/12#issuecomment-278605326)
   `<c-u>`
 
@@ -119,9 +123,7 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
   completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
   `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 
-- If you want to disable some of the builtin sources of this plugin, add the
-  following code into your vimrc to remove builtin tag completion, for
-  example:
+- Disable the plugin builtin tag completion source, for example:
 
 ```vim
 " remove the builtin tag completion
@@ -138,7 +140,8 @@ autocmd User CmSetup call cm#remove_source('cm-tags')
 
 - For really simple, light weight completion candidate calculation, refer to
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
-- For really async completion source, refer to the file path completion example:
+- For really async completion source (strongly encoraged), refer to the file
+  path completion example:
   [autoload/cm/sources/cm_filepath.py](autoload/cm/sources/cm_filepath.py)
 - For existing omni completion ([strongly
   discoraged](https://github.com/roxma/nvim-completion-manager/issues/9)),
