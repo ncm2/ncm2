@@ -57,7 +57,7 @@ If you have a new completion source, please upload your screenshot
 
 ## Installation and Configuration
 
-Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
+- Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 " `npm install` For javascript code completion support
@@ -66,9 +66,15 @@ Plug 'roxma/nvim-completion-manager', {'do': 'npm install'}
 Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
 ```
 
-If you are using
-[python-support.nvim](https://github.com/roxma/python-support.nvim), add the
-following code into your vimrc, to satisfy requirement 1 and requirement 2.
+- Install the required pip modules for you neovim python3:
+
+```sh
+pip3 --user install neovim jedi mistune psutil setproctitle
+```
+
+(Optional) It's easier to use
+[python-support.nvim](/roxma/python-support.nvim) to help manage your pip
+modules for neovim:
 
 ```vim
 Plug 'roxma/python-support.nvim'
@@ -83,7 +89,7 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 
 ```
 
-Add this to supress the annoying completion messages:
+- Add this to supress the annoying completion messages:
 
 ```vim
 " don't give |ins-completion-menu| messages.  For example,
@@ -91,19 +97,20 @@ Add this to supress the annoying completion messages:
 set shortmess+=c
 ```
 
-**Note** that there's no guarantee that this plugin will be compatible with
-other completion plugin in the same buffer. Use `let g:cm_enable_for_all=0`
-and `call cm#enable_for_buffer()` to use this plugin for specific buffer.
-
-**Tab Completion**
+- Add this to your vimrc for **Tab Completion**
 
 ```vim
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
 
-If you want to disable some of the builtin source of this plugin, for example,
-add the following code into your vimrc to remove builtin tag completion:
+- There's no guarantee that this plugin will be compatible with other
+  completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
+  `call cm#enable_for_buffer()` to use this plugin for specific buffer.
+
+- If you want to disable some of the builtin sources of this plugin, add the
+  following code into your vimrc to remove builtin tag completion, for
+  example:
 
 ```vim
 " remove the builtin tag completion
