@@ -526,7 +526,7 @@ func! s:register_builtin_sources()
 
 	call cm#register_source({'name' : 'cm-ultisnips',
 		\ 'priority': 7, 
-		\ 'abbreviation': 'Snips',
+		\ 'abbreviation': 'Snip',
 		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
 		\ })
 

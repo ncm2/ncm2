@@ -268,6 +268,8 @@ class Handler:
         result = []
         base = ctx['typed'][startcol-1:]
 
+        abbr = self._sources[name].get('abbreviation','')
+
         for item in matches:
 
             e = {}
@@ -277,13 +279,18 @@ class Handler:
                 e = copy.deepcopy(item)
 
             if 'menu' not in e:
-                if 'info' in e and e['info'] and len(e['info'])<70:
-                    if self._sources[name].get('abbreviation',''):
-                        e['menu'] = self._sources[name]['abbreviation'] + " :" + e['info']
+                if 'info' in e and e['info'] and len(e['info'])<50:
+                    if abbr:
+                        e['menu'] = "<%s> %s" % (abbr,e['info'])
                     else:
                         e['menu'] = e['info']
                 else:
-                    e['menu'] = self._sources[name].get('abbreviation','')
+                    # info too long
+                    if abbr:
+                        e['menu'] = "<%s>" % abbr
+            else:
+                # e['menu'] = "<%s> %s"  % (self._sources[name]['abbreviation'], e['info'])
+                pass
 
             if len(base)>len(e['word']):
                 continue
