@@ -218,7 +218,8 @@ class Handler:
             self._complete(ctx, ctx['col'], [])
             return
 
-        startcol = ctx['col']
+        col = ctx['col']
+        startcol = col
         base = ctx['typed'][startcol-1:]
 
         # basick processing per source
@@ -226,7 +227,7 @@ class Handler:
 
             try:
                 source_startcol = self._matches[name]['startcol']
-                if source_startcol>ctx['col']:
+                if source_startcol>col or source_startcol==0:
                     self._matches[name]['last_matches'] = []
                     logger.error('ignoring invalid startcol: %s', self._matches[name])
                     continue
