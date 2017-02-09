@@ -309,11 +309,10 @@ class Handler:
 
             result.append(e)
 
-        # for now, simply sort them by length
         # TODO: enable custom config
         # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
         # sorting before 'A'
-        result.sort(key=lambda e: ( len(e['word']), e['word'].swapcase() ) )
+        result.sort(key=lambda e: e['word'].swapcase())
 
         return result
 
