@@ -106,7 +106,9 @@ inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
 
-- Triggering ultisnips or show popup hints with the same key `<c-u>`
+- Triggering Ultisnips or show popup hints [with the same
+  key](https://github.com/roxma/nvim-completion-manager/issues/12#issuecomment-278605326)
+  `<c-u>`
 
 ```vim
 let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
