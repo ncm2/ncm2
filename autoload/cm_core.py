@@ -29,7 +29,8 @@ class Handler:
         self._matches = {}
         self._sources = {}
         self._last_matches = []
-        self._has_popped_up = False
+        # should be True for supporting display menu directly without cm_refresh
+        self._has_popped_up = True
         self._subscope_detectors = {}
         # builtin detectors
         self._subscope_detectors['markdown'] = [cm.MarkdownScope(),]
@@ -78,7 +79,10 @@ class Handler:
 
         # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
+            logger.info("update popup for [%s]",name)
             self._refresh_completions(ctx)
+        else:
+            logger.info("delay popup for [%s]",name)
 
     def cm_insert_enter(self):
         self._matches = {}

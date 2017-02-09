@@ -55,7 +55,7 @@ If you have a new completion source, please upload your screenshot
 - For **Golang code completion**, you need to install
   [gocode](https://github.com/nsf/gocode#setup).
 
-## Installation and Configuration
+## Installation
 
 - Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
@@ -89,6 +89,8 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 
 ```
 
+## Configuration Tips:
+
 - Add this to supress the annoying completion messages:
 
 ```vim
@@ -102,6 +104,13 @@ set shortmess+=c
 ```vim
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+```
+
+- Triggering ultisnips or show popup hints with the same key `<c-u>`
+
+```vim
+let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
+inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 ```
 
 - There's no guarantee that this plugin will be compatible with other

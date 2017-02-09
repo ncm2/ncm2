@@ -10,14 +10,6 @@ let s:already_setup = 0
 
 " use silent mapping that doesn't slower the terminal ui
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
-" <nop> for preventing context changing
-nnoremap <silent> <Plug>(cm_complete) <nop>
-onoremap <silent> <Plug>(cm_complete) <nop>
-" visual and select
-vnoremap <silent> <Plug>(cm_complete) <nop>
-snoremap <silent> <Plug>(cm_complete) <nop>
-cnoremap <silent> <Plug>(cm_complete) <nop>
-tnoremap <silent> <Plug>(cm_complete) <nop>
 
 " options
 
