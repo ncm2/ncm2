@@ -6,7 +6,7 @@ This is a **Fast! Easily Extensible! Async! completion framework** for
 [neovim](https://github.com/neovim/neovim).  For more information about plugin
 implementation, please read the **[Why](#why) section**.
 
-Future updates, announcements will be post
+Future updates, announcements will be posted
 **[here](https://github.com/roxma/nvim-completion-manager/issues/12).
 Subscribe it if you are interested.**
 
