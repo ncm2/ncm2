@@ -17,10 +17,10 @@ inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 " popup menu flashes when multiple sources are updating the popup menu in a
 " short interval, use a interval which is long enough for computer and short
 " enough for human
-let g:cm#complete_delay = get(g:,'cm#complete_delay',50)
+let g:cm_complete_delay = get(g:,'cm_complete_delay',50)
 
 " used to override default options of sources
-let g:cm#sources_override = get(g:,'cm#sources_override',{})
+let g:cm_sources_override = get(g:,'cm_sources_override',{})
 
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
@@ -132,9 +132,9 @@ func! cm#register_source(info)
 		return
 	endif
 
-	if has_key(g:cm#sources_override,a:info['name'])
+	if has_key(g:cm_sources_override,a:info['name'])
 		" override source default options
-		call extend(a:info,g:cm#sources_override[a:info['name']])
+		call extend(a:info,g:cm_sources_override[a:info['name']])
 	endif
 
 	let s:sources[a:info['name']] = a:info
@@ -463,7 +463,7 @@ func! cm#_notify_sources_to_refresh(calls, channels, ctx)
 		call timer_stop(s:complete_timer)
 		unlet s:complete_timer
 	endif
-	let s:complete_timer = timer_start(g:cm#complete_delay,function('s:complete_timeout'))
+	let s:complete_timer = timer_start(g:cm_complete_delay,function('s:complete_timeout'))
 	let s:complete_timer_ctx = a:ctx
 
 	for l:channel in a:channels
