@@ -136,18 +136,6 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
   completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
   `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 
-- Disable the plugin builtin tag completion source, for example:
-
-```vim
-" remove the builtin tag completion
-"
-" An autocmd will avoid error when nvim-completion-manager is not installed
-" yet.
-"
-" And it also avoid the loading of autoload/cm.vim on neovim startup, so
-" that nvim-completion-manager won't affect neovim's startup time.
-autocmd User CmSetup call cm#remove_source('cm-tags')
-```
 
 ## How to extend this framework?
 
