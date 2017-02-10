@@ -178,7 +178,7 @@ endfunc
 "	1 ignored for context change
 "   2 async completion has been disabled
 "   3 this source has not been registered yet
-func! cm#complete(src, context, startcol, matches)
+func! cm#complete(src, context, startcol, matches, ...)
 
 	if type(a:src)==1
 		" string
@@ -193,7 +193,7 @@ func! cm#complete(src, context, startcol, matches)
 	endif
 
 	" ignore the request if context has changed
-	if  cm#context_changed(a:context) || (mode()!='i')
+	if  cm#context_changed(a:context)
 		return 1
 	endif
 
@@ -201,7 +201,7 @@ func! cm#complete(src, context, startcol, matches)
 		return 3
 	endif
 
-	call s:notify_core_channel('cm_complete',s:sources,l:name,a:context,a:startcol,a:matches)
+	call call(function('s:notify_core_channel'),['cm_complete',s:sources,l:name,a:context,a:startcol,a:matches]+a:000)
 
 endfunc
 

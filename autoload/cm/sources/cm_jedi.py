@@ -68,7 +68,7 @@ class Handler:
             signature_text = self._get_signature_text(script)
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
-                self._nvim.call('cm#complete', info['name'], ctx, col, matches, async=True)
+                self._nvim.call('cm#complete', info['name'], ctx, col, matches, True, async=True)
             return
 
         if skip_completions:

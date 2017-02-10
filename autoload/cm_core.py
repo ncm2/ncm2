@@ -135,7 +135,7 @@ class Handler:
 
         self._ctx = None
 
-    def cm_complete(self,srcs,name,ctx,startcol,matches,*args):
+    def cm_complete(self,srcs,name,ctx,startcol,matches,refresh=0,*args):
 
         # if cm.context_outdated(self._ctx,ctx):
         #     logger.info('ignore outdated context from [%s]', name)
@@ -164,6 +164,7 @@ class Handler:
                 del self._matches[name]
             else:
                 self._matches[name]['startcol'] = startcol
+                self._matches[name]['refresh'] = refresh
                 self._matches[name]['matches'] = matches
 
         # wait for cm_complete_timeout, reduce flashes
@@ -242,8 +243,9 @@ class Handler:
                         logger.info('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
                         continue
 
-                    if (info['name'] in self._matches) and (info.get('refresh',0)==0):
+                    if (name in self._matches) and not self._matches[name]['refresh']:
                         # no need to refresh
+                        logger.info('cached for <%s>, no need to refresh', name)
                         continue
 
                     if 'cm_refresh' in info:
