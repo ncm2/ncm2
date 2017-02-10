@@ -569,19 +569,21 @@ func! s:register_builtin_sources()
 
 
 	" tmux
-	call cm#register_source({
-			\ 'name' : 'cm-tmux',
-			\ 'priority': 4, 
-			\ 'abbreviation': 'Tmux',
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_tmux.py',
-			\		'events':['CursorHold','CursorHoldI','FocusGained','BufEnter'],
-			\		'detach':1,
-			\	}
-			\ ],
-			\ })
+	if $TMUX != ''
+		call cm#register_source({
+				\ 'name' : 'cm-tmux',
+				\ 'priority': 4, 
+				\ 'abbreviation': 'Tmux',
+				\ 'channels': [
+				\   {
+				\		'type': 'python3',
+				\		'path': 'autoload/cm/sources/cm_tmux.py',
+				\		'events':['CursorHold','CursorHoldI','FocusGained','BufEnter'],
+				\		'detach':1,
+				\	}
+				\ ],
+				\ })
+	endif
 
 
 	" filepath
