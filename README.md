@@ -18,7 +18,7 @@ Subscribe it if you are interested.**
 * [Available Completion Sources](#available-completion-sources)
 * [Requirements](#requirements)
 * [Installation](#installation)
-* [Configuration Tips:](#configuration-tips)
+* [Configuration Tips](#configuration-tips)
 * [How to extend this framework?](#how-to-extend-this-framework)
 * [Why?](#why)
     * [Async architecture](#async-architecture)
@@ -106,7 +106,7 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 
 ```
 
-## Configuration Tips:
+## Configuration Tips
 
 - Supress the annoying completion messages:
 
