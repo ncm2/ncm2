@@ -10,6 +10,25 @@ Future updates, announcements will be posted
 **[here](https://github.com/roxma/nvim-completion-manager/issues/12).
 Subscribe it if you are interested.**
 
+## Table of Contents
+
+<!-- vim-markdown-toc GFM -->
+* [Available Completion Sources](#available-completion-sources)
+* [Screenshots](#screenshots)
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Configuration Tips:](#configuration-tips)
+* [How to extend this framework?](#how-to-extend-this-framework)
+* [Why?](#why)
+    * [Async architecture](#async-architecture)
+    * [Scoping](#scoping)
+    * [Experimental hacking](#experimental-hacking)
+* [FAQ](#faq)
+    * [Vim 8 support?](#vim-8-support)
+    * [Why Python?](#why-python)
+* [Related Projects](#related-projects)
+
+<!-- vim-markdown-toc -->
 
 ## Available Completion Sources
 
