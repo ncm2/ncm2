@@ -136,6 +136,14 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
   completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
   `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 
+- To disable the tag completion source. It's also possible to use
+  `g:cm#sources_override` to override other options of a completion source.
+
+```vim
+let g:cm#sources_override = {
+    \ 'cm-tags': {'enable':0}
+    \ }
+```
 
 ## How to extend this framework?
 

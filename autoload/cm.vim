@@ -17,7 +17,10 @@ inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 " popup menu flashes when multiple sources are updating the popup menu in a
 " short interval, use a interval which is long enough for computer and short
 " enough for human
-let g:cm#complete_delay = get(g:,'complete_delay',50)
+let g:cm#complete_delay = get(g:,'cm#complete_delay',50)
+
+" used to override default options of sources
+let g:cm#sources_override = get(g:,'cm#sources_override',{})
 
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
@@ -127,6 +130,11 @@ func! cm#register_source(info)
 	" if registered before, ignore this call
 	if has_key(s:sources,a:info['name'])
 		return
+	endif
+
+	if has_key(g:cm#sources_override,a:info['name'])
+		" override source default options
+		call extend(a:info,g:cm#sources_override[a:info['name']])
 	endif
 
 	let s:sources[a:info['name']] = a:info
@@ -242,6 +250,9 @@ endfunc
 
 " check and start channels
 func! s:check_and_start_channels(info)
+	if get(a:info,'enable',1)==0
+		return
+	endif
 	if s:check_scope(a:info)==0
 		return
 	endif

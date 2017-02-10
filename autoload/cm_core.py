@@ -227,9 +227,15 @@ class Handler:
         refreshes_calls = []
         refreshes_channels = []
 
+        # get the sources that need to be notified
         for ctx in ctx_lists:
             for name in srcs:
+
                 info = srcs[name]
+                if not info.get('enable',True):
+                    # ignore disabled source
+                    continue
+
                 try:
 
                     if not self._check_scope(ctx,info):
