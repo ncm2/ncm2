@@ -6,15 +6,16 @@ This is a **Fast! Easily Extensible! Async! completion framework** for
 [neovim](https://github.com/neovim/neovim).  For more information about plugin
 implementation, please read the **[Why](#why) section**.
 
-Future updates, announcements will be posted
+Future updates, announcements, screenshots will be posted
 **[here](https://github.com/roxma/nvim-completion-manager/issues/12).
 Subscribe it if you are interested.**
+
+![All in one screenshot](https://cloud.githubusercontent.com/assets/4538941/22727187/78f35172-ee12-11e6-95e5-e9c160151f3b.gif)
 
 ## Table of Contents
 
 <!-- vim-markdown-toc GFM -->
 * [Available Completion Sources](#available-completion-sources)
-* [Screenshots](#screenshots)
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Configuration Tips:](#configuration-tips)
@@ -55,13 +56,6 @@ extra sources:
   (experimental plugin for [language server
   ](https://github.com/neovim/neovim/issues/5522 support))
 
-
-## Screenshots
-
-If you have a new completion source, please upload your screenshot
-[here](https://github.com/roxma/nvim-completion-manager/issues/12).
-
-![All in one screenshot](https://cloud.githubusercontent.com/assets/4538941/22727187/78f35172-ee12-11e6-95e5-e9c160151f3b.gif)
 
 ## Requirements
 
