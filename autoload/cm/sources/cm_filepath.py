@@ -1,31 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# If you're implementing your own completion source, add the setup code like
-# this into your vimrc, or plugin/foo.vim
-#
-# autocmd User CmSetup call cm#register_source({
-# 			\ 'name' : 'cm-filepath',
-# 			\ 'priority': 6, 
-# 			\ 'abbreviation': 'path',
-# 			\ 'channels': [
-# 			\   {
-# 			\		'type': 'python3',
-# 			\		'path': 'autoload/cm/sources/cm_filepath.py',
-# 			\		'detach': 1,
-# 			\   }
-# 			\ ],
-# 			\ })
-#
-#
-# An autocmd will avoid error when nvim-completion-manager is not installed
-# yet. And it also avoid the loading of autoload/cm.vim on neovim startup, so
-# that nvim-completion-manager won't affect neovim's startup time.
-#
-
 # For debugging, use this command to start neovim:
 #
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
-
+#
+#
+# Please register source before executing any other code, this allow cm_core to
+# read basic information about the source without loading the whole module, and
+# modules required by this module
 import cm
 cm.register_source(name='cm-filepath',
                    abbreviation='path',
@@ -36,7 +18,6 @@ import os
 import re
 import logging
 from neovim.api import Nvim
-import cm
 
 logger = logging.getLogger(__name__)
 
