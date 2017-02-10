@@ -145,7 +145,7 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
   path completion example:
   [autoload/cm/sources/cm_filepath.py](autoload/cm/sources/cm_filepath.py)
 - For existing omni completion (strongly discoraged), refer to
-  [this](/roxma/nvim-completion-manager/issues/9#issuecomment-278895791)
+  [this](https://github.com/roxma/nvim-completion-manager/issues/9#issuecomment-278895791)
 
 Please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
