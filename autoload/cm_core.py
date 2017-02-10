@@ -19,6 +19,10 @@ import cm
 
 logger = logging.getLogger(__name__)
 
+# use a trick to only register the source withou loading the entire
+# module
+class CmSkipLoading(Exception):
+    pass
 
 class Handler:
 
@@ -36,7 +40,7 @@ class Handler:
 
         scoper_paths = self._nvim.eval("globpath(&rtp,'autoload/cm/scopers/*.py')").split("\n")
 
-        # loading scopers
+        # auto find scopers
         for path in scoper_paths:
             if not path:
                 continue
@@ -57,6 +61,69 @@ class Handler:
 
             except Exception as ex:
                 logger.exception('importing scoper <%s> failed: %s', name, ex)
+
+        # auto find sources
+        sources_paths = self._nvim.eval("globpath(&rtp,'autoload/cm/sources/*.py')").split("\n")
+        for path in sources_paths:
+
+            dir = os.path.dirname(path)
+            if dir not in sys.path:
+                sys.path.append(dir)
+            modulename = os.path.splitext(os.path.basename(path))[0]
+
+            # use a trick to only register the source withou loading the entire
+            # module
+            def register_source(name,abbreviation,priority,scopes=None,events=[],detach=0):
+
+                # " jedi
+                # " refresh 1 for call signatures
+                # " detach 0, jedi enters infinite loops sometime, don't know why.
+                # call cm#register_source({
+                # 		\ 'name' : 'cm-jedi',
+                # 		\ 'priority': 9, 
+                # 		\ 'abbreviation': 'Py',
+                # 		\ 'scopes': ['python'],
+                # 		\ 'refresh': 1, 
+                # 		\ 'channels': [
+                # 		\   {
+                # 		\		'type': 'python3',
+                # 		\		'path': 'autoload/cm/sources/cm_jedi.py',
+                # 		\		'events': ['InsertLeave'],
+                # 		\		'detach': 0,
+                # 		\   }
+                # 		\ ],
+                # 		\ })
+
+                channel = dict(type='python3',
+                               path='autoload/cm/sources/%s.py' % modulename,
+                               detach=detach,
+                               events=events)
+
+                source = {}
+                source['channels']     = [channel]
+                source['name']         = name
+                source['priority']     = priority
+                source['abbreviation'] = abbreviation
+                if scopes:
+                    source['scopes']       = scopes
+
+                logger.info('registering source: %s',source)
+                nvim.call('cm#register_source',source)
+
+                # use a trick to only register the source withou loading the entire
+                # module
+                raise CmSkipLoading()
+
+            cm.register_source = register_source
+            try:
+                # register_source
+                m = importlib.import_module(modulename)
+            except CmSkipLoading:
+                # This is not an error
+                logger.info('source <%s> registered', modulename)
+            except Exception as ex:
+                logger.exception("register_source for %s failed",name)
+
 
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
 

@@ -26,6 +26,11 @@
 #
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+import cm
+cm.register_source(name='cm-filepath',
+                   abbreviation='path',
+                   priority=6,
+                   detach=1)
 
 import os
 import re

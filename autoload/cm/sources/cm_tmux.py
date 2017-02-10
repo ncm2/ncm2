@@ -4,6 +4,13 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+import cm
+cm.register_source(name='cm-tmux',
+                   abbreviation='Tmux',
+                   priority=4,
+                   events=['CursorHold','CursorHoldI','FocusGained','BufEnter'],
+                   detach=1)
+
 import os
 import re
 import logging
@@ -16,6 +23,11 @@ class Handler:
     def __init__(self,nvim):
 
         self._nvim = nvim
+
+        if not os.environ['TMUX']:
+            # suiside for tmux not available
+            nvim.call("cm#remove_source",'cm-tmux')
+
         self._words = set()
 
         self._split_pattern = r'[^0-9a-zA-Z_]+'

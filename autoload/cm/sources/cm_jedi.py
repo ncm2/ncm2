@@ -3,12 +3,21 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+# detach 1 for quick shutdown for neovim, detach 0, 'cause jedi enters infinite
+# loops sometime, don't know why.
+import cm
+cm.register_source(name='cm-jedi',
+                   priority=9,
+                   abbreviation='Py',
+                   scopes=['python'],
+                   events=['InsertLeave'],
+                   detach=0)
+
 import os
 import re
 import logging
 import jedi
 from neovim import attach, setup_logging
-import cm
 
 logger = logging.getLogger(__name__)
 

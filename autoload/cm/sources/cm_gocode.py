@@ -3,6 +3,14 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+import cm
+# detach=1 for exit vim quickly
+cm.register_source(name='cm-gocode',
+                   priority=9,
+                   abbreviation='Go',
+                   scopes=['go'],
+                   detach=1)
+
 import os
 import re
 import logging

@@ -537,117 +537,20 @@ func! s:register_builtin_sources()
 	" another thread to do the indexing, caching work, it's easier to use another
 	" channel instead of controlling threading on your own.
 
-	" keyword
-	call cm#register_source({
-			\ 'name' : 'cm-bufkeyword',
-			\ 'priority': 5, 
-			\ 'abbreviation': 'Key',
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
-			\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-			\		'detach':1,
-			\	}
-			\ ],
-			\ })
-
-	" tags
-	call cm#register_source({
-			\ 'name' : 'cm-tags',
-			\ 'priority': 6, 
-			\ 'abbreviation': 'Tag',
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_tags.py',
-			\		'events':['WinEnter'],
-			\		'detach':1,
-			\	}
-			\ ],
-			\ })
-
-
-	" tmux
-	if $TMUX != ''
-		call cm#register_source({
-				\ 'name' : 'cm-tmux',
-				\ 'priority': 4, 
-				\ 'abbreviation': 'Tmux',
-				\ 'channels': [
-				\   {
-				\		'type': 'python3',
-				\		'path': 'autoload/cm/sources/cm_tmux.py',
-				\		'events':['CursorHold','CursorHoldI','FocusGained','BufEnter'],
-				\		'detach':1,
-				\	}
-				\ ],
-				\ })
-	endif
-
-
-	" filepath
-	call cm#register_source({
-			\ 'name' : 'cm-filepath',
-			\ 'priority': 6, 
-			\ 'abbreviation': 'path',
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_filepath.py',
-			\		'detach': 1,
-			\   }
-			\ ],
-			\ })
-
-	" jedi
-	" refresh 1 for call signatures
-	" detach 0, jedi enters infinite loops sometime, don't know why.
-	call cm#register_source({
-			\ 'name' : 'cm-jedi',
-			\ 'priority': 9, 
-			\ 'abbreviation': 'Py',
-			\ 'scopes': ['python'],
-			\ 'refresh': 1, 
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_jedi.py',
-			\		'events': ['InsertLeave'],
-			\		'detach': 0,
-			\   }
-			\ ],
-			\ })
-
-	" gocode
-	call cm#register_source({
-			\ 'name' : 'cm-gocode',
-			\ 'priority': 9, 
-			\ 'abbreviation': 'Go',
-			\ 'scopes': ['go'],
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_gocode.py',
-			\		'detach': 1,
-			\   }
-			\ ],
-			\ })
-
-	" tern
-	call cm#register_source({
-			\ 'name' : 'cm-tern',
-			\ 'priority': 9, 
-			\ 'abbreviation': 'Js',
-			\ 'scopes': ['javascript','javascript.jsx'],
-			\ 'channels': [
-			\   {
-			\		'type': 'python3',
-			\		'path': 'autoload/cm/sources/cm_tern.py',
-			\		'detach': 1,
-			\   }
-			\ ],
-			\ })
+	" " keyword
+	" call cm#register_source({
+	" 		\ 'name' : 'cm-bufkeyword',
+	" 		\ 'priority': 5, 
+	" 		\ 'abbreviation': 'Key',
+	" 		\ 'channels': [
+	" 		\   {
+	" 		\		'type': 'python3',
+	" 		\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
+	" 		\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
+	" 		\		'detach':1,
+	" 		\	}
+	" 		\ ],
+	" 		\ })
 
 endfunc
 

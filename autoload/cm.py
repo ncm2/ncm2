@@ -6,6 +6,13 @@ import copy
 
 logger = logging.getLogger(__name__)
 
+def register_source(name,abbreviation,priority,scopes=[],events=[],detach=0):
+    # implementation is put inside cm_core
+    # 
+    # cm_core use a trick to only register the source withou loading the entire
+    # module
+    return
+
 def context_outdated(ctx1,ctx2):
     # same as cm#context_changed
     return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']

@@ -3,6 +3,13 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+import cm
+cm.register_source(name='cm-tern',
+                   priority=9,
+                   abbreviation='Js',
+                   scopes=['javascript','javascript.jsx'],
+                   detach=1)
+
 import os
 import re
 import logging
