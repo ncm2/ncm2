@@ -5,7 +5,7 @@
 
 # detach 1 for quick shutdown for neovim, detach 0, 'cause jedi enters infinite
 # loops sometime, don't know why.
-import cm
+from cm import cm
 cm.register_source(name='cm-jedi',
                    priority=9,
                    abbreviation='Py',

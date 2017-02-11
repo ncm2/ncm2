@@ -15,7 +15,7 @@ import urllib
 import json
 from neovim import attach, setup_logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import cm
+from cm import cm
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class CmSkipLoading(Exception):
     pass
 
-class Handler:
+class CoreHandler:
 
     def __init__(self,nvim):
 
@@ -578,7 +578,7 @@ def main():
         try:
             # connect neovim
             nvim = nvim_env()
-            handler = Handler(nvim)
+            handler = CoreHandler(nvim)
             logger.info('starting core, enter event loop')
             cm_event_loop('core',logger,nvim,handler)
         except Exception as ex:

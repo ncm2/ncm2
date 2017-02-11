@@ -8,7 +8,7 @@
 # Please register source before executing any other code, this allow cm_core to
 # read basic information about the source without loading the whole module, and
 # modules required by this module
-import cm
+from cm import cm
 cm.register_source(name='cm-filepath',
                    abbreviation='path',
                    priority=6,

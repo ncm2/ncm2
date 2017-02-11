@@ -4,7 +4,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-import cm
+from cm import cm
 cm.register_source(name='cm-tags',
                    priority=6,
                    abbreviation='Tag',

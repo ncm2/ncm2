@@ -3,7 +3,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-import cm
+from cm import cm
 # detach=1 for exit vim quickly
 cm.register_source(name='cm-gocode',
                    priority=9,
@@ -21,7 +21,7 @@ import logging
 from urllib import request
 import json
 
-import cm
+from cm import cm
 
 logger = logging.getLogger(__name__)
 
