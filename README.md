@@ -132,6 +132,21 @@ let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
 inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 ```
 
+- If you have only `omnifunc` available, you may register it as a source to the
+  framework.
+
+```vim
+" css
+" the omnifunc pattern is PCRE
+au User CmSetup call cm#register_source({'name' : 'cm-css',
+		\ 'priority': 9, 
+		\ 'scopes': ['css'],
+		\ 'abbreviation': 'css',
+		\ 'cm_refresh_patterns':['\w{2,}$',':\s+\w*$'],
+		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
+		\ })
+```
+
 - There's no guarantee that this plugin will be compatible with other
   completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
   `call cm#enable_for_buffer()` to use this plugin for specific buffer.
@@ -151,9 +166,7 @@ let g:cm_sources_override = {
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
 - For really async completion source (strongly encoraged), refer to the file
   path completion example:
-  [autoload/cm/sources/cm_filepath.py](autoload/cm/sources/cm_filepath.py)
-- For existing omni completion (strongly discoraged), refer to
-  [this](https://github.com/roxma/nvim-completion-manager/issues/9#issuecomment-278895791)
+  [pythonx/cm/sources/cm_filepath.py](pythonx/cm/sources/cm_filepath.py)
 
 Please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
