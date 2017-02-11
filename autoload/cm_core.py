@@ -248,10 +248,12 @@ class Handler:
                         logger.info('cached for <%s>, no need to refresh', name)
                         continue
 
+                    if not self._check_refresh_patterns(ctx['typed'],info):
+                        continue
+
                     if 'cm_refresh' in info:
                         # check patterns when necessary
-                        if self._check_patterns(ctx['typed'],info['cm_refresh']):
-                            refreshes_calls.append(dict(name=name,context=ctx))
+                        refreshes_calls.append(dict(name=name,context=ctx))
 
                     # start channels on demand here
                     if info.get('channels',None):
@@ -279,11 +281,11 @@ class Handler:
             self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
     # check patterns for dict, if non dict, return True
-    def _check_patterns(self,typed,opt):
+    def _check_refresh_patterns(self,typed,opt):
         if type(opt)!=type({}):
             return True
-        patterns = opt.get('patterns',None)
-        if patterns is None:
+        patterns = opt.get('cm_refresh_patterns',None)
+        if not patterns:
             return True
         for pattern in patterns:
             if re.search(pattern,typed):

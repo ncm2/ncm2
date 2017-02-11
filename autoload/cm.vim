@@ -13,15 +13,6 @@ inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 
 " options
 
-" wait for a while before popping up, in milliseconds, this would reduce the
-" popup menu flashes when multiple sources are updating the popup menu in a
-" short interval, use a interval which is long enough for computer and short
-" enough for human
-let g:cm_complete_delay = get(g:,'cm_complete_delay',50)
-
-" used to override default options of sources
-let g:cm_sources_override = get(g:,'cm_sources_override',{})
-
 " chech this plugin is enabled
 " get(b:,'cm_enable',0)
 
@@ -31,7 +22,6 @@ autocmd User CmSetup silent
 func! cm#enable_for_buffer()
 
 	if s:already_setup == 0
-		call s:register_builtin_sources()
 		doautocmd User CmSetup
 		let s:already_setup = 1
 	endif
@@ -250,7 +240,8 @@ endfunc
 
 " check and start channels
 func! s:check_and_start_channels(info)
-	if get(a:info,'enable',1)==0
+	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
+	if a:info['enable'] == 0
 		return
 	endif
 	if s:check_scope(a:info)==0
@@ -523,45 +514,5 @@ func! s:menu_selected()
 	" current_selected item
 	" if v:completed_item is empty, no item is selected
 	return pumvisible() && !empty(v:completed_item)
-endfunc
-
-func! s:register_builtin_sources()
-
-	call cm#register_source({'name' : 'cm-ultisnips',
-		\ 'priority': 7, 
-		\ 'abbreviation': 'Snip',
-		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
-		\ })
-
-	" css
-	" the omnifunc pattern is PCRE
-	call cm#register_source({'name' : 'cm-css',
-		\ 'priority': 9, 
-		\ 'scopes': ['css'],
-		\ 'abbreviation': 'css',
-		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS', 'patterns':['\w{2,}$',':\s+\w*$'] },
-		\ })
-
-
-	" Note: the channels field is required as an array, on most cases only one
-	" channel will would be enough. While there may be cases in which you need
-	" another thread to do the indexing, caching work, it's easier to use another
-	" channel instead of controlling threading on your own.
-
-	" " keyword
-	" call cm#register_source({
-	" 		\ 'name' : 'cm-bufkeyword',
-	" 		\ 'priority': 5, 
-	" 		\ 'abbreviation': 'Key',
-	" 		\ 'channels': [
-	" 		\   {
-	" 		\		'type': 'python3',
-	" 		\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
-	" 		\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-	" 		\		'detach':1,
-	" 		\	}
-	" 		\ ],
-	" 		\ })
-
 endfunc
 
