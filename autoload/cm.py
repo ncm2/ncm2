@@ -6,7 +6,7 @@ import copy
 
 logger = logging.getLogger(__name__)
 
-def register_source(name,abbreviation,priority,scopes=[],events=[],detach=0):
+def register_source(name,abbreviation,priority,scopes=None,cm_refresh_patterns=None,events=[],detach=0):
     # implementation is put inside cm_core
     # 
     # cm_core use a trick to only register the source withou loading the entire

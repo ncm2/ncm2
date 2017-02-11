@@ -9,6 +9,7 @@ cm.register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
                    events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
+                   cm_refresh_patterns=[r'[0-9a-zA-Z_]{3,}$'],
                    detach=1)
 
 import os
@@ -69,8 +70,6 @@ class Handler:
         typed = ctx['typed']
         
         kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
-        if len(kw)<3:
-            return
         startcol = col-len(kw)
 
         matches = []

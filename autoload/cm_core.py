@@ -73,7 +73,7 @@ class Handler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,scopes=None,events=[],detach=0):
+            def register_source(name,abbreviation,priority,scopes=None,cm_refresh_patterns=None,events=[],detach=0):
 
                 # " jedi
                 # " refresh 1 for call signatures
@@ -100,12 +100,14 @@ class Handler:
                                events=events)
 
                 source = {}
-                source['channels']     = [channel]
-                source['name']         = name
-                source['priority']     = priority
-                source['abbreviation'] = abbreviation
+                source['channels']            = [channel]
+                source['name']                = name
+                source['priority']            = priority
+                source['abbreviation']        = abbreviation
+                if cm_refresh_patterns:
+                    source['cm_refresh_patterns'] = cm_refresh_patterns
                 if scopes:
-                    source['scopes']       = scopes
+                    source['scopes'] = scopes
 
                 logger.info('registering source: %s',source)
                 nvim.call('cm#register_source',source)
