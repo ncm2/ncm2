@@ -382,18 +382,18 @@ class Handler:
         base = ctx['typed'][startcol-1:]
         abbr = self._sources[name].get('abbreviation','')
 
-        # datastructure
-        tmp = []
+        # formalize datastructure
+        formalized = []
         for item in matches:
             e = {}
             if type(item)==type(''):
                 e['word'] = item
             else:
                 e = copy.deepcopy(item)
-            tmp.append(e)
+            formalized.append(e)
 
         # filtering and sorting
-        result = [ e for e in tmp if self._matcher(base=base,item=e)]
+        result = [ e for e in formalized if self._matcher(base=base,item=e)]
         result = self._sorter(base,startcol,result)
 
         # fix some text
