@@ -9,7 +9,7 @@ cm.register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
                    events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-                   cm_refresh_patterns=[r'[0-9a-zA-Z_]{3,}$'],
+                   cm_refresh_patterns=[r'[0-9a-zA-Z_#]{3,}$'],
                    detach=1)
 
 import os
@@ -25,8 +25,8 @@ class Handler:
         self._nvim = nvim
         self._words = set()
 
-        self._split_pattern = r'[^0-9a-zA-Z_]+'
-        self._kw_pattern = r'[0-9a-zA-Z_]'
+        self._split_pattern = r'[^0-9a-zA-Z_#]+'
+        self._kw_pattern = r'[0-9a-zA-Z_#]'
 
         self._last_ctx = None
 
