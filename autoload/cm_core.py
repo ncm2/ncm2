@@ -379,22 +379,25 @@ class Handler:
 
     def process_matches(self,name,ctx,startcol,matches):
 
-        # do some basic filtering and sorting
-        result = []
         base = ctx['typed'][startcol-1:]
-
         abbr = self._sources[name].get('abbreviation','')
 
+        # datastructure
+        tmp = []
         for item in matches:
-
             e = {}
             if type(item)==type(''):
                 e['word'] = item
             else:
                 e = copy.deepcopy(item)
+            tmp.append(e)
 
-            if not self._matcher(base=base,item=e):
-                continue
+        # filtering and sorting
+        result = [ e for e in tmp if self._matcher(base=base,item=e)]
+        result = self._sorter(base,startcol,result)
+
+        # fix some text
+        for e in result:
 
             if 'menu' not in e:
                 if 'info' in e and e['info'] and len(e['info'])<50:
@@ -409,16 +412,6 @@ class Handler:
             else:
                 # e['menu'] = "<%s> %s"  % (self._sources[name]['abbreviation'], e['info'])
                 pass
-
-            if len(base)>len(e['word']):
-                continue
-
-            if base.lower() != e['word'][0:len(base)].lower():
-                continue
-
-            result.append(e)
-
-        result = self._sorter(base,startcol,result)
 
         return result
 
