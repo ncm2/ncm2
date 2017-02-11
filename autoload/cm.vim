@@ -203,8 +203,7 @@ let s:change_timer = -1
 let s:lasttick = ''
 let s:channel_id = -1
 let s:channel_started = 0
-let s:dir = expand('<sfile>:p:h')
-let s:core_py_path = s:dir . '/cm_core.py'
+let s:core_py_path = globpath(&rtp,'pythonx/cm_core.py')
 " let s:complete_timer
 let s:complete_timer_ctx = {}
 
@@ -268,11 +267,6 @@ func! cm#_start_channels(info)
 
 			" find script path
 			let l:py3 = get(g:,'python3_host_prog','python3')
-			let l:path = globpath(&rtp,l:channel['path'],1)
-			if empty(l:path)
-				echom 'cannot find channel path: ' . l:channel['path']
-				continue
-			endif
 
 			let l:opt = {'rpc':1, 'channel': l:channel}
 			let l:opt['detach'] = get(l:channel,'detach',0)
@@ -295,7 +289,7 @@ func! cm#_start_channels(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = jobstart([l:py3,s:core_py_path,'channel',l:path],l:opt)
+			let l:channel['id'] = jobstart([l:py3,s:core_py_path,'channel',l:channel['path']],l:opt)
 
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']

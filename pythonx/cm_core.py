@@ -38,38 +38,34 @@ class Handler:
         self._has_popped_up = True
         self._subscope_detectors = {}
 
-        scoper_paths = self._nvim.eval("globpath(&rtp,'autoload/cm/scopers/*.py')").split("\n")
+        scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm/scopers/*.py')").split("\n")
 
         # auto find scopers
         for path in scoper_paths:
             if not path:
                 continue
             try:
-                dir = os.path.dirname(path)
-                if dir not in sys.path:
-                    sys.path.append(dir)
-                name = os.path.splitext(os.path.basename(path))[0]
-                m = importlib.import_module(name)
+                modulename = os.path.splitext(os.path.basename(path))[0]
+                modulename = "cm.scopers.%s" % modulename
+                m = importlib.import_module(modulename)
 
                 scoper = m.Scoper()
                 for scope in scoper.scopes:
                     if scope not in self._subscope_detectors:
                         self._subscope_detectors[scope] = []
                     self._subscope_detectors[scope].append(scoper)
-                    logger.info('scoper <%s> imported for %s', name, scope)
+                    logger.info('scoper <%s> imported for %s', modulename, scope)
 
 
             except Exception as ex:
-                logger.exception('importing scoper <%s> failed: %s', name, ex)
+                logger.exception('importing scoper <%s> failed: %s', modulename, ex)
 
         # auto find sources
-        sources_paths = self._nvim.eval("globpath(&rtp,'autoload/cm/sources/*.py')").split("\n")
+        sources_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm/sources/*.py')").split("\n")
         for path in sources_paths:
 
-            dir = os.path.dirname(path)
-            if dir not in sys.path:
-                sys.path.append(dir)
             modulename = os.path.splitext(os.path.basename(path))[0]
+            modulename = "cm.sources.%s" % modulename
 
             # use a trick to only register the source withou loading the entire
             # module
@@ -95,7 +91,7 @@ class Handler:
                 # 		\ })
 
                 channel = dict(type='python3',
-                               path='autoload/cm/sources/%s.py' % modulename,
+                               path= modulename,
                                detach=detach,
                                events=events)
 
@@ -124,7 +120,7 @@ class Handler:
                 # This is not an error
                 logger.info('source <%s> registered', modulename)
             except Exception as ex:
-                logger.exception("register_source for %s failed",name)
+                logger.exception("register_source for %s failed", modulename)
 
 
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
@@ -581,7 +577,7 @@ def main():
 
         try:
             # connect neovim
-            nvim = attach('stdio')
+            nvim = nvim_env()
             handler = Handler(nvim)
             logger.info('starting core, enter event loop')
             cm_event_loop('core',logger,nvim,handler)
@@ -594,9 +590,7 @@ def main():
 
     elif start_type == 'channel':
 
-        path = sys.argv[2]
-        dir = os.path.dirname(path)
-        name = os.path.splitext(os.path.basename(path))[0]
+        name = sys.argv[2]
 
         # use the module name here
         setup_logging(name)
@@ -613,8 +607,7 @@ def main():
 
         try:
             # connect neovim
-            nvim = attach('stdio')
-            sys.path.append(dir)
+            nvim = nvim_env()
             m = importlib.import_module(name)
             handler = m.Handler(nvim)
             logger.info('handler created, entering event loop')
@@ -625,6 +618,18 @@ def main():
         finally:
             # terminate here
             exit(0)
+
+def nvim_env():
+    nvim = attach('stdio')
+    # setup pythonx
+    pythonxs = nvim.eval('globpath(&rtp,"pythonx")')
+    for path in pythonxs.split("\n"):
+        if not path:
+            continue
+        if path not in sys.path:
+            sys.path.append(path)
+    return nvim
+
 
 def get_loglevel():
     # logging setup
