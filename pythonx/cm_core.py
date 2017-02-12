@@ -564,7 +564,7 @@ def main():
     # the default nice is inheriting from parent neovim process.  Increment it
     # so that heavy calculation will not block the ui.
     try:
-        os.nice(1)
+        os.nice(5)
     except:
         pass
 
