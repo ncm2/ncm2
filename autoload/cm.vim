@@ -265,7 +265,7 @@ func! cm#_start_channels(info)
 				continue
 			endif
 
-			" find script path
+			" find interpreter path
 			let l:py3 = get(g:,'python3_host_prog','python3')
 
 			let l:opt = {'rpc':1, 'channel': l:channel}
@@ -289,7 +289,7 @@ func! cm#_start_channels(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = jobstart([l:py3,s:core_py_path,'channel',l:channel['path']],l:opt)
+			let l:channel['id'] = jobstart([l:py3,s:core_py_path,'channel',l:channel['module']],l:opt)
 
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']

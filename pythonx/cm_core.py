@@ -83,7 +83,7 @@ class CoreHandler:
                 # 		\ 'channels': [
                 # 		\   {
                 # 		\		'type': 'python3',
-                # 		\		'path': 'autoload/cm/sources/cm_jedi.py',
+                # 		\		'module': 'cm.sources.cm_jedi',
                 # 		\		'events': ['InsertLeave'],
                 # 		\		'detach': 0,
                 # 		\   }
@@ -91,7 +91,7 @@ class CoreHandler:
                 # 		\ })
 
                 channel = dict(type='python3',
-                               path= modulename,
+                               module=modulename,
                                detach=detach,
                                events=events)
 
@@ -128,8 +128,10 @@ class CoreHandler:
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
 
-        from cm.matchers.prifex_matcher import Matcher
-        self._matcher = Matcher(nvim)
+        # from cm.matchers.prifex_matcher import Matcher
+        matcher_opt = nvim.eval('g:cm_matcher')
+        m = importlib.import_module(matcher_opt['module'])
+        self._matcher = m.Matcher(nvim,matcher_opt.get('extra',None))
 
         self._ctx = None
 

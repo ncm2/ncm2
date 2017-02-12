@@ -4,6 +4,8 @@ if get(g:,'cm_enable_for_all',1)
 	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<1000000) | call cm#enable_for_buffer() | endif
 endif
 
+let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.prifex_matcher', 'extra': 'smartcase'})
+
 
 " wait for a while before popping up, in milliseconds, this would reduce the
 " popup menu flashes when multiple sources are updating the popup menu in a
