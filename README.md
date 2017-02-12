@@ -175,13 +175,13 @@ created the extension.
 
 ## Why?
 
-I'm writing this for fun, feeding my own need, and it's working pleasingly for
-me now. And It seems there's lots of differences between deoplete, YCM, and
-nvim-completion-manager, by design.
+This project was started just for fun, and it's working pleasingly for me now.
+However, it seems there's lots of differences between deoplete, YCM, and
+nvim-completion-manager, by implementation.
 
-I havn't read the source of YCM yet. So here I'm describing the main design of
-NCM (from now on, I'm using NCM as short for nvim-completion-manager) and some
-of the differences between deoplete and this plugin.
+I havn't read the source of YCM yet. So here I'm describing the basic
+implementation of NCM (short for nvim-completion-manager) and some of the
+differences between deoplete and this plugin.
 
 ### Async architecture
 
