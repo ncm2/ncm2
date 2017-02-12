@@ -6,11 +6,10 @@ class Matcher(object):
     def __init__(self,nvim,extra=None):
         if extra not in ['case','icase','smartcase']:
             ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
-            if ignorecase:
-                if smartcase:
-                    self._match = self._match_smartcase
-                else:
-                    self._match = self._match_icase
+            if smartcase:
+                self._match = self._match_smartcase
+            elif ignorecase:
+                self._match = self._match_icase
             else:
                 self._match = self._match_case
         elif extra=='case':
