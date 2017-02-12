@@ -210,7 +210,7 @@ class CoreHandler:
             if scope in self._subscope_detectors:
                 for detector in self._subscope_detectors[scope]:
                     try:
-                        sub_ctx = detector.get_subscope_ctx(ctx, self._file_server.get_src(ctx))
+                        sub_ctx = detector.sub_context(ctx, self._file_server.get_src(ctx))
                         if sub_ctx:
                             # append the subscope for further processing
                             sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
@@ -609,7 +609,7 @@ def main():
             # connect neovim
             nvim = nvim_env()
             m = importlib.import_module(name)
-            handler = m.Handler(nvim)
+            handler = m.Source(nvim)
             logger.info('handler created, entering event loop')
             cm_event_loop('channel',logger,nvim,handler)
         except Exception as ex:

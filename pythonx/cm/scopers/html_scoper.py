@@ -14,7 +14,7 @@ class Scoper:
 
     scopes = ['html','xhtml','php','blade','jinja','jinja2']
 
-    def get_subscope_ctx(self,ctx,src):
+    def sub_context(self,ctx,src):
 
         lnum = ctx['lnum']
         col = ctx['col']

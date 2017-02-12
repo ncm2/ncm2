@@ -21,7 +21,7 @@ from neovim.api import Nvim
 
 logger = logging.getLogger(__name__)
 
-class Handler:
+class Source:
 
     def __init__(self,nvim):
 

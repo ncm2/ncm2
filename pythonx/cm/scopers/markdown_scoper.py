@@ -14,7 +14,7 @@ class Scoper:
 
     scopes = ['markdown']
 
-    def get_subscope_ctx(self,ctx,src):
+    def sub_context(self,ctx,src):
 
         import mistune
 

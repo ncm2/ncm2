@@ -26,7 +26,7 @@ from cm import cm
 logger = logging.getLogger(__name__)
 
 
-class Handler:
+class Source:
 
     def __init__(self,nvim):
 

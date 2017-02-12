@@ -83,7 +83,7 @@ class Tern:
           return None
 
 
-class Handler:
+class Source:
 
     def __init__(self,nvim):
 
