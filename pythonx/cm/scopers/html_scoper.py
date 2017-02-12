@@ -55,7 +55,7 @@ class Scoper:
                             # style
                             self.scope_info['scope']='css'
 
-                        self.scope_info['scope_offset']= cm.get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
+                        self.scope_info['scope_offset']= cm.get_pos(startpos[0],startpos[1]+1,src)
                         self.scope_info['scope_len']=len(self.last_data)
 
                         # offset as lnum, col format

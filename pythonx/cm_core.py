@@ -202,7 +202,7 @@ class CoreHandler:
         # simple complete done
         if root_ctx['typed'] == '':
             self._matches = {}
-        elif re.match(r'\s',root_ctx['typed'][-1]):
+        elif re.match(r'[^0-9a-zA-Z_]',root_ctx['typed'][-1]):
             self._matches = {}
 
         root_ctx['src_uri'] = self._file_server.get_src_uri(root_ctx)

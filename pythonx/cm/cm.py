@@ -33,10 +33,7 @@ def get_src(ctx):
     return None
 
 # convert (lnum, col) to pos
-def get_pos(ctx,src):
-
-    lnum = ctx['lnum']
-    col = ctx['col']
+def get_pos(lnum,col,src):
 
     # curpos
     lines = src.split('\n')
@@ -46,6 +43,14 @@ def get_pos(ctx,src):
     pos += col-1
 
     return pos
+
+def get_lnum_col(pos,src):
+    splited = src.split("\n")
+    p = 0
+    for idx,line in enumerate(splited):
+        if p<=pos and p+len(line)>=pos:
+            return (idx+1,pos-p+1)
+        p += len(line)+1
 
 def smart_case_prefix_matcher(base,item):
     if len(base)>len(item['word']):

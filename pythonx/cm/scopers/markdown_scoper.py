@@ -82,7 +82,7 @@ class Scoper:
         block = HackBlockLexer()
         block.cm_scope_info = None
 
-        pos = cm.get_pos(ctx,src)
+        pos = cm.get_pos(ctx['lnum'],ctx['col'],src)
 
         block.cm_cur_pos = pos
         mistune.markdown(src,block=block)
@@ -101,6 +101,9 @@ class Scoper:
                 new_ctx['col'] = new_pos-p+1
                 new_ctx['scope_offset'] = block.cm_scope_info['scope_offset']
                 new_ctx['scope_len'] = len(new_src)
+                lnum_col = cm.get_lnum_col(block.cm_scope_info['scope_offset'],src)
+                new_ctx['scope_lnum'] = lnum_col[0]
+                new_ctx['scope_col'] = lnum_col[1]
                 return new_ctx
             else:
                 p += len(line)+1
