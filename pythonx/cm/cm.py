@@ -48,6 +48,8 @@ def get_pos(ctx,src):
     return pos
 
 def smart_case_prefix_matcher(base,item):
+    if len(base)>len(item['word']):
+        return False
     for a,b in zip(base,item['word']):
         if a.isupper() :
             if a!=b:
