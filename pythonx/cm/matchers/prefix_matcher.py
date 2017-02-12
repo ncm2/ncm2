@@ -3,21 +3,8 @@
 
 class Matcher(object):
 
-    def __init__(self,nvim,extra=None):
-        if extra not in ['case','icase','smartcase']:
-            ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
-            if smartcase:
-                self._match = self._match_smartcase
-            elif ignorecase:
-                self._match = self._match_icase
-            else:
-                self._match = self._match_case
-        elif extra=='case':
-            self._match = self._match_case
-        elif extra=='icase':
-            self._match = self._match_icase
-        elif extra=='smartcase':
-            self._match = self._match_smartcase
+    def __init__(self,nvim,chcmp,*args):
+        self._chcmp = chcmp
 
     def process(self,name,ctx,startcol,matches):
 
@@ -31,20 +18,11 @@ class Matcher(object):
 
         return matches
 
-    def _match_smartcase(self,base,item):
+    def _match(self,base,item):
         if len(base)>len(item['word']):
             return False
         for a,b in zip(base,item['word']):
-            if a.isupper() :
-                if a!=b:
-                    return False
-            elif a!=b.lower():
+            if not self._chcmp(a,b):
                 return False
         return True
-
-    def _match_case(self,base,item):
-        return base == item['word'][0:len(base)]
-
-    def _match_icase(self,base,item):
-        return base.lower() == item['word'][0:len(base)].lower()
 

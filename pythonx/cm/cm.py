@@ -3,6 +3,7 @@ import logging
 import urllib
 import http.client
 import copy
+import importlib
 
 logger = logging.getLogger(__name__)
 
@@ -51,4 +52,45 @@ def get_lnum_col(pos,src):
         if p<=pos and p+len(line)>=pos:
             return (idx+1,pos-p+1)
         p += len(line)+1
+
+def get_matcher(nvim):
+
+    if hasattr(get_matcher,'matcher'):
+        return get_matcher.matcher
+
+    # from cm.matchers.prifex_matcher import Matcher
+    matcher_opt = nvim.eval('g:cm_matcher')
+    m = importlib.import_module(matcher_opt['module'])
+
+    def chcmp_smartcase(a,b):
+        if a.isupper():
+            return a==b
+        else:
+            return a == b.lower()
+
+    def chcmp_case(a,b):
+        return a==b
+
+    def chcmp_icase(a,b):
+        return a.lower()==b.lower()
+
+    chcmp = None
+    case = matcher_opt.get('case','')
+    if case not in ['case','icase','smartcase']:
+        ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
+        if smartcase:
+            chcmp = chcmp_smartcase
+        elif ignorecase:
+            chcmp = chcmp_icase
+        else:
+            chcmp = chcmp_case
+    elif case=='case':
+        chcmp = chcmp_case
+    elif case=='icase':
+        chcmp = chcmp_icase
+    elif case=='smartcase':
+        chcmp = chcmp_smartcase
+
+    # cache result
+    get_matcher.matcher = m.Matcher(nvim,chcmp)
 

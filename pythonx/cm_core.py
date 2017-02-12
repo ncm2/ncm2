@@ -128,11 +128,6 @@ class CoreHandler:
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
 
-        # from cm.matchers.prifex_matcher import Matcher
-        matcher_opt = nvim.eval('g:cm_matcher')
-        m = importlib.import_module(matcher_opt['module'])
-        self._matcher = m.Matcher(nvim,matcher_opt.get('extra',None))
-
         self._ctx = None
 
     def cm_complete(self,srcs,name,ctx,startcol,matches,refresh=0,*args):
@@ -407,7 +402,7 @@ class CoreHandler:
 
         # filtering and sorting
         # result = [ e for e in formalized if self._matcher(base=base,item=e)]
-        result = self._matcher.process(name,ctx,startcol,formalized)
+        result = cm.get_matcher(self._nvim).process(name,ctx,startcol,formalized)
 
         # fix some text
         for e in result:

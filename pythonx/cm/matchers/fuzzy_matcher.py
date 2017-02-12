@@ -3,21 +3,8 @@
 
 class Matcher(object):
 
-    def __init__(self,nvim,extra=None):
-        if extra not in ['case','icase','smartcase']:
-            ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
-            if smartcase:
-                self._chcmp = self._chcmp_smartcase
-            elif ignorecase:
-                self._chcmp = self._chcmp_icase
-            else:
-                self._chcmp = self._chcmp_case
-        elif extra=='case':
-            self._chcmp = self._chcmp_case
-        elif extra=='icase':
-            self._chcmp = self._chcmp_icase
-        elif extra=='smartcase':
-            self._chcmp = self._chcmp_smartcase
+    def __init__(self,nvim,chcmp,*args):
+        self._chcmp = chcmp
 
     def process(self,name,ctx,startcol,matches):
 
@@ -57,16 +44,4 @@ class Matcher(object):
 
         # return the score, the smaller the better
         return (p-begin, len(word), word.swapcase())
-
-    def _chcmp_smartcase(self,a,b):
-        if a.isupper():
-            return a==b
-        else:
-            return a == b.lower()
-
-    def _chcmp_case(self,a,b):
-        return a==b
-
-    def _chcmp_icase(self,a,b):
-        return a.lower()==b.lower()
 
