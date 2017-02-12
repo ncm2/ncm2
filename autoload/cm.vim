@@ -491,7 +491,9 @@ func! s:cm_refresh_omni(opt,ctx)
 		return
 	endif
 	" echom a:opt['name'] . ", col: " . l:startcol . " matches: " . json_encode(l:matches)
-	call cm#complete(a:opt, a:ctx, l:startcol, l:matches)
+	" there's no scoping context in omnifunc, use cm#context to get the root
+	" context
+	call cm#complete(a:opt, cm#context(), l:startcol, l:matches)
 endfunc
 
 func! s:complete_timeout(timer)
