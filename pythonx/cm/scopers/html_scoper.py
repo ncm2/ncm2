@@ -29,7 +29,8 @@ class Scoper:
 
             def handle_endtag(self, tag):
 
-                if tag=='script':
+                if tag in ['style','script']:
+
                     startpos = self.last_data_start
                     endpos = self.getpos()
                     if ((startpos[0]<lnum 
@@ -47,31 +48,21 @@ class Scoper:
                             self.scope_info['col'] = col-(startpos[1]+1)+1
                         else:
                             self.scope_info['col']=col
-                        self.scope_info['scope']='javascript'
-                        self.scope_info['scope_offset']= cm.get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
-                        self.scope_info['scope_len']=len(self.last_data)
 
-                elif tag=='style':
-                    startpos = self.last_data_start
-                    endpos = self.getpos()
-                    if ((startpos[0]<lnum 
-                        or (startpos[0]==lnum
-                            and startpos[1]+1<=col))
-                        and
-                        (endpos[0]>lnum
-                         or (endpos[0]==lnum
-                             and endpos[1]>=col))
-                        ):
-
-                        self.scope_info = {}
-                        self.scope_info['lnum'] = lnum-startpos[0]+1
-                        if lnum==startpos[0]:
-                            self.scope_info['col'] = col-(startpos[1]+1)+1
+                        if tag=='script':
+                            self.scope_info['scope']='javascript'
                         else:
-                            self.scope_info['col']=col
-                        self.scope_info['scope']='css'
+                            # style
+                            self.scope_info['scope']='css'
+
                         self.scope_info['scope_offset']= cm.get_pos(dict(lnum=startpos[0],col=startpos[1]+1),src)
                         self.scope_info['scope_len']=len(self.last_data)
+
+                        # offset as lnum, col format
+                        self.scope_info['scope_lnum']= startpos[0]
+                        # startpos[1] is zero based
+                        self.scope_info['scope_col']= startpos[1]+1
+
 
             def handle_data(self, data):
                 self.last_data = data
@@ -86,7 +77,11 @@ class Scoper:
         new_ctx['scope'] = parser.scope_info['scope']
         new_ctx['lnum'] = parser.scope_info['lnum']
         new_ctx['col'] = parser.scope_info['col']
+
         new_ctx['scope_offset'] = parser.scope_info['scope_offset']
         new_ctx['scope_len'] = parser.scope_info['scope_len']
+        new_ctx['scope_lnum'] = parser.scope_info['scope_lnum']
+        new_ctx['scope_col'] = parser.scope_info['scope_col']
+
         return new_ctx
 

@@ -79,7 +79,7 @@ class Tern:
           logger.error('result: %s', result)
           return json.loads(result)
       except Exception as ex:
-          logger.error('exception: %s', ex)
+          logger.exception('exception: %s, %s', ex, doc)
           return None
 
 
@@ -114,7 +114,7 @@ class Source:
             return
 
         completions = self._tern.completions(src,lnum-1,len(typed),path)
-        logger.info('completions %s', completions)
+        logger.info('completions %s, typed[%s], %s', completions,typed,ctx)
 
         if not completions or not completions.get('completions',None):
             return

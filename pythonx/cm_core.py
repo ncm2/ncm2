@@ -135,6 +135,10 @@ class CoreHandler:
 
     def cm_complete(self,srcs,name,ctx,startcol,matches,refresh=0,*args):
 
+        # adjust for subscope
+        if ctx['lnum']==1:
+            startcol += ctx.get('scope_col',1)-1
+
         # if cm.context_outdated(self._ctx,ctx):
         #     logger.info('ignore outdated context from [%s]', name)
         #     return
@@ -168,7 +172,9 @@ class CoreHandler:
         # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
             logger.info("update popup for [%s]",name)
-            self._refresh_completions(ctx)
+            # the ctx in parameter maybe a subctx for completion source, use
+            # nvim.call to get the root context
+            self._refresh_completions(self._nvim.call('cm#context'))
         else:
             logger.info("delay popup for [%s]",name)
 
@@ -196,7 +202,7 @@ class CoreHandler:
         # simple complete done
         if root_ctx['typed'] == '':
             self._matches = {}
-        elif re.match(r'[^0-9a-zA-Z_]',root_ctx['typed'][-1]):
+        elif re.match(r'\s',root_ctx['typed'][-1]):
             self._matches = {}
 
         root_ctx['src_uri'] = self._file_server.get_src_uri(root_ctx)
@@ -212,8 +218,14 @@ class CoreHandler:
                     try:
                         sub_ctx = detector.sub_context(ctx, self._file_server.get_src(ctx))
                         if sub_ctx:
-                            # append the subscope for further processing
+                            # adjust offset to global based
+                            # and add the new context
                             sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
+                            sub_ctx['scope_lnum'] += ctx.get('scope_lnum',1)-1
+                            if int(sub_ctx['lnum']) == 1:
+                                sub_ctx['typed'] = sub_ctx['typed'][sub_ctx['scope_col']-1:]
+                                sub_ctx['scope_col'] += ctx.get('scope_col',1)-1
+                                logger.info('adjusting scope_col')
                             sub_ctx['src_uri'] = self._file_server.get_src_uri(sub_ctx)
                             ctx_lists.append(sub_ctx)
                             logger.info('new sub context: %s', sub_ctx)
@@ -323,10 +335,13 @@ class CoreHandler:
         for name in names:
 
             try:
+
+                self._matches[name]['last_matches'] = []
+
                 source_startcol = self._matches[name]['startcol']
                 if source_startcol>col or source_startcol==0:
                     self._matches[name]['last_matches'] = []
-                    logger.error('ignoring invalid startcol: %s', self._matches[name])
+                    logger.error('ignoring invalid startcol for %s %s', name, self._matches[name]['startcol'])
                     continue
 
                 source_matches = self._matches[name]['matches']
@@ -350,10 +365,10 @@ class CoreHandler:
 
             try:
                 source_startcol = self._matches[name]['startcol']
-                if source_startcol>ctx['col']:
-                    logger.error('ignoring invalid startcol: %s', self._matches[name])
-                    continue
                 source_matches = self._matches[name]['last_matches']
+                if not source_matches:
+                    continue
+
                 prefix = ctx['typed'][startcol-1 : source_startcol-1]
 
                 for e in source_matches:
