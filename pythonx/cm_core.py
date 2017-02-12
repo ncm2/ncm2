@@ -128,8 +128,8 @@ class CoreHandler:
         self._file_server = FileServer()
         self._file_server.start(self._nvim.eval('v:servername'))
 
-        self._matcher = cm.smart_case_prefix_matcher
-        self._sorter = cm.alnum_sorter
+        from cm.matchers.prifex_matcher import Matcher
+        self._matcher = Matcher(nvim)
 
         self._ctx = None
 
@@ -404,8 +404,8 @@ class CoreHandler:
             formalized.append(e)
 
         # filtering and sorting
-        result = [ e for e in formalized if self._matcher(base=base,item=e)]
-        result = self._sorter(base,startcol,result)
+        # result = [ e for e in formalized if self._matcher(base=base,item=e)]
+        result = self._matcher.process(name,ctx,startcol,formalized)
 
         # fix some text
         for e in result:

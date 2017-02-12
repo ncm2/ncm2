@@ -52,20 +52,3 @@ def get_lnum_col(pos,src):
             return (idx+1,pos-p+1)
         p += len(line)+1
 
-def smart_case_prefix_matcher(base,item):
-    if len(base)>len(item['word']):
-        return False
-    for a,b in zip(base,item['word']):
-        if a.isupper() :
-            if a!=b:
-                return False
-        elif a!=b.lower():
-            return False
-    return True
-
-def alnum_sorter(base,startcol,matches):
-    # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
-    # sorting before 'A'
-    matches.sort(key=lambda e: e['word'].swapcase())
-    return matches
-
