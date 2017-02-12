@@ -70,18 +70,46 @@ class Scoper:
 
         parser = MyHTMLParser()
         parser.feed(src)
-        if not parser.scope_info:
-            return None
+        if parser.scope_info:
 
-        new_ctx = copy.deepcopy(ctx)
-        new_ctx['scope'] = parser.scope_info['scope']
-        new_ctx['lnum'] = parser.scope_info['lnum']
-        new_ctx['col'] = parser.scope_info['col']
+            new_ctx = copy.deepcopy(ctx)
+            new_ctx['scope'] = parser.scope_info['scope']
+            new_ctx['lnum'] = parser.scope_info['lnum']
+            new_ctx['col'] = parser.scope_info['col']
 
-        new_ctx['scope_offset'] = parser.scope_info['scope_offset']
-        new_ctx['scope_len'] = parser.scope_info['scope_len']
-        new_ctx['scope_lnum'] = parser.scope_info['scope_lnum']
-        new_ctx['scope_col'] = parser.scope_info['scope_col']
+            new_ctx['scope_offset'] = parser.scope_info['scope_offset']
+            new_ctx['scope_len'] = parser.scope_info['scope_len']
+            new_ctx['scope_lnum'] = parser.scope_info['scope_lnum']
+            new_ctx['scope_col'] = parser.scope_info['scope_col']
 
-        return new_ctx
+            return new_ctx
+
+
+        pos = cm.get_pos(lnum,col,src)
+        # css completions for style='|'
+        for match in re.finditer(r'style\s*=\s*("|\')(.*?)\1',src):
+            if match.start(2)>pos:
+                return
+            if match.end(2)<pos:
+                continue
+            # start < pos and and>=pos
+            new_src = match.group(2)
+
+            new_ctx = copy.deepcopy(ctx)
+            new_ctx['scope'] = 'css'
+
+            new_ctx['scope_offset'] = match.start(2)
+            new_ctx['scope_len'] = len(new_src)
+            scope_lnum_col = cm.get_lnum_col(match.start(2),src)
+            new_ctx['scope_lnum'] = scope_lnum_col[0]
+            new_ctx['scope_col'] = scope_lnum_col[1]
+
+            sub_pos = pos - match.start(2)
+            sub_lnum_col = cm.get_lnum_col(sub_pos,new_src)
+            new_ctx['lnum'] = sub_lnum_col[0]
+            new_ctx['col'] = sub_lnum_col[1]
+            return new_ctx
+        
+        return None
+
 
