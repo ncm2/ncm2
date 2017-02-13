@@ -43,5 +43,7 @@ class Matcher(object):
                 begin = p
 
         # return the score, the smaller the better
-        return (p-begin, len(word), word.swapcase())
+        # prefer shorter match
+        # prefer fronter match
+        return (p-begin, begin, word.swapcase())
 
