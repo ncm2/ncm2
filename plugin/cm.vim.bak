@@ -4,9 +4,8 @@ if get(g:,'cm_enable_for_all',1)
 	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<1000000) | call cm#enable_for_buffer() | endif
 endif
 
-let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.prefix_matcher', 'case': 'smartcase'})
-" use this for fuzzy matching
-" let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.fuzzy_matcher', 'case': 'smartcase'})
+let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.fuzzy_matcher', 'case': 'smartcase'})
+
 
 " wait for a while before popping up, in milliseconds, this would reduce the
 " popup menu flashes when multiple sources are updating the popup menu in a
@@ -16,10 +15,10 @@ let g:cm_complete_delay = get(g:,'cm_complete_delay',50)
 
 " automatically enable all sources
 " set this to 0 if you want to select sources manually
-let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
+let g:cm_sources_enable = get(g:,'cm_sources_enable',0)
 
 " used to override default options of sources
-let g:cm_sources_override = get(g:,'cm_sources_override',{})
+let g:cm_sources_override = get(g:,'cm_sources_override',{'cm-bufkeyword':{'enable':1}})
 
 
 au User CmSetup call cm#register_source({'name' : 'cm-ultisnips',

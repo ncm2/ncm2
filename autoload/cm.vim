@@ -9,8 +9,23 @@ let s:init = 1
 let s:already_setup = 0
 
 " use silent mapping that doesn't slower the terminal ui
+" Note: `:help complete()` says:
+" > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
+" > after CTRL-O or with an expression mapping.
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
+
+
+if !exists('g:cm_completekeys')
+	if g:cm_matcher['module'] == 'cm.matchers.prefix_matcher'
+		" cm_complete has no flickering issue with prefix_matcher
+		let g:cm_completekeys = "\<Plug>(cm_complete)"
+	else
+		" cm_completefunc has less flickering with fuzzy matcher. But it has
+		" cursor flickering issue
+		let g:cm_completekeys = "\<Plug>(cm_completefunc)"
+	endif
+endif
 
 
 " options
@@ -39,6 +54,7 @@ func! cm#enable_for_buffer()
 	let s:saved_completeopt = &completeopt
 	" TODO this override the global options, any way to fix this?
 	set completeopt=menu,menuone,noinsert,noselect
+	set completefunc=cm#_completefunc
 
 	augroup cm
 		autocmd! * <buffer>
@@ -334,12 +350,7 @@ func! cm#_core_complete(context, startcol, matches)
 	let s:startcol = a:startcol
 	let s:matches = a:matches
 
-	set completefunc=cm#_completefunc
-
-	" Note: `:help complete()` says:
-	" > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
-	" > after CTRL-O or with an expression mapping.
-	call feedkeys("\<Plug>(cm_completefunc)")
+	call feedkeys(g:cm_completekeys)
 
 endfunc
 
@@ -351,18 +362,6 @@ func! cm#_completefunc(findstart,base)
 endfunc
 
 func! cm#_complete()
-
-	" ignore the request if context has changed
-	if  cm#context_changed(s:context)
-		return ''
-	endif
-
-	" from core channel
-	" something selected by user, do not refresh the menu
-	if s:menu_selected()
-		return ''
-	endif
-
 	call complete(s:startcol, s:matches)
 	return ''
 endfunc
