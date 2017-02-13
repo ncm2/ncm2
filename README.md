@@ -59,10 +59,7 @@ extra sources:
 
 ## Requirements
 
-1. Neovim python3 support. `:help provider-python`. For lazy linux users, I
-   recommend this plugin
-   [python-support.nvim](https://github.com/roxma/python-support.nvim).
-   (Note: Self promotion)
+1. Neovim python3 support. (`pip3 install neovim`).
 - For **python code completion**, you need to install
   [jedi](https://github.com/davidhalter/jedi) library. For python code
   completion in markdown file, you need to install
