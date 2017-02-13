@@ -16,7 +16,10 @@ def register_source(name,abbreviation,priority,scopes=None,cm_refresh_patterns=N
 
 def context_outdated(ctx1,ctx2):
     # same as cm#context_changed
-    return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
+    # return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
+    # Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
+    # bug, use curpos as workaround
+    return ctx1 is None or ctx2 is None or ctx1['curpos']!=ctx2['curpos']
 
 def get_src(ctx):
     src_uri = ctx['src_uri']

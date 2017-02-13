@@ -10,6 +10,8 @@ let s:already_setup = 0
 
 " use silent mapping that doesn't slower the terminal ui
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
+inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
+
 
 " options
 
@@ -88,7 +90,10 @@ func! cm#context()
 endfunc
 
 func! cm#context_changed(ctx)
-	return (b:changedtick!=a:ctx['changedtick']) || (getcurpos()!=a:ctx['curpos'])
+	" return (b:changedtick!=a:ctx['changedtick']) || (getcurpos()!=a:ctx['curpos'])
+	" Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
+	" bug, use curpos as workaround
+	return getcurpos()!=a:ctx['curpos']
 endfunc
 
 
@@ -329,11 +334,20 @@ func! cm#_core_complete(context, startcol, matches)
 	let s:startcol = a:startcol
 	let s:matches = a:matches
 
+	set completefunc=cm#_completefunc
+
 	" Note: `:help complete()` says:
 	" > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 	" > after CTRL-O or with an expression mapping.
-	call feedkeys("\<Plug>(cm_complete)")
+	call feedkeys("\<Plug>(cm_completefunc)")
 
+endfunc
+
+func! cm#_completefunc(findstart,base)
+	if a:findstart
+		return s:startcol-1
+	endif
+	return {'refresh': 'always', 'words': s:matches }
 endfunc
 
 func! cm#_complete()
@@ -387,7 +401,10 @@ endf
 " }
 
 func! s:changetick()
-	return [b:changedtick , getcurpos()]
+	" return [b:changedtick , getcurpos()]
+	" Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
+	" bug, use curpos as workaround
+	return getcurpos()
 endfunc
 
 func! s:change_tick_start()
