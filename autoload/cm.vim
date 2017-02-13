@@ -12,20 +12,11 @@ let s:already_setup = 0
 " Note: `:help complete()` says:
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
+" 
+" They both work. use g:cm_completekeys to decide which one to use.
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 
-
-if !exists('g:cm_completekeys')
-	if g:cm_matcher['module'] == 'cm.matchers.prefix_matcher'
-		" cm_complete has no flickering issue with prefix_matcher
-		let g:cm_completekeys = "\<Plug>(cm_complete)"
-	else
-		" cm_completefunc has less flickering with fuzzy matcher. But it has
-		" cursor flickering issue
-		let g:cm_completekeys = "\<Plug>(cm_completefunc)"
-	endif
-endif
 
 
 " options
