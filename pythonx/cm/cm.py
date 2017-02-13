@@ -53,6 +53,7 @@ def get_lnum_col(pos,src):
             return (idx+1,pos-p+1)
         p += len(line)+1
 
+# allow a source to preprocess inputs before commit to the manager
 def get_matcher(nvim):
 
     if hasattr(get_matcher,'matcher'):
@@ -93,4 +94,5 @@ def get_matcher(nvim):
 
     # cache result
     get_matcher.matcher = m.Matcher(nvim,chcmp)
+    return get_matcher.matcher
 

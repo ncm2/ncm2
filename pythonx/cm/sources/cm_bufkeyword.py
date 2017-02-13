@@ -72,16 +72,8 @@ class Source:
         kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
         startcol = col-len(kw)
 
-        matches = []
-        lkw = kw.lower()
-        for word in self._words:
-            if word.lower().find(lkw)==0 and word!=kw:
-                matches.append(dict(word=word,icase=1))
-
-        matches.sort(key=lambda x: len(x['word']))
-
-        # simply limit the number of matches here, avoid overwhelming neovim
-        matches = matches[0:1024]
+        matches = (dict(word=word,icase=1)  for word in self._words)
+        matches = cm.get_matcher(self._nvim).process(info['name'], ctx, startcol, matches)
 
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
