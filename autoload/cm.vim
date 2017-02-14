@@ -42,7 +42,6 @@ func! cm#enable_for_buffer()
 
 	let b:cm_enable = 1
 
-	let s:saved_completeopt = &completeopt
 	" TODO this override the global options, any way to fix this?
 	set completeopt=menu,menuone,noinsert,noselect
 	set completefunc=cm#_completefunc
@@ -54,9 +53,7 @@ func! cm#enable_for_buffer()
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 		autocmd FileType,BufWinEnter <buffer> call s:check_and_start_all_channels()
-		" save and restore completeopt
-		autocmd BufWinEnter    <buffer> let s:saved_completeopt = &completeopt | set completeopt=menu,menuone,noinsert,noselect
-		autocmd BufWinLeave    <buffer> let &completeopt = s:saved_completeopt
+		autocmd BufEnter    <buffer> set completeopt=menu,menuone,noinsert,noselect
 	augroup END
 
 	call s:start_core_channel()
@@ -69,8 +66,6 @@ func! cm#disable_for_buffer()
 		iunmap <buffer> <CR>
 	endif
 	let b:cm_enable = 0
-	" restore completeopt
-	let &completeopt = s:saved_completeopt
 	augroup cm
 		autocmd! * <buffer>
 	augroup END
