@@ -176,7 +176,7 @@ This project was started just for fun, and it's working pleasingly for me now.
 However, it seems there's lots of differences between deoplete, YCM, and
 nvim-completion-manager, by implementation.
 
-I havn't read the source of YCM yet. So here I'm describing the basic
+I haven't read the source of YCM yet. So here I'm describing the basic
 implementation of NCM (short for nvim-completion-manager) and some of the
 differences between deoplete and this plugin.
 
@@ -186,24 +186,24 @@ Each completion source should be a standalone process, the manager notifies
 the completion source for any text changing, even when popup menu is visible.
 The completion source notifies the manager if there's any complete matches
 available. After some basic priority sorting between completion sources, and
-some simple filtering, the completion popup menu will be trigger with the
+some simple filtering, the completion popup menu will be triggered with the
 `complete()` function by the completion manager.
 
 If some of the completion source is calculating matches for a long long time,
-the popup menu will still be shown quickly if other completion sources works
-properly. And if the user havn't changed anything, the popup menu will be
-updated after the slow completion source finish the work.
+the popup menu will still be shown quickly if other completion sources work
+properly. And if the user hasn't changed anything, the popup menu will be
+updated after the slow completion source finishes the work.
 
 As the time as of this plugin being created, the completion sources of
 deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
-the display of popup menu. Of course It will not block the ui.
+the display of popup menu. Of course it will not block the ui.
 
-IMHO, NCM is potentially faster 'cause all completion sources run in parallel.
+IMHO, NCM is potentially faster because all completion sources run in parallel.
 
 ### Scoping
 
-I write markdown file with code blocks quite often, so I've also implemented
+I write markdown files with code blocks quite often, so I've also implemented
 [language specific completion for markdown
 file](#language-specific-completion-for-markdown). This is a framework
 feature, which is called scoping. It should work for any markdown code block
@@ -213,7 +213,7 @@ style tag.
 
 The idea was originated in
 [vim-syntax-compl-pop](https://github.com/roxma/vim-syntax-compl-pop). Since
-it's pure vimscript implementation, and there're some limitation currently
+it's pure vimscript implementation, and there are some limitations currently
 with neovim's syntax api. It's very likely that vim-syntax-compl-pop doesn't
 work, for example, javascript completion in markdown or html script tag.  So I
 use custom parser in NCM to implement the scoping features.
