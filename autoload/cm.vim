@@ -156,6 +156,7 @@ func! cm#remove_source(name)
 		for l:channel in get(l:info,'channels',[])
 			try
 				if has_key(l:channel,'id')
+					let l:channel['normal_stop'] = 1
 					jobstop(l:channel.id)
 				endif
 			catch
@@ -165,7 +166,7 @@ func! cm#remove_source(name)
 		unlet l:info
 		unlet s:sources[a:name]
 	catch
-		return
+		echom v:exception
 	endtry
 endfunc
 
@@ -282,6 +283,7 @@ func! cm#_start_channels(info)
 
 			let l:opt = {'rpc':1, 'channel': l:channel}
 			let l:opt['detach'] = get(l:channel,'detach',0)
+			let l:opt['info'] = a:info
 
 			func l:opt.on_exit(job_id, data, event)
 
@@ -296,7 +298,9 @@ func! cm#_start_channels(info)
 				if s:leaving
 					return
 				endif
-				echom self['channel']['path'] . ' ' . 'exit'
+				if !get(self['channel'],'normal_stop',0)
+					echom self['channel']['module'] . ' ' . 'exit'
+				endif
 				unlet self['channel']
 			endfunc
 

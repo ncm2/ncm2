@@ -25,9 +25,12 @@ class Source:
 
         self._nvim = nvim
 
-        if not os.environ['TMUX']:
+        if 'TMUX' not in  os.environ:
             # suiside for tmux not available
+            logger.info('no tmux, suiside')
             nvim.call("cm#remove_source",'cm-tmux')
+
+        logger.info('tmux: %s', os.environ['TMUX'])
 
         self._words = set()
 
