@@ -3,7 +3,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import cm
+import cm
 cm.register_source(name='cm-tern',
                    priority=9,
                    abbreviation='Js',
@@ -19,7 +19,7 @@ import subprocess
 import logging
 from urllib import request
 import json
-from cm import cm
+import cm
 
 logger = logging.getLogger(__name__)
 

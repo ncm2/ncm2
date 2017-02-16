@@ -4,7 +4,7 @@ if get(g:,'cm_enable_for_all',1)
 	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<1000000) | call cm#enable_for_buffer() | endif
 endif
 
-let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.prefix_matcher', 'case': 'smartcase'})
+let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})
 
 " use this for fuzzy matching
 " let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.fuzzy_matcher', 'case': 'smartcase'})

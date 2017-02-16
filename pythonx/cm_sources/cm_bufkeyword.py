@@ -4,7 +4,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import cm
+import cm
 cm.register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',

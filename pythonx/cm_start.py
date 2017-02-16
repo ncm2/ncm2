@@ -9,7 +9,7 @@ import re
 import logging
 import importlib
 from neovim import attach, setup_logging
-from cm import cm
+import cm
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def main():
         pass
 
     if start_type == 'core':
-        modulename = 'cm.core'
+        modulename = 'cm_core'
     else:
         modulename = sys.argv[2]
 
@@ -55,10 +55,10 @@ def main():
     try:
         if start_type == 'core':
 
-            from cm import core
+            import cm_core
             # connect neovim
             nvim = nvim_env()
-            handler = core.CoreHandler(nvim)
+            handler = cm_core.CoreHandler(nvim)
             logger.info('starting core, enter event loop')
             cm_event_loop('core',logger,nvim,handler)
 

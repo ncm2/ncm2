@@ -14,7 +14,7 @@ import urllib
 import json
 from neovim import attach
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from cm import cm
+import cm
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class CoreHandler:
         self._has_popped_up = True
         self._subscope_detectors = {}
 
-        scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm/scopers/*.py')").split("\n")
+        scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py')").split("\n")
 
         # auto find scopers
         for path in scoper_paths:
@@ -45,7 +45,7 @@ class CoreHandler:
                 continue
             try:
                 modulename = os.path.splitext(os.path.basename(path))[0]
-                modulename = "cm.scopers.%s" % modulename
+                modulename = "cm_scopers.%s" % modulename
                 m = importlib.import_module(modulename)
 
                 scoper = m.Scoper()
@@ -60,11 +60,11 @@ class CoreHandler:
                 logger.exception('importing scoper <%s> failed: %s', modulename, ex)
 
         # auto find sources
-        sources_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm/sources/*.py')").split("\n")
+        sources_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_sources/*.py')").split("\n")
         for path in sources_paths:
 
             modulename = os.path.splitext(os.path.basename(path))[0]
-            modulename = "cm.sources.%s" % modulename
+            modulename = "cm_sources.%s" % modulename
 
             # use a trick to only register the source withou loading the entire
             # module

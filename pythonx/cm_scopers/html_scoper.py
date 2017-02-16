@@ -4,7 +4,7 @@ import logging
 import urllib
 import http.client
 import copy
-from cm import cm
+import cm
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
