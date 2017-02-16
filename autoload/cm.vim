@@ -266,7 +266,7 @@ func! cm#_start_channels(info)
 	endif
 	for l:channel in get(l:info,'channels',[])
 
-		if l:channel['type']=='python3'
+		if l:channel['type']=='python3' || l:channel['type']=='python2'
 
 			if get(l:channel, 'id',-1)!=-1
 				" channel already started
@@ -274,7 +274,10 @@ func! cm#_start_channels(info)
 			endif
 
 			" find interpreter path
-			let l:py3 = get(g:,'python3_host_prog','python3')
+			let l:py = get(g:,'python3_host_prog','python3')
+			if l:channel['type']=='python2'
+				let l:py = get(g:,'python_host_prog','python2')
+			endif
 
 			let l:opt = {'rpc':1, 'channel': l:channel}
 			let l:opt['detach'] = get(l:channel,'detach',0)
@@ -300,7 +303,7 @@ func! cm#_start_channels(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = jobstart([l:py3,s:core_py_path,'channel',l:channel['module']],l:opt)
+			let l:channel['id'] = jobstart([l:py,s:core_py_path,'channel',l:channel['module']],l:opt)
 
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']

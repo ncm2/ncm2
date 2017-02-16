@@ -66,7 +66,17 @@ def main():
 
             # connect neovim
             nvim = nvim_env()
-            m = importlib.import_module(modulename)
+            if sys.version_info.major==2:
+                # python2 doesn't support namespace package
+                # use load_source as a workaround
+                import imp
+                file = modulename.replace('.','/')
+                exp = 'globpath(&rtp,"pythonx/%s.py")' % file
+                path = nvim.eval(exp).strip()
+                logger.info('python2 file path: %s, exp: %s',path, exp)
+                m = imp.load_source(modulename,path)
+            else:
+                m = importlib.import_module(modulename)
             handler = m.Source(nvim)
             logger.info('handler created, entering event loop')
             cm_event_loop('channel',logger,nvim,handler)

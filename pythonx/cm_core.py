@@ -68,7 +68,7 @@ class CoreHandler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,scopes=None,cm_refresh_patterns=None,events=[],detach=0):
+            def register_source(name,abbreviation,priority,scopes=None,cm_refresh_patterns=None,events=[],detach=0,python='python3'):
 
                 # " jedi
                 # " refresh 1 for call signatures
@@ -89,7 +89,7 @@ class CoreHandler:
                 # 		\ ],
                 # 		\ })
 
-                channel = dict(type='python3',
+                channel = dict(type=python,
                                module=modulename,
                                detach=detach,
                                events=events)
