@@ -1,8 +1,14 @@
-import re
-import logging
-import urllib
-import http.client
+import sys
+
+if sys.version_info.major==2:
+    from httplib import HTTPConnection
+    from urlparse import urlparse
+else:
+    from urllib.parse import urlparse
+    from http.client import HTTPConnection
+
 import importlib
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +28,9 @@ def context_outdated(ctx1,ctx2):
 
 def get_src(ctx):
     src_uri = ctx['src_uri']
-    parsed = urllib.parse.urlparse(src_uri)
+    parsed = urlparse(src_uri)
     logger.info('hostname: %s, port %s, path: %s', parsed.hostname, parsed.port, parsed.path)
-    conn = http.client.HTTPConnection(parsed.hostname, parsed.port)
+    conn = HTTPConnection(parsed.hostname, parsed.port)
     try:
         conn.request("GET", src_uri)
         res = conn.getresponse()
