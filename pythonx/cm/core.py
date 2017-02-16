@@ -4,7 +4,6 @@
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
 import os
-import sys
 import re
 import logging
 import copy
@@ -13,7 +12,7 @@ import threading
 from threading import Thread, RLock
 import urllib
 import json
-from neovim import attach, setup_logging
+from neovim import attach
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from cm import cm
 

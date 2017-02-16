@@ -7,14 +7,8 @@ import os
 import sys
 import re
 import logging
-import copy
 import importlib
-import threading
-from threading import Thread, RLock
-import urllib
-import json
 from neovim import attach, setup_logging
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from cm import cm
 
 logger = logging.getLogger(__name__)
