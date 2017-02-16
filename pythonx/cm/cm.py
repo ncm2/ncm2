@@ -2,7 +2,6 @@ import re
 import logging
 import urllib
 import http.client
-import copy
 import importlib
 
 logger = logging.getLogger(__name__)
