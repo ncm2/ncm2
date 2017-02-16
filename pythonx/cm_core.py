@@ -37,7 +37,7 @@ class CoreHandler:
         self._has_popped_up = True
         self._subscope_detectors = {}
 
-        scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py')").split("\n")
+        scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
         # auto find scopers
         for path in scoper_paths:
@@ -60,7 +60,7 @@ class CoreHandler:
                 logger.exception('importing scoper <%s> failed: %s', modulename, ex)
 
         # auto find sources
-        sources_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_sources/*.py')").split("\n")
+        sources_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_sources/*.py',1)").split("\n")
         for path in sources_paths:
 
             modulename = os.path.splitext(os.path.basename(path))[0]

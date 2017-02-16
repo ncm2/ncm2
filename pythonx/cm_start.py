@@ -71,7 +71,7 @@ def main():
                 # use load_source as a workaround
                 import imp
                 file = modulename.replace('.','/')
-                exp = 'globpath(&rtp,"pythonx/%s.py")' % file
+                exp = 'globpath(&rtp,"pythonx/%s.py",1)' % file
                 path = nvim.eval(exp).strip()
                 logger.info('python2 file path: %s, exp: %s',path, exp)
                 m = imp.load_source(modulename,path)
@@ -91,7 +91,7 @@ def main():
 def nvim_env():
     nvim = attach('stdio')
     # setup pythonx
-    pythonxs = nvim.eval('globpath(&rtp,"pythonx")')
+    pythonxs = nvim.eval('globpath(&rtp,"pythonx",1)')
     for path in pythonxs.split("\n"):
         if not path:
             continue
