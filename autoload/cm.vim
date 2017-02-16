@@ -211,7 +211,7 @@ let s:change_timer = -1
 let s:lasttick = ''
 let s:channel_id = -1
 let s:channel_started = 0
-let s:core_py_path = globpath(&rtp,'pythonx/cm_core.py')
+let s:core_py_path = globpath(&rtp,'pythonx/cm_start.py')
 " let s:complete_timer
 let s:complete_timer_ctx = {}
 
@@ -257,7 +257,7 @@ func! s:check_and_start_channels(info)
 	call cm#_start_channels(a:info)
 endfunc
 
-" called from cm_core.py
+" called from pythonx/cm_start.py
 func! cm#_start_channels(info)
 	let l:info = a:info
 	if type(a:info)==type("")
