@@ -55,7 +55,7 @@ extra sources:
 - [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
   (experimental plugin for [language server
   ](https://github.com/neovim/neovim/issues/5522 support))
-
+- [clang_complete](https://github.com/Rip-Rip/clang_complete/pull/515)
 
 ## Requirements
 

@@ -10,7 +10,7 @@ let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 
 " let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.fuzzy_matcher', 'case': 'smartcase'})
 
 if !exists('g:cm_completekeys')
-	if g:cm_matcher['module'] == 'cm.matchers.prefix_matcher'
+	if g:cm_matcher['module'] == 'cm_matchers.prefix_matcher'
 		" <Plug>(cm_complete) has no flickering issue with prefix_matcher. But
 		" it has terrible popup flickering issue with fuzzy_matcher.
 		let g:cm_completekeys = "\<Plug>(cm_complete)"
