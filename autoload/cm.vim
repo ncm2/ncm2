@@ -127,7 +127,7 @@ endfunc
 func! cm#register_source(info)
 
 	" if registered before, ignore this call
-	if has_key(s:sources,a:info['name'])
+	if has_key(g:_cm_sources,a:info['name'])
 		return
 	endif
 
@@ -136,7 +136,7 @@ func! cm#register_source(info)
 		call extend(a:info,g:cm_sources_override[a:info['name']])
 	endif
 
-	let s:sources[a:info['name']] = a:info
+	let g:_cm_sources[a:info['name']] = a:info
 
 	" check and start channels
 	if get(b:,'cm_enable',0) == 0
@@ -149,7 +149,7 @@ endfunc
 
 func! cm#remove_source(name)
 	try
-		let l:info = s:sources[a:name]
+		let l:info = g:_cm_sources[a:name]
 		for l:channel in get(l:info,'channels',[])
 			try
 				if has_key(l:channel,'id')
@@ -161,7 +161,7 @@ func! cm#remove_source(name)
 			endtry
 		endfor
 		unlet l:info
-		unlet s:sources[a:name]
+		unlet g:_cm_sources[a:name]
 	catch
 		echom v:exception
 	endtry
@@ -197,17 +197,17 @@ func! cm#complete(src, context, startcol, matches, ...)
 		return 1
 	endif
 
-	if !has_key(s:sources,l:name)
+	if !has_key(g:_cm_sources,l:name)
 		return 3
 	endif
 
-	call call(function('s:notify_core_channel'),['cm_complete',s:sources,l:name,a:context,a:startcol,a:matches]+a:000)
+	call call(function('s:notify_core_channel'),['cm_complete',g:_cm_sources,l:name,a:context,a:startcol,a:matches]+a:000)
 
 endfunc
 
 " internal functions and variables
 
-let s:sources = {}
+let g:_cm_sources = {}
 let s:leaving = 0
 let s:change_timer = -1
 let s:lasttick = ''
@@ -224,8 +224,8 @@ augroup cm
 augroup END
 
 func! s:check_and_start_all_channels()
-	for l:name in keys(s:sources)
-		call s:check_and_start_channels(s:sources[l:name])
+	for l:name in keys(g:_cm_sources)
+		call s:check_and_start_channels(g:_cm_sources[l:name])
 	endfor
 endfunc
 
@@ -264,7 +264,7 @@ func! cm#_start_channels(info)
 	let l:info = a:info
 	if type(a:info)==type("")
 		" parameter is a name
-		let l:info = s:sources[a:info]
+		let l:info = g:_cm_sources[a:info]
 	endif
 	for l:channel in get(l:info,'channels',[])
 
@@ -446,7 +446,7 @@ func! s:on_changed()
 
 	let l:ctx = cm#context()
 
-	call s:notify_core_channel('cm_refresh',s:sources,l:ctx)
+	call s:notify_core_channel('cm_refresh',g:_cm_sources,l:ctx)
 
 	" TODO
 	" detect popup item selected event then notify sources
@@ -464,7 +464,7 @@ func! cm#_notify_sources_to_refresh(calls, channels, ctx)
 
 	for l:channel in a:channels
 		try
-			call rpcnotify(l:channel['id'], 'cm_refresh', s:sources[l:channel['name']], l:channel['context'])
+			call rpcnotify(l:channel['id'], 'cm_refresh', g:_cm_sources[l:channel['name']], l:channel['context'])
 		catch
 			continue
 		endtry
@@ -472,16 +472,16 @@ func! cm#_notify_sources_to_refresh(calls, channels, ctx)
 	for l:call in a:calls
 		let l:name = l:call['name']
 		try
-			let l:type = type(s:sources[l:name].cm_refresh)
+			let l:type = type(g:_cm_sources[l:name].cm_refresh)
 			if l:type==2
 				" funcref
-				call s:sources[l:name].cm_refresh(s:sources[l:name],l:call['context'])
+				call g:_cm_sources[l:name].cm_refresh(g:_cm_sources[l:name],l:call['context'])
 			elseif l:type==1
 				"string
-				call call(s:sources[l:name].cm_refresh,[s:sources[l:name],l:call['context']],s:sources[l:name])
-			elseif l:type==4 && has_key(s:sources[l:name].cm_refresh,'omnifunc')
+				call call(g:_cm_sources[l:name].cm_refresh,[g:_cm_sources[l:name],l:call['context']],g:_cm_sources[l:name])
+			elseif l:type==4 && has_key(g:_cm_sources[l:name].cm_refresh,'omnifunc')
 				" dict
-				call s:cm_refresh_omni(s:sources[l:name],l:call['context'])
+				call s:cm_refresh_omni(g:_cm_sources[l:name],l:call['context'])
 			endif
 		catch
 			echom "cm completion source " . l:name . " exception caught: " . v:exception
@@ -513,7 +513,7 @@ func! s:complete_timeout(timer)
 	if cm#context_changed(s:complete_timer_ctx)
 		return
 	endif
-	call s:notify_core_channel('cm_complete_timeout',s:sources,s:complete_timer_ctx)
+	call s:notify_core_channel('cm_complete_timeout',g:_cm_sources,s:complete_timer_ctx)
 endfunc
 
 func! s:menu_selected()
