@@ -44,7 +44,9 @@ func! cm#enable_for_buffer()
 
 	" TODO this override the global options, any way to fix this?
 	set completeopt=menu,menuone,noinsert,noselect
-	set completefunc=cm#_completefunc
+	if g:cm_completekeys=="\<Plug>(cm_completefunc)"
+		set completefunc=cm#_completefunc
+	endif
 
 	augroup cm
 		autocmd! * <buffer>
