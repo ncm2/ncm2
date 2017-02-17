@@ -163,7 +163,8 @@ let g:cm_sources_override = {
 
 ## How to extend this framework?
 
-- For really simple, light weight completion candidate calculation, refer to
+- For really simple, light weight completion candidate calculation, or
+  avoiding python, refer to
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
 - For really async completion source (strongly encoraged), refer to the file
   path completion example:
