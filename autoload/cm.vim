@@ -36,6 +36,15 @@ autocmd User CmSetup silent
 
 func! cm#enable_for_buffer()
 
+	if has('nvim')==0
+		try
+			call neovim_rpc#serveraddr()
+		catch
+			" neovim_rpc plugin for vim8 is not available
+			return
+		endtry
+	endif
+
 	if s:already_setup == 0
 		doautocmd User CmSetup
 		let s:already_setup = 1
