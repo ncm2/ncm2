@@ -125,7 +125,14 @@ class CoreHandler:
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
 
         self._file_server = FileServer()
-        self._file_server.start(self._nvim.eval('v:servername'))
+        servername = ''
+        try:
+            servername = self._nvim.eval('v:servername')
+        except:
+            pass
+        if not servername:
+            servername = self._nvim.eval('neovim_rpc#serveraddr()')
+        self._file_server.start(servername)
 
         self._ctx = None
 
@@ -469,7 +476,12 @@ class FileServer(Thread):
                     self.wfile.write(bytes(message, "utf8"))
 
         # create another connection to avoid synchronization issue?
-        self._nvim = attach('socket',path=nvim_server_name)
+        if len(nvim_server_name.split(':'))==2:
+            addr,port = nvim_server_name.split(':')
+            port = int(port)
+            self._nvim = attach('tcp',address=addr,port=port)
+        else:
+            self._nvim = attach('socket',path=nvim_server_name)
 
         # Server settings
         # 0 for random port

@@ -18,6 +18,13 @@ inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 
 
+let s:rpcnotify = 'rpcnotify'
+let s:jobstart = 'jobstart'
+if has('nvim')==0
+	let s:rpcnotify = 'neovim_rpc#rpcnotify'
+	let s:jobstart = 'neovim_rpc#jobstart'
+endif
+
 
 " options
 
@@ -88,7 +95,9 @@ func! cm#context()
 	let l:ret['lnum'] = l:ret['curpos'][1]
 	let l:ret['col'] = l:ret['curpos'][2]
 	let l:ret['filetype'] = &filetype
-	let l:ret['filepath'] = expand('%:p')
+	" string is necessary here, otherwise empty filepath is somehow converted
+	" to None in vim's python binding.
+	let l:ret['filepath'] = string(expand('%:p'))
 	let l:ret['typed'] = strpart(getline(l:ret['lnum']),0,l:ret['col']-1)
 	return l:ret
 endfunc
@@ -305,12 +314,12 @@ func! cm#_start_channels(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = jobstart([l:py,s:core_py_path,'channel',l:channel['module']],l:opt)
+			let l:channel['id'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module']],l:opt])
 
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']
 			for l:event in get(l:channel,'events',[])
-				let l:exec =  'if get(b:,"cm_enable",0) | call rpcnotify(' . l:channel['id'] . ', "cm_event", "'.l:event.'",cm#context()) | endif'
+				let l:exec =  'if get(b:,"cm_enable",0) | call call(s:rpcnotify,[' . l:channel['id'] . ', "cm_event", "'.l:event.'",cm#context()]) | endif'
 				if type(l:event)==type('')
 					execute 'au ' . l:event . ' * ' . l:exec
 				elseif type(l:event)==type([])
@@ -368,10 +377,10 @@ func! s:start_core_channel()
 		return
 	endif
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let s:channel_id = jobstart([l:py3,s:core_py_path,'core'],{'rpc':1,
+	let s:channel_id = call(s:jobstart,[[l:py3,s:core_py_path,'core'],{'rpc':1,
 			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ 'detach'  : 1,
-			\ })
+			\ }])
 
 	let s:channel_started = 1
 endfunc
@@ -389,7 +398,7 @@ fun s:notify_core_channel(event,...)
 		return -1
 	endif
 	" forward arguments
-	call call('rpcnotify',[s:channel_id, a:event] + a:000 )
+	call call(s:rpcnotify,[s:channel_id, a:event] + a:000 )
 	return 0
 endf
 " }
@@ -464,7 +473,7 @@ func! cm#_notify_sources_to_refresh(calls, channels, ctx)
 
 	for l:channel in a:channels
 		try
-			call rpcnotify(l:channel['id'], 'cm_refresh', g:_cm_sources[l:channel['name']], l:channel['context'])
+			call call(s:rpcnotify, [l:channel['id'], 'cm_refresh', g:_cm_sources[l:channel['name']], l:channel['context']])
 		catch
 			continue
 		endtry
