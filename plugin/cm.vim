@@ -2,6 +2,11 @@
 if get(g:,'cm_enable_for_all',1)
 	" simple ignore files larger than 1M, for performance
 	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<1000000) | call cm#enable_for_buffer() | endif
+
+	" disable clang default mapping by default,
+	" https://github.com/Rip-Rip/clang_complete/pull/515
+	let g:clang_make_default_keymappings = get(g:,'clang_make_default_keymappings',0)
+
 endif
 
 let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})
