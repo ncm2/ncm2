@@ -9,7 +9,7 @@ cm.register_source(name='cm-tmux',
                    abbreviation='Tmux',
                    priority=4,
                    cm_refresh_patterns=[r'[0-9a-zA-Z_#]{3,}$'],
-                   events=['CursorHold','CursorHoldI','FocusGained','BufEnter'],
+                   events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],
                    detach=1)
 
 import os
