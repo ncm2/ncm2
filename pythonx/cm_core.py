@@ -273,7 +273,7 @@ class CoreHandler:
                             if channel.get('has_terminated',0)==0:
                                 logger.info('starting channels for %s',name)
                                 # has not been started yet, start it now
-                                self._nvim.call('cm#_start_channels',name)
+                                self._nvim.call('cm#_start_channel',name,async=True)
 
                     channel = info.get('channel',{})
                     if 'id' in channel:

@@ -162,7 +162,7 @@ func! cm#register_source(info)
 		return
 	endif
 
-	call s:check_and_start_channels(a:info)
+	call s:check_and_start_channel(a:info)
 
 endfunc
 
@@ -246,7 +246,7 @@ augroup END
 
 func! s:check_and_start_all_channels()
 	for l:name in keys(g:_cm_sources)
-		call s:check_and_start_channels(g:_cm_sources[l:name])
+		call s:check_and_start_channel(g:_cm_sources[l:name])
 	endfor
 endfunc
 
@@ -269,7 +269,7 @@ func! s:check_scope(info)
 endfunc
 
 " check and start channels
-func! s:check_and_start_channels(info)
+func! s:check_and_start_channel(info)
 	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
 	if a:info['enable'] == 0
 		return
@@ -277,61 +277,63 @@ func! s:check_and_start_channels(info)
 	if s:check_scope(a:info)==0
 		return
 	endif
-	call cm#_start_channels(a:info)
+	call cm#_start_channel(a:info)
 endfunc
 
 " called from pythonx/cm_start.py
-func! cm#_start_channels(info)
+func! cm#_start_channel(info)
 	let l:info = a:info
 	if type(a:info)==type("")
 		" parameter is a name
 		let l:info = g:_cm_sources[a:info]
 	endif
-	if has_key(l:info,'channel')
-		let l:channel = l:info['channel']
-
-		if l:channel['type']=='python3' || l:channel['type']=='python2'
-
-			if get(l:channel, 'jobid',-1)!=-1
-				" channel already started
-				continue
-			endif
-
-			" find interpreter path
-			let l:py = get(g:,'python3_host_prog','python3')
-			if l:channel['type']=='python2'
-				let l:py = get(g:,'python_host_prog','python2')
-			endif
-
-			let l:opt = {'rpc':1, 'channel': l:channel}
-			let l:opt['detach'] = get(l:channel,'detach',0)
-			let l:opt['info'] = a:info
-
-			func l:opt.on_exit(job_id, data, event)
-
-				" delete event group
-				execute 'augroup cm_channel_' . self['channel']['jobid']
-				execute 'autocmd!'
-				execute 'augroup END'
-
-				unlet self['channel']['jobid']
-				" mark it
-				let self['channel']['has_terminated'] = 1
-				if s:leaving
-					return
-				endif
-				if !get(self['channel'],'normal_stop',0)
-					echom self['channel']['module'] . ' ' . 'exit'
-				endif
-				unlet self['channel']
-			endfunc
-
-			" start channel
-			let l:channel['jobid'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module'],l:info['name'],g:_cm_servername],l:opt])
-
-		endif
+	if !has_key(l:info,'channel')
+		return
 	endif
-	return l:info
+
+	let l:channel = l:info['channel']
+
+	if l:channel['type']=='python3' || l:channel['type']=='python2'
+
+		if get(l:channel, 'jobid',-1)!=-1
+			" channel already started
+			return
+		endif
+
+		" find interpreter path
+		let l:py = get(g:,'python3_host_prog','python3')
+		if l:channel['type']=='python2'
+			let l:py = get(g:,'python_host_prog','python2')
+		endif
+
+		let l:opt = {'rpc':1, 'channel': l:channel}
+		let l:opt['detach'] = get(l:channel,'detach',0)
+		let l:opt['info'] = a:info
+
+		func l:opt.on_exit(job_id, data, event)
+
+			" delete event group
+			execute 'augroup cm_channel_' . self['channel']['jobid']
+			execute 'autocmd!'
+			execute 'augroup END'
+
+			unlet self['channel']['jobid']
+			" mark it
+			let self['channel']['has_terminated'] = 1
+			if s:leaving
+				return
+			endif
+			if !get(self['channel'],'normal_stop',0)
+				echom self['channel']['module'] . ' ' . 'exit'
+			endif
+			unlet self['channel']
+		endfunc
+
+		" start channel
+		let l:channel['jobid'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module'],l:info['name'],g:_cm_servername],l:opt])
+
+	endif
+
 endfunc
 
 func! cm#_update_channel_id(name,id)
@@ -354,6 +356,9 @@ func! cm#_update_channel_id(name,id)
 		endif
 	endfor
 	execute 'augroup END'
+
+	" refresh for this channel
+	call s:on_changed()
 
 endfunc
 
@@ -459,17 +464,14 @@ func! s:check_changes(timer)
 	let l:tick = s:changetick()
 	if l:tick!=s:lasttick
 		let s:lasttick = l:tick
-		if mode()=='i' && (&paste==0)
-			" only in insert non paste mode
-			call s:on_changed()
-		endif
+		call s:on_changed()
 	endif
 endfunc
 
 " on completion context changed
 func! s:on_changed()
 
-	if get(b:,'cm_enable',0) == 0
+	if get(b:,'cm_enable',0)==0 || mode()!='i' || &paste!=0
 		return
 	endif
 
