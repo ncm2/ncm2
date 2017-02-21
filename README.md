@@ -84,7 +84,9 @@ Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer 
 ```
 
 - If you are **vim8 user**, You'll need
-  [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc)
+  [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc). The vim8
+  support layer is still experimental, please 'upgrade' to
+  [neovim](https://github.com/neovim/neovim) if it's possible.
 
 ```vim
 " Requires vim8 with has('python') or has('python3')
