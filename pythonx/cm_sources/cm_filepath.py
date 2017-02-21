@@ -11,7 +11,7 @@
 import cm
 cm.register_source(name='cm-filepath',
                    abbreviation='path',
-                   cm_refresh_patterns=['[0-9a-zA-Z_\-\.\/~\$]{4,}$','\.\/[0-9a-zA-Z_\-\.\/~\$]*$'],
+                   cm_refresh_patterns=[r'[0-9a-zA-Z_\-\.\\\/~\$]{4,}$',r'\.[\/\\][0-9a-zA-Z_\-\.\\\/~\$]*$'],
                    priority=6,
                    detach=1)
 
@@ -33,7 +33,7 @@ class Source:
         self._nvim = nvim
 
         self._name_kw_pattern = r'[0-9a-zA-Z_\-\.]'
-        self._path_kw_pattern = r'[0-9a-zA-Z_\-\.\/~\$]'
+        self._path_kw_pattern = r'[0-9a-zA-Z_\-\.\\\/~\$]'
 
     def cm_refresh(self,info,ctx):
 
