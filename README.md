@@ -25,7 +25,6 @@ Subscribe it if you are interested.**
     * [Scoping](#scoping)
     * [Experimental hacking](#experimental-hacking)
 * [FAQ](#faq)
-    * [Vim 8 support?](#vim-8-support)
     * [Why Python?](#why-python)
 * [Related Projects](#related-projects)
 
@@ -82,6 +81,17 @@ extra sources:
 Plug 'roxma/nvim-completion-manager', {'do': 'npm install'}
 " PHP code completion is moved to a standalone plugin
 Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
+```
+
+- If you are **vim8 user**, You'll need
+  [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc)
+
+```vim
+" Requires vim8 with has('python') or has('python3')
+" Requires the installation of msgpack-python. (pip install msgpack-python)
+if !has('nvim')
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
 ```
 
 - Install the required pip modules for you neovim python3:
@@ -235,12 +245,6 @@ Deoplete and YCM are mature, they have tons of features I'm not offering
 currently, which should be considered a main difference too.
 
 ## FAQ
-
-### Vim 8 support?
-
-Currently not available. Refer to
-[#14](https://github.com/roxma/nvim-completion-manager/issues/14) for
-discussion.
 
 ### Why Python?
 
