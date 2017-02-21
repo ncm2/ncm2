@@ -79,14 +79,12 @@ class CoreHandler:
                 # 		\ 'abbreviation': 'Py',
                 # 		\ 'scopes': ['python'],
                 # 		\ 'refresh': 1, 
-                # 		\ 'channels': [
-                # 		\   {
+                # 		\ 'channel': {
                 # 		\		'type': 'python3',
                 # 		\		'module': 'cm.sources.cm_jedi',
                 # 		\		'events': ['InsertLeave'],
                 # 		\		'detach': 0,
-                # 		\   }
-                # 		\ ],
+                # 		\ },
                 # 		\ })
 
                 channel = dict(type=python,
@@ -95,7 +93,7 @@ class CoreHandler:
                                events=events)
 
                 source = {}
-                source['channels']            = [channel]
+                source['channel']             = channel
                 source['name']                = name
                 source['priority']            = priority
                 source['abbreviation']        = abbreviation
@@ -269,17 +267,17 @@ class CoreHandler:
                         refreshes_calls.append(dict(name=name,context=ctx))
 
                     # start channels on demand here
-                    if info.get('channels',None):
-                        channel = info['channels'][0]
+                    if 'channel' in info:
+                        channel = info['channel']
                         if 'id' not in channel:
                             if channel.get('has_terminated',0)==0:
                                 logger.info('starting channels for %s',name)
                                 # has not been started yet, start it now
-                                info = self._nvim.call('cm#_start_channels',name)
+                                self._nvim.call('cm#_start_channels',name)
 
-                    for channel in info.get('channels',[]):
-                        if 'id' in channel:
-                            refreshes_channels.append(dict(name=name,id=channel['id'],context=ctx))
+                    channel = info.get('channel',{})
+                    if 'id' in channel:
+                        refreshes_channels.append(dict(name=name,id=channel['id'],context=ctx))
                 except Exception as inst:
                     logger.exception('cm_refresh process exception: %s', inst)
                     continue

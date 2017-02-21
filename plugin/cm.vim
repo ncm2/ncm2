@@ -59,23 +59,16 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ })
 
 
-" Note: the channels field is required as an array, on most cases only one
-" channel will would be enough. While there may be cases in which you need
-" another thread to do the indexing, caching work, it's easier to use another
-" channel instead of controlling threading on your own.
-
 " " keyword
 " call cm#register_source({
 " 		\ 'name' : 'cm-bufkeyword',
 " 		\ 'priority': 5, 
 " 		\ 'abbreviation': 'Key',
-" 		\ 'channels': [
-" 		\   {
+" 		\ 'channel': {
 " 		\		'type': 'python3',
 " 		\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
 " 		\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
 " 		\		'detach':1,
-" 		\	}
-" 		\ ],
+" 		\ },
 " 		\ })
 

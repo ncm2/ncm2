@@ -34,10 +34,12 @@ def main():
 
     if start_type == 'core':
         modulename = 'cm_core'
+        source_name = ''
         addr = sys.argv[2]
     else:
         modulename = sys.argv[2]
-        addr = sys.argv[3]
+        source_name = sys.argv[3]
+        addr = sys.argv[4]
 
     # setup for the module 
     setup_logging(modulename)
@@ -46,6 +48,9 @@ def main():
 
     logger = logging.getLogger(__name__)
     logger.setLevel(get_loglevel())
+
+    # connect neovim
+    nvim = nvim_env(addr)
 
     # change proccess title
     try:
@@ -58,16 +63,15 @@ def main():
         if start_type == 'core':
 
             import cm_core
-            # connect neovim
-            nvim = nvim_env(addr)
+            nvim.vars['_cm_channel_id'] = nvim.channel_id
             handler = cm_core.CoreHandler(nvim)
             logger.info('starting core, enter event loop')
             cm_event_loop('core',logger,nvim,handler)
 
         elif start_type == 'channel':
 
-            # connect neovim
-            nvim = nvim_env(addr)
+            nvim.call('cm#_update_channel_id',source_name,nvim.channel_id)
+
             if sys.version_info.major==2:
                 # python2 doesn't support namespace package
                 # use load_source as a workaround
@@ -79,6 +83,7 @@ def main():
                 m = imp.load_source(modulename,path)
             else:
                 m = importlib.import_module(modulename)
+
             handler = m.Source(nvim)
             logger.info('handler created, entering event loop')
             cm_event_loop('channel',logger,nvim,handler)

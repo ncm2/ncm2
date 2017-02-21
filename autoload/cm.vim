@@ -169,14 +169,15 @@ endfunc
 func! cm#remove_source(name)
 	try
 		let l:info = g:_cm_sources[a:name]
-		for l:channel in get(l:info,'channels',[])
+		if has_key(l:info,'channel')
+			let l:channel = l:info['channel']
 			try
-				if has_key(l:channel,'id')
+				if has_key(l:channel,'jobid')
 					let l:channel['normal_stop'] = 1
 					jobstop(l:channel.id)
 				endif
 			catch
-				continue
+				" do nothing
 			endtry
 		endfor
 		unlet l:info
@@ -230,7 +231,8 @@ let g:_cm_sources = {}
 let s:leaving = 0
 let s:change_timer = -1
 let s:lasttick = ''
-let s:channel_id = -1
+let s:channel_jobid = -1
+let g:_cm_channel_id = -1
 let s:channel_started = 0
 let s:core_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
 " let s:complete_timer
@@ -285,11 +287,12 @@ func! cm#_start_channels(info)
 		" parameter is a name
 		let l:info = g:_cm_sources[a:info]
 	endif
-	for l:channel in get(l:info,'channels',[])
+	if has_key(l:info,'channel')
+		let l:channel = l:info['channel']
 
 		if l:channel['type']=='python3' || l:channel['type']=='python2'
 
-			if get(l:channel, 'id',-1)!=-1
+			if get(l:channel, 'jobid',-1)!=-1
 				" channel already started
 				continue
 			endif
@@ -307,11 +310,11 @@ func! cm#_start_channels(info)
 			func l:opt.on_exit(job_id, data, event)
 
 				" delete event group
-				execute 'augroup cm_channel_' . self['channel']['id']
+				execute 'augroup cm_channel_' . self['channel']['jobid']
 				execute 'autocmd!'
 				execute 'augroup END'
 
-				unlet self['channel']['id']
+				unlet self['channel']['jobid']
 				" mark it
 				let self['channel']['has_terminated'] = 1
 				if s:leaving
@@ -324,23 +327,34 @@ func! cm#_start_channels(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module'],g:_cm_servername],l:opt])
-
-			" events
-			execute 'augroup cm_channel_' . l:channel['id']
-			for l:event in get(l:channel,'events',[])
-				let l:exec =  'if get(b:,"cm_enable",0) | call call(s:rpcnotify,[' . l:channel['id'] . ', "cm_event", "'.l:event.'",cm#context()]) | endif'
-				if type(l:event)==type('')
-					execute 'au ' . l:event . ' * ' . l:exec
-				elseif type(l:event)==type([])
-					execute 'au ' . join(l:event,' ') .' ' .  l:exec
-				endif
-			endfor
-			execute 'augroup END'
+			let l:channel['jobid'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module'],l:info['name'],g:_cm_servername],l:opt])
 
 		endif
-	endfor
+	endif
 	return l:info
+endfunc
+
+func! cm#_update_channel_id(name,id)
+
+	if !has_key(g:_cm_sources,a:name)
+		return
+	endif
+
+	let l:channel = g:_cm_sources[a:name]['channel']
+	let l:channel['id'] = a:id
+
+	" register events
+	execute 'augroup cm_channel_' . l:channel['jobid']
+	for l:event in get(l:channel,'events',[])
+		let l:exec =  'if get(b:,"cm_enable",0) | silent! call call(s:rpcnotify,[' . l:channel['id'] . ', "cm_event", "'.l:event.'",cm#context()]) | endif'
+		if type(l:event)==type('')
+			execute 'au ' . l:event . ' * ' . l:exec
+		elseif type(l:event)==type([])
+			execute 'au ' . join(l:event,' ') .' ' .  l:exec
+		endif
+	endfor
+	execute 'augroup END'
+
 endfunc
 
 func! cm#_core_complete(context, startcol, matches)
@@ -387,7 +401,7 @@ func! s:start_core_channel()
 		return
 	endif
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let s:channel_id = call(s:jobstart,[[l:py3,s:core_py_path,'core',g:_cm_servername],{'rpc':1,
+	let s:channel_jobid = call(s:jobstart,[[l:py3,s:core_py_path,'core',g:_cm_servername],{'rpc':1,
 			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ 'detach'  : 1,
 			\ }])
@@ -396,7 +410,7 @@ func! s:start_core_channel()
 endfunc
 
 fun s:on_core_channel_exit(job_id, data, event)
-	let s:channel_id = -1
+	let s:channel_jobid = -1
 	if s:leaving
 		return
 	endif
@@ -404,11 +418,12 @@ fun s:on_core_channel_exit(job_id, data, event)
 endf
 
 fun s:notify_core_channel(event,...)
-	if s:channel_id==-1
+	" if s:channel_jobid==-1
+	if g:_cm_channel_id==-1
 		return -1
 	endif
 	" forward arguments
-	call call(s:rpcnotify,[s:channel_id, a:event] + a:000 )
+	call call(s:rpcnotify,[g:_cm_channel_id, a:event] + a:000 )
 	return 0
 endf
 " }
