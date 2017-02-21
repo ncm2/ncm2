@@ -127,7 +127,7 @@ class CoreHandler:
         self._file_server = FileServer()
         servername = ''
         try:
-            servername = self._nvim.eval('v:servername')
+            servername = self._nvim.eval('g:_cm_servername')
         except:
             pass
         if not servername:
