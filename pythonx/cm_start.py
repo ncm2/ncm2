@@ -34,8 +34,10 @@ def main():
 
     if start_type == 'core':
         modulename = 'cm_core'
+        addr = sys.argv[2]
     else:
         modulename = sys.argv[2]
+        addr = sys.argv[3]
 
     # setup for the module 
     setup_logging(modulename)
@@ -57,7 +59,7 @@ def main():
 
             import cm_core
             # connect neovim
-            nvim = nvim_env()
+            nvim = nvim_env(addr)
             handler = cm_core.CoreHandler(nvim)
             logger.info('starting core, enter event loop')
             cm_event_loop('core',logger,nvim,handler)
@@ -65,7 +67,7 @@ def main():
         elif start_type == 'channel':
 
             # connect neovim
-            nvim = nvim_env()
+            nvim = nvim_env(addr)
             if sys.version_info.major==2:
                 # python2 doesn't support namespace package
                 # use load_source as a workaround
@@ -88,8 +90,21 @@ def main():
         # terminate here
         exit(0)
 
-def nvim_env():
-    nvim = attach('stdio')
+def nvim_env(addr):
+    try:
+        nvim = attach('stdio')
+    except Exception as ex:
+        logger.exception('Exception when running : %s', ex)
+        logger.info("Fallback to servername: %s",addr)
+        # create another connection to avoid synchronization issue?
+        if len(addr.split(':'))==2:
+            addr,port = addr.split(':')
+            port = int(port)
+            nvim = attach('tcp',address=addr,port=port)
+        else:
+            nvim = attach('socket',path=addr)
+
+
     # setup pythonx
     pythonxs = nvim.eval('globpath(&rtp,"pythonx",1)')
     for path in pythonxs.split("\n"):

@@ -20,6 +20,7 @@ inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 
 let s:rpcnotify = 'rpcnotify'
 let s:jobstart = 'jobstart'
+let g:_cm_servername = v:servername
 if has('nvim')==0
 	let s:rpcnotify = 'neovim_rpc#rpcnotify'
 	let s:jobstart = 'neovim_rpc#jobstart'
@@ -38,7 +39,7 @@ func! cm#enable_for_buffer()
 
 	if has('nvim')==0
 		try
-			call neovim_rpc#serveraddr()
+			let g:_cm_servername = neovim_rpc#serveraddr()
 		catch
 			" neovim_rpc plugin for vim8 is not available
 			return
@@ -323,7 +324,7 @@ func! cm#_start_channels(info)
 			endfunc
 
 			" start channel
-			let l:channel['id'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module']],l:opt])
+			let l:channel['id'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module'],g:_cm_servername],l:opt])
 
 			" events
 			execute 'augroup cm_channel_' . l:channel['id']
@@ -386,7 +387,7 @@ func! s:start_core_channel()
 		return
 	endif
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let s:channel_id = call(s:jobstart,[[l:py3,s:core_py_path,'core'],{'rpc':1,
+	let s:channel_id = call(s:jobstart,[[l:py3,s:core_py_path,'core',g:_cm_servername],{'rpc':1,
 			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ 'detach'  : 1,
 			\ }])
