@@ -180,7 +180,7 @@ let g:cm_sources_override = {
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
 - For really async completion source (strongly encoraged), refer to the file
   path completion example:
-  [pythonx/cm/sources/cm_filepath.py](pythonx/cm/sources/cm_filepath.py)
+  [pythonx/cm_sources/cm_filepath.py](pythonx/cm_sources/cm_filepath.py)
 
 Please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
