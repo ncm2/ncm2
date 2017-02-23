@@ -5,9 +5,12 @@
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
 import cm
+import os
+
 cm.register_source(name='cm-tmux',
                    abbreviation='Tmux',
                    priority=4,
+                   enable= 'TMUX' in os.environ,
                    cm_refresh_patterns=[r'[0-9a-zA-Z_#]{3,}$'],
                    events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],
                    detach=1)
@@ -24,13 +27,6 @@ class Source:
     def __init__(self,nvim):
 
         self._nvim = nvim
-
-        if 'TMUX' not in  os.environ:
-            # suiside for tmux not available
-            logger.info('no tmux, suiside')
-            nvim.call("cm#remove_source",'cm-tmux')
-
-        logger.info('tmux: %s', os.environ['TMUX'])
 
         self._words = set()
 

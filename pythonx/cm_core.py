@@ -68,7 +68,7 @@ class CoreHandler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,scopes=None,cm_refresh_patterns=None,events=[],detach=0,python='python3'):
+            def register_source(name,abbreviation,priority,enable=True,scopes=None,cm_refresh_patterns=None,events=[],detach=0,python='python3'):
 
                 # " jedi
                 # " refresh 1 for call signatures
@@ -96,6 +96,7 @@ class CoreHandler:
                 source['channel']             = channel
                 source['name']                = name
                 source['priority']            = priority
+                source['enable']              = enable
                 source['abbreviation']        = abbreviation
                 if cm_refresh_patterns:
                     source['cm_refresh_patterns'] = cm_refresh_patterns
