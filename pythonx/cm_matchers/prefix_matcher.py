@@ -8,15 +8,23 @@ class Matcher(object):
 
     def process(self,name,ctx,startcol,matches):
 
-        base = ctx['typed'][startcol-1:]
+        # fix for chinese characters
+        # `你好 abcd|` 
+        # has  col('.')==11 on vim
+        # the evaluated startcol is: startcol[8] typed[你好 abcd]
+        # but in python, "你好 abcd"[8] is not a valid index
+        begin = -(ctx['col'] - startcol)
+        base = ''
+        if begin:
+            base = ctx['typed'][begin:]
 
-        matches = [m for m in matches if self._match(base,m)]
+        ret = [m for m in matches if self._match(base,m)]
 
         # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
         # sorting before 'A'
-        matches.sort(key=lambda e: e['word'].swapcase())
+        ret.sort(key=lambda e: e['word'].swapcase())
 
-        return matches
+        return ret
 
     def _match(self,base,item):
         if len(base)>len(item['word']):

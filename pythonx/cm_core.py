@@ -330,7 +330,6 @@ class CoreHandler:
 
         col = ctx['col']
         startcol = col
-        base = ctx['typed'][startcol-1:]
 
         # basick processing per source
         for name in names:
@@ -391,7 +390,6 @@ class CoreHandler:
 
     def process_matches(self,name,ctx,startcol,matches):
 
-        base = ctx['typed'][startcol-1:]
         abbr = self._sources[name].get('abbreviation','')
 
         # formalize datastructure
@@ -405,7 +403,6 @@ class CoreHandler:
             formalized.append(e)
 
         # filtering and sorting
-        # result = [ e for e in formalized if self._matcher(base=base,item=e)]
         result = cm.get_matcher(self._nvim).process(name,ctx,startcol,formalized)
 
         # fix some text
