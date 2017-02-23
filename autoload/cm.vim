@@ -20,10 +20,12 @@ inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 
 let s:rpcnotify = 'rpcnotify'
 let s:jobstart = 'jobstart'
+let s:jobstop = 'jobstop'
 let g:_cm_servername = v:servername
 if has('nvim')==0
 	let s:rpcnotify = 'neovim_rpc#rpcnotify'
 	let s:jobstart = 'neovim_rpc#jobstart'
+	let s:jobstop = 'neovim_rpc#jobstop'
 endif
 
 
@@ -145,17 +147,21 @@ endfunc
 " 	9 smart programming language aware completion
 func! cm#register_source(info)
 
+	let l:name = a:info['name']
+
 	" if registered before, ignore this call
-	if has_key(g:_cm_sources,a:info['name'])
+	if has_key(g:_cm_sources,l:name)
 		return
 	endif
 
-	if has_key(g:cm_sources_override,a:info['name'])
+	if has_key(g:cm_sources_override,l:name)
 		" override source default options
-		call extend(a:info,g:cm_sources_override[a:info['name']])
+		call extend(a:info,g:cm_sources_override[l:name])
 	endif
 
-	let g:_cm_sources[a:info['name']] = a:info
+	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
+
+	let g:_cm_sources[l:name] = a:info
 
 	" check and start channels
 	if get(b:,'cm_enable',0) == 0
@@ -169,19 +175,9 @@ endfunc
 func! cm#remove_source(name)
 	try
 		let l:info = g:_cm_sources[a:name]
-		if has_key(l:info,'channel')
-			let l:channel = l:info['channel']
-			try
-				if has_key(l:channel,'jobid')
-					let l:channel['normal_stop'] = 1
-					jobstop(l:channel.id)
-				endif
-			catch
-				" do nothing
-			endtry
-		endfor
-		unlet l:info
+		" remove from registry
 		unlet g:_cm_sources[a:name]
+		call cm#_channel_cleanup(l:info)
 	catch
 		echom v:exception
 	endtry
@@ -270,7 +266,6 @@ endfunc
 
 " check and start channels
 func! s:check_and_start_channel(info)
-	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
 	if a:info['enable'] == 0
 		return
 	endif
@@ -282,6 +277,7 @@ endfunc
 
 " called from pythonx/cm_start.py
 func! cm#_start_channel(info)
+
 	let l:info = a:info
 	if type(a:info)==type("")
 		" parameter is a name
@@ -306,27 +302,23 @@ func! cm#_start_channel(info)
 			let l:py = get(g:,'python_host_prog','python2')
 		endif
 
-		let l:opt = {'rpc':1, 'channel': l:channel}
+		let l:opt = {}
 		let l:opt['detach'] = get(l:channel,'detach',0)
-		let l:opt['info'] = a:info
+		let l:opt['_info'] = l:info
 
 		func l:opt.on_exit(job_id, data, event)
 
-			" delete event group
-			execute 'augroup cm_channel_' . self['channel']['jobid']
-			execute 'autocmd!'
-			execute 'augroup END'
-
-			unlet self['channel']['jobid']
-			" mark it
-			let self['channel']['has_terminated'] = 1
+			let l:info = self['_info']
+			call cm#_channel_cleanup(l:info)
 			if s:leaving
 				return
 			endif
-			if !get(self['channel'],'normal_stop',0)
-				echom self['channel']['module'] . ' ' . 'exit'
+			if has_key(g:_cm_sources, l:info['name']) && l:info['enable']
+				" if source is not removed or disabled, than the channel must
+				" have been terminated unexpectedly
+				echom l:info['name'] . ' channel has exited'
 			endif
-			unlet self['channel']
+
 		endfunc
 
 		" start channel
@@ -336,7 +328,7 @@ func! cm#_start_channel(info)
 
 endfunc
 
-func! cm#_update_channel_id(name,id)
+func! cm#_channel_started(name,id)
 
 	if !has_key(g:_cm_sources,a:name)
 		return
@@ -346,9 +338,9 @@ func! cm#_update_channel_id(name,id)
 	let l:channel['id'] = a:id
 
 	" register events
-	execute 'augroup cm_channel_' . l:channel['jobid']
+	execute 'augroup cm_channel_' . a:id
 	for l:event in get(l:channel,'events',[])
-		let l:exec =  'if get(b:,"cm_enable",0) | silent! call call(s:rpcnotify,[' . l:channel['id'] . ', "cm_event", "'.l:event.'",cm#context()]) | endif'
+		let l:exec =  'if get(b:,"cm_enable",0) | silent! call call(s:rpcnotify,[' . a:id . ', "cm_event", "'.l:event.'",cm#context()]) | endif'
 		if type(l:event)==type('')
 			execute 'au ' . l:event . ' * ' . l:exec
 		elseif type(l:event)==type([])
@@ -359,6 +351,35 @@ func! cm#_update_channel_id(name,id)
 
 	" refresh for this channel
 	call s:on_changed()
+
+endfunc
+
+func! cm#_channel_cleanup(info)
+
+	if !has_key(a:info,'channel')
+		return
+	endif
+
+	let l:channel = a:info['channel']
+
+	if has_key(l:channel,'id')
+		" clean event group
+		execute 'augroup cm_channel_' . l:channel['id']
+		execute 'autocmd!'
+		execute 'augroup END'
+		unlet l:channel['id']
+	endif
+
+	if has_key(l:channel,'jobid')
+		try
+			call call(s:jobstop,[l:channel['jobid']])
+			unlet l:channel['jobid']
+		catch
+			" do nothing
+		endtry
+	endif
+
+	let l:channel['has_terminated'] = 1
 
 endfunc
 

@@ -33,7 +33,7 @@ endif
 " enough for human
 let g:cm_complete_delay = get(g:,'cm_complete_delay',50)
 
-" automatically enable all sources
+" automatically enable all registered sources
 " set this to 0 if you want to select sources manually
 let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 

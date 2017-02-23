@@ -70,7 +70,7 @@ def main():
 
         elif start_type == 'channel':
 
-            nvim.call('cm#_update_channel_id',source_name,nvim.channel_id)
+            nvim.call('cm#_channel_started',source_name,nvim.channel_id)
 
             if sys.version_info.major==2:
                 # python2 doesn't support namespace package
@@ -96,19 +96,15 @@ def main():
         exit(0)
 
 def nvim_env(addr):
-    try:
-        nvim = attach('stdio')
-    except Exception as ex:
-        logger.exception('Exception when running : %s', ex)
-        logger.info("Fallback to servername: %s",addr)
-        # create another connection to avoid synchronization issue?
-        if len(addr.split(':'))==2:
-            addr,port = addr.split(':')
-            port = int(port)
-            nvim = attach('tcp',address=addr,port=port)
-        else:
-            nvim = attach('socket',path=addr)
 
+    logger.info("connecting to neovim server: %s",addr)
+    # create another connection to avoid synchronization issue?
+    if len(addr.split(':'))==2:
+        addr,port = addr.split(':')
+        port = int(port)
+        nvim = attach('tcp',address=addr,port=port)
+    else:
+        nvim = attach('socket',path=addr)
 
     # setup pythonx
     pythonxs = nvim.eval('globpath(&rtp,"pythonx",1)')
