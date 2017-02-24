@@ -68,7 +68,7 @@ class CoreHandler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,enable=True,scoping=False,scopes=None,cm_refresh_patterns=None,events=[],detach=0,python='python3'):
+            def register_source(name,abbreviation,priority,enable=True,scoping=False,detach=0,python='python3',**kwargs):
 
                 # " jedi
                 # " refresh 1 for call signatures
@@ -89,8 +89,7 @@ class CoreHandler:
 
                 channel = dict(type=python,
                                module=modulename,
-                               detach=detach,
-                               events=events)
+                               detach=detach,)
 
                 source = {}
                 source['channel']      = channel
@@ -99,9 +98,9 @@ class CoreHandler:
                 source['enable']       = enable
                 source['abbreviation'] = abbreviation
                 source['enable']       = enable
-                source['scopes']       = scopes
                 source['scoping']      = scoping
-                source['cm_refresh_patterns'] = cm_refresh_patterns
+                for k in kwargs:
+                    source[k] = kwargs[k]
 
                 logger.info('registering source: %s',source)
                 nvim.call('cm#register_source',source)
