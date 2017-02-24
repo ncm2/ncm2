@@ -106,16 +106,6 @@ class CoreHandler:
 
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
 
-        self._file_server = FileServer()
-        servername = ''
-        try:
-            servername = self._nvim.eval('g:_cm_servername')
-        except:
-            pass
-        if not servername:
-            servername = self._nvim.eval('neovim_rpc#serveraddr()')
-        self._file_server.start(servername)
-
         self._ctx = None
 
     def _is_kw_futher_typing(self,oldctx,curctx):
@@ -207,7 +197,6 @@ class CoreHandler:
 
         # update file server
         self._ctx = root_ctx
-        self._file_server.set_current_ctx(root_ctx)
 
         # initial scope
         root_ctx['scope'] = root_ctx['filetype']
@@ -221,7 +210,6 @@ class CoreHandler:
         elif re.match(r'[^0-9a-zA-Z_]',root_ctx['typed'][-1]):
             self._matches = {}
 
-        root_ctx['src_uri'] = self._file_server.get_src_uri(root_ctx)
         ctx_lists = [root_ctx,]
 
         # scoping
@@ -232,7 +220,7 @@ class CoreHandler:
             if scope in self._subscope_detectors:
                 for detector in self._subscope_detectors[scope]:
                     try:
-                        sub_ctx = detector.sub_context(ctx, self._file_server.get_src(ctx))
+                        sub_ctx = detector.sub_context(ctx, cm.get_src(ctx))
                         if sub_ctx:
                             # adjust offset to global based and add the new
                             # context
@@ -242,7 +230,6 @@ class CoreHandler:
                                 sub_ctx['typed'] = sub_ctx['typed'][sub_ctx['scope_col']-1:]
                                 sub_ctx['scope_col'] += ctx.get('scope_col',1)-1
                                 logger.info('adjusting scope_col')
-                            sub_ctx['src_uri'] = self._file_server.get_src_uri(sub_ctx)
                             ctx_lists.append(sub_ctx)
                             logger.info('new sub context: %s', sub_ctx)
                     except Exception as ex:
@@ -459,131 +446,4 @@ class CoreHandler:
         self._nvim.call('cm#_core_complete', ctx, startcol, matches, async=True)
         self._last_matches = matches
         self._last_startcol = startcol
-
-    def cm_shutdown(self):
-        self._file_server.shutdown(wait=False)
-
-
-# Cached file content in memory, and use http protocol to serve files, instead
-# of asking vim for file every time.  FileServer is important in implementing
-# the scoping feature, for example, language specific completion inside
-# markdown code fences.
-class FileServer(Thread):
-
-    def __init__(self):
-        self._rlock = RLock()
-        self._current_context = None
-        self._cache_context = None
-        self._cache_src = ""
-        Thread.__init__(self)
-
-    def start(self,nvim_server_name):
-        """
-        Start the file server
-        @type request: str
-        """
-
-        server = self
-
-        class HttpHandler(BaseHTTPRequestHandler):
-            def do_GET(self):
-                try:
-                    server.run_GET(self)
-                except Exception as ex:
-                    logger.exception('exception on FileServer: %s', ex)
-                    self.send_response(500)
-                    self.send_header('Content-type','text/html')
-                    self.end_headers()
-                    message = str(ex)
-                    self.wfile.write(bytes(message, "utf8"))
-
-        # create another connection to avoid synchronization issue?
-        if len(nvim_server_name.split(':'))==2:
-            addr,port = nvim_server_name.split(':')
-            port = int(port)
-            self._nvim = attach('tcp',address=addr,port=port)
-        else:
-            self._nvim = attach('socket',path=nvim_server_name)
-
-        # Server settings
-        # 0 for random port
-        server_address = ('127.0.0.1', 0)
-        self._httpd = HTTPServer(server_address, HttpHandler)
-
-        Thread.start(self)
-
-    def run_GET(self,request):
-        """
-        Process get request. This method, with the `run_` prefix is running on
-        the same thread as `self.run` method.
-        @type request: BaseHTTPRequestHandler
-        """
-
-        params = {}
-        for e in urllib.parse.parse_qsl(urllib.parse.urlparse(request.path).query):
-            params[e[0]] = e[1]
-        
-        logger.info('thread %s processing %s', threading.get_ident(), params)
-
-        context = json.loads(params['context'])
-        src = self.get_src(context)
-        if src is None:
-            src = ""
-
-        request.send_response(200)
-        request.send_header('Content-type','text/html')
-        request.end_headers()
-        request.wfile.write(bytes(src, "utf8"))
-
-    def run(self):
-        logger.info('running server on port %s, thread %s', self._httpd.server_port, threading.get_ident())
-        self._httpd.serve_forever()
-
-    def get_src(self,context):
-
-        with self._rlock:
-
-            # If context does not match current context, check the neovim current
-            # context, if does not match neither, return None
-            if cm.context_outdated(self._current_context,context):
-                self._current_context = self._nvim.eval('cm#context()')
-            if cm.context_outdated(self._current_context,context):
-                logger.info('get_src returning None for oudated context: %s', context)
-                return None
-
-            # update cache when necessary
-            if cm.context_outdated(self._current_context, self._cache_context):
-                logger.info('get_src updating cache for context %s', context)
-                self._cache_context = self._current_context
-                self._cache_src = "\n".join(self._nvim.current.buffer[:])
-
-            scope_offset = context.get('scope_offset',0)
-            scope_len = context.get('scope_len',len(self._cache_src))
-            return self._cache_src[scope_offset:scope_offset+scope_len]
-
-    def set_current_ctx(self,context):
-        """
-        This method is running on main thread as cm core
-        """
-        with self._rlock:
-            self._current_context = context
-
-    def get_src_uri(self,context):
-        # changedtick and curpos is enough for outdating check
-        stripped = dict(changedtick=context['changedtick'],curpos=context['curpos'])
-        if 'scope_offset' in context:
-            stripped['scope_offset'] = context['scope_offset']
-        if 'scope_len' in context:
-            stripped['scope_len'] = context['scope_len']
-        query = urllib.parse.urlencode(dict(context=json.dumps(stripped)))
-        return urllib.parse.urljoin('http://127.0.0.1:%s' % self._httpd.server_port, '?%s' % query)
-
-    def shutdown(self,wait=True):
-        """
-        Shutdown the file server
-        """
-        self._httpd.shutdown()
-        if wait:
-            self.join()
-
 

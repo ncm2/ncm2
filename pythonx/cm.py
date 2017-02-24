@@ -1,16 +1,10 @@
 import sys
-
-if sys.version_info.major==2:
-    from httplib import HTTPConnection
-    from urlparse import urlparse
-else:
-    from urllib.parse import urlparse
-    from http.client import HTTPConnection
-
 import importlib
 import logging
 
 logger = logging.getLogger(__name__)
+
+nvim = None
 
 # python="python2" is only used for sources that depends on python2 libraries,
 # don't use it if possible
@@ -28,20 +22,25 @@ def context_outdated(ctx1,ctx2):
     # bug, use curpos as workaround
     return ctx1 is None or ctx2 is None or ctx1['curpos']!=ctx2['curpos']
 
+
 def get_src(ctx):
-    src_uri = ctx['src_uri']
-    parsed = urlparse(src_uri)
-    logger.info('hostname: %s, port %s, path: %s', parsed.hostname, parsed.port, parsed.path)
-    conn = HTTPConnection(parsed.hostname, parsed.port)
-    try:
-        conn.request("GET", src_uri)
-        res = conn.getresponse()
-        src = res.read().decode('utf-8')
-        res.close()
-        return src
-    finally:
-        conn.close()
-    return None
+
+    bufnr = ctx['bufnr']
+    changedtick = ctx['changedtick']
+
+    key = (bufnr,changedtick)
+    if key != get_src._cache_key:
+        lines = nvim.buffers[bufnr][:]
+        get_src._cache_src = "\n".join(lines)
+        get_src._cache_key = key
+
+    scope_offset = ctx.get('scope_offset',0)
+    scope_len = ctx.get('scope_len',len(get_src._cache_src))
+
+    return get_src._cache_src[scope_offset:scope_offset+scope_len]
+# function static local
+get_src._cache_src = ''
+get_src._cache_key = None
 
 # convert (lnum, col) to pos
 def get_pos(lnum,col,src):
