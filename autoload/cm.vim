@@ -13,9 +13,10 @@ let s:already_setup = 0
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
 " 
-" They both work. use g:cm_completekeys to decide which one to use.
+" They all work. use g:cm_completekeys to decide which one to use.
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
+inoremap <silent> <Plug>(cm_omnifunc) <c-x><c-o>
 
 
 let s:rpcnotify = 'rpcnotify'
@@ -65,6 +66,9 @@ func! cm#enable_for_buffer()
 	set completeopt=menu,menuone,noinsert,noselect
 	if g:cm_completekeys=="\<Plug>(cm_completefunc)"
 		set completefunc=cm#_completefunc
+	endif
+	if g:cm_completekeys=="\<Plug>(cm_omnifunc)"
+		set omnifunc=cm#_completefunc
 	endif
 
 	augroup cm
