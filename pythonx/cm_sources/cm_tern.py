@@ -9,6 +9,7 @@ cm.register_source(name='cm-tern',
                    abbreviation='Js',
                    scoping=True,
                    scopes=['javascript','javascript.jsx'],
+                   cm_refresh_patterns=[r'[\w_]{2,}$',r'\.[\w_]*$'],
                    detach=1)
 
 import os
@@ -105,14 +106,6 @@ class Source:
         startcol = col-len(kwtyped)
 
         src = cm.get_src(ctx)
-
-        # completion pattern
-        if (re.search(r'[\w_]{2,}$',typed)
-            or re.search(r'\.[\w_]*$',typed)
-            ):
-            pass
-        else:
-            return
 
         completions = self._tern.completions(src,lnum-1,len(typed),path)
         logger.info('completions %s, typed[%s], %s', completions,typed,ctx)
