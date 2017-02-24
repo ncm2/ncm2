@@ -51,6 +51,8 @@ scoping features:
 
 extra sources:
 
+- [LanguageClient-neovim](https://github.com/roxma/LanguageClient-neovim)
+  which is a nice implementation of the language server protocol.
 - [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
   (experimental plugin for [language server
   ](https://github.com/neovim/neovim/issues/5522 support))
