@@ -32,6 +32,7 @@ class CoreHandler:
         # { '{source_name}': {'startcol': , 'matches'}
         self._matches = {}
         self._sources = {}
+        self._last_startcol = 0
         self._last_matches = []
         # should be True for supporting display menu directly without cm_refresh
         self._has_popped_up = True
@@ -193,6 +194,8 @@ class CoreHandler:
 
     def cm_insert_enter(self):
         self._matches = {}
+        self._last_matches = []
+        self._last_startcol = 0
 
     def cm_complete_timeout(self,srcs,ctx,*args):
         if not self._has_popped_up:
@@ -450,8 +453,12 @@ class CoreHandler:
             # no need to fire complete message
             logger.info('matches==0, _last_matches==0, ignore')
             return
+        if self._last_startcol==startcol and self._last_matches==matches:
+            logger.info('ignore _complete call: self._last_startcol==startcol and self._last_matches==matches')
+            return
         self._nvim.call('cm#_core_complete', ctx, startcol, matches, async=True)
         self._last_matches = matches
+        self._last_startcol = startcol
 
     def cm_shutdown(self):
         self._file_server.shutdown(wait=False)
