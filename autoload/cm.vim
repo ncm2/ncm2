@@ -196,33 +196,22 @@ endfunc
 "
 " @return 
 "   0 cm accepted
-"	1 ignored for context change
-"   2 async completion has been disabled
-"   3 this source has not been registered yet
+"	1 context changed
 func! cm#complete(src, context, startcol, matches, ...)
 
-	if type(a:src)==1
-		" string
-		let l:name = a:src
-	else
-		" dict
-		let l:name = a:src['name']
-	endif
-
-	if get(b:,'cm_enable',0) == 0
-		return 2
+	let l:refresh = 0
+	if len(a:000)
+		let l:refresh = a:1
 	endif
 
 	" ignore the request if context has changed
 	if  cm#context_changed(a:context)
+		call s:notify_core_channel('cm_complete',g:_cm_sources,a:src,a:context,a:startcol,a:matches,l:refresh,1,cm#context())
 		return 1
 	endif
 
-	if !has_key(g:_cm_sources,l:name)
-		return 3
-	endif
-
-	call call(function('s:notify_core_channel'),['cm_complete',g:_cm_sources,l:name,a:context,a:startcol,a:matches]+a:000)
+	call s:notify_core_channel('cm_complete',g:_cm_sources,a:src,a:context,a:startcol,a:matches,l:refresh,0,'')
+	return 0
 
 endfunc
 

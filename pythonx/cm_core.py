@@ -117,15 +117,44 @@ class CoreHandler:
 
         self._ctx = None
 
-    def cm_complete(self,srcs,name,ctx,startcol,matches,refresh=0,*args):
+    def _is_kw_futher_typing(self,oldctx,curctx):
+        old_typed = oldctx['typed']
+        cur_typed = curctx['typed']
+
+        old_len = len(old_typed)
+        cur_len = len(cur_typed)
+
+        if cur_len < old_len:
+            return False
+
+        if cur_typed[0:old_len] != old_typed:
+            return False
+
+        if re.match(r'^[a-zA-Z0-9_]*$',cur_typed[old_len:]):
+            return True
+
+        return False
+
+    def cm_complete(self,srcs,name,ctx,startcol,matches,refresh,outdated,current_ctx):
+
+        if isinstance(name,dict):
+            name = name['name']
+
+        if name not in srcs:
+            logger.error("invalid completion source name [%s]", name)
+            return
+
+        # be careful when completion matches context is outdated
+        if outdated:
+            logger.info("[%s] outdated matches, old typed [%s] cur typed[%s]", name, ctx['typed'], current_ctx['typed'])
+            if refresh or not self._is_kw_futher_typing(ctx,current_ctx):
+                logger.info("[%s] matches is outdated. ignore them.", name)
+                return
+            logger.info("[%s] matches is outdated by keyword futher typing. I'm gonna keep it.", name)
 
         # adjust for subscope
         if ctx['lnum']==1:
             startcol += ctx.get('scope_col',1)-1
-
-        # if cm.context_outdated(self._ctx,ctx):
-        #     logger.info('ignore outdated context from [%s]', name)
-        #     return
 
         self._sources = srcs
 
@@ -136,7 +165,7 @@ class CoreHandler:
 
             if (not result) and (not self._matches.get(name,{}).get('last_matches',[])):
                 # not popping up, ignore this request
-                logger.info('Not popping up, not refreshing for cm_complete by %s, startcol %s', name, startcol)
+                logger.debug('Not popping up, not refreshing for cm_complete by %s, startcol %s', name, startcol)
                 return
 
         finally:
@@ -160,7 +189,7 @@ class CoreHandler:
             # nvim.call to get the root context
             self._refresh_completions(self._nvim.call('cm#context'))
         else:
-            logger.info("delay popup for [%s]",name)
+            logger.debug("delay popup for [%s]",name)
 
     def cm_insert_enter(self):
         self._matches = {}
