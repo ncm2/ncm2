@@ -51,7 +51,6 @@ def main():
 
     # connect neovim
     nvim = nvim_env(addr)
-    cm.nvim = nvim
 
     # change proccess title
     try:

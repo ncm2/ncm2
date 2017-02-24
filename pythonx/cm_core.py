@@ -220,7 +220,7 @@ class CoreHandler:
             if scope in self._subscope_detectors:
                 for detector in self._subscope_detectors[scope]:
                     try:
-                        sub_ctx = detector.sub_context(ctx, cm.get_src(ctx))
+                        sub_ctx = detector.sub_context(ctx, cm.get_src(self._nvim,ctx))
                         if sub_ctx:
                             # adjust offset to global based and add the new
                             # context

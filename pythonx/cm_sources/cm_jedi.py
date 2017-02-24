@@ -5,8 +5,8 @@
 
 # detach 1 for quick shutdown for neovim, detach 0, 'cause jedi enters infinite
 # loops sometime, don't know why.
-import cm
-cm.register_source(name='cm-jedi',
+from cm import get_src, register_source
+register_source(name='cm-jedi',
                    priority=9,
                    abbreviation='Py',
                    scoping=True,
@@ -38,8 +38,7 @@ class Source:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-
-        src = cm.get_src(ctx)
+        src = get_src(self._nvim,ctx)
         if not src.strip():
             # empty src may possibly block jedi execution, don't know why
             logger.info('ignore empty src [%s]', src)

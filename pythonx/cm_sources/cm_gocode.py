@@ -3,9 +3,10 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-import cm
+from cm import get_src, register_source
+
 # detach=1 for exit vim quickly
-cm.register_source(name='cm-gocode',
+register_source(name='cm-gocode',
                    priority=9,
                    abbreviation='Go',
                    scoping=True,
@@ -21,8 +22,6 @@ import subprocess
 import logging
 from urllib import request
 import json
-
-import cm
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +41,7 @@ class Source:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        src = cm.get_src(ctx)
+        src = get_src(self._nvim,ctx)
 
         # completion pattern
         if (re.search(r'[\w_]{2,}$',typed)

@@ -1,10 +1,9 @@
 import sys
 import importlib
 import logging
+from neovim.api import Nvim
 
 logger = logging.getLogger(__name__)
-
-nvim = None
 
 # python="python2" is only used for sources that depends on python2 libraries,
 # don't use it if possible
@@ -15,21 +14,23 @@ def register_source(name,abbreviation,priority,enable=True,events=[],detach=0,py
     # module
     return
 
-def context_outdated(ctx1,ctx2):
+def context_changed(ctx1,ctx2):
     # same as cm#context_changed
     # return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
     # Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
     # bug, use curpos as workaround
     return ctx1 is None or ctx2 is None or ctx1['curpos']!=ctx2['curpos']
 
-
-def get_src(ctx):
+def get_src(nvim,ctx):
+    """
+    :type nvim: Nvim
+    """
 
     bufnr = ctx['bufnr']
     changedtick = ctx['changedtick']
 
     key = (bufnr,changedtick)
-    if key != get_src._cache_key:
+    if key != getattr(get_src,'_cache_key',None):
         lines = nvim.buffers[bufnr][:]
         get_src._cache_src = "\n".join(lines)
         get_src._cache_key = key
@@ -38,9 +39,7 @@ def get_src(ctx):
     scope_len = ctx.get('scope_len',len(get_src._cache_src))
 
     return get_src._cache_src[scope_offset:scope_offset+scope_len]
-# function static local
-get_src._cache_src = ''
-get_src._cache_key = None
+
 
 # convert (lnum, col) to pos
 def get_pos(lnum,col,src):

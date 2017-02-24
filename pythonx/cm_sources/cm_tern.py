@@ -3,8 +3,8 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-import cm
-cm.register_source(name='cm-tern',
+from cm import get_src, register_source
+register_source(name='cm-tern',
                    priority=9,
                    abbreviation='Js',
                    scoping=True,
@@ -105,7 +105,7 @@ class Source:
         kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
         startcol = col-len(kwtyped)
 
-        src = cm.get_src(ctx)
+        src = get_src(self._nvim,ctx)
 
         completions = self._tern.completions(src,lnum-1,len(typed),path)
         logger.info('completions %s, typed[%s], %s', completions,typed,ctx)
