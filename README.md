@@ -56,8 +56,7 @@ extra sources:
 - [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
   (experimental plugin for [language server
   ](https://github.com/neovim/neovim/issues/5522 support))
-- [clang_complete](https://github.com/Rip-Rip/clang_complete/pull/515), with
-  vimrc `let g:clang_make_default_keymappings=0`. Clang python binding
+- [clang_complete](https://github.com/roxma/clang_complete). This plugin
   [requires
   python2](https://github.com/llvm-mirror/clang/commit/abdad67b94ad4dad2d655d48ff5f81d6ccf3852e)
   support for neovim.
@@ -98,7 +97,7 @@ if !has('nvim')
 endif
 ```
 
-- Install the required pip modules for you neovim python3:
+- Install the required pip modules for your neovim python3:
 
 ```sh
 pip3 --user install neovim jedi mistune psutil setproctitle
