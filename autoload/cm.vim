@@ -75,6 +75,11 @@ func! cm#enable_for_buffer()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 		autocmd FileType,BufWinEnter <buffer> call s:check_and_start_all_channels()
 		autocmd BufEnter    <buffer> set completeopt=menu,menuone,noinsert,noselect
+		" working together with timer, the timer is for detecting changes
+		" popup menu is visible. TextChangedI will not be triggered when popup
+		" menu is visible, but TextChangedI is more efficient and faster than
+		" timer when popup menu is not visible.
+		autocmd TextChangedI <buffer> call s:check_changes()
 	augroup END
 
 	call s:start_core_channel()
@@ -479,7 +484,7 @@ func! s:change_tick_stop()
 endfunc
 
 
-func! s:check_changes(timer)
+func! s:check_changes(...)
 	let l:tick = s:changetick()
 	if l:tick!=s:lasttick
 		let s:lasttick = l:tick
