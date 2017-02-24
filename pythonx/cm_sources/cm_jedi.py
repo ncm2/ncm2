@@ -9,6 +9,7 @@ import cm
 cm.register_source(name='cm-jedi',
                    priority=9,
                    abbreviation='Py',
+                   scoping=True,
                    scopes=['python'],
                    events=['InsertLeave'],
                    detach=0)

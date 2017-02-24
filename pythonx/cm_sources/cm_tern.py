@@ -7,6 +7,7 @@ import cm
 cm.register_source(name='cm-tern',
                    priority=9,
                    abbreviation='Js',
+                   scoping=True,
                    scopes=['javascript','javascript.jsx'],
                    detach=1)
 

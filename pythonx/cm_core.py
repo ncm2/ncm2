@@ -68,7 +68,7 @@ class CoreHandler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,enable=True,scopes=None,cm_refresh_patterns=None,events=[],detach=0,python='python3'):
+            def register_source(name,abbreviation,priority,enable=True,scoping=False,scopes=None,cm_refresh_patterns=None,events=[],detach=0,python='python3'):
 
                 # " jedi
                 # " refresh 1 for call signatures
@@ -93,15 +93,15 @@ class CoreHandler:
                                events=events)
 
                 source = {}
-                source['channel']             = channel
-                source['name']                = name
-                source['priority']            = priority
-                source['enable']              = enable
-                source['abbreviation']        = abbreviation
-                if cm_refresh_patterns:
-                    source['cm_refresh_patterns'] = cm_refresh_patterns
-                if scopes:
-                    source['scopes'] = scopes
+                source['channel']      = channel
+                source['name']         = name
+                source['priority']     = priority
+                source['enable']       = enable
+                source['abbreviation'] = abbreviation
+                source['enable']       = enable
+                source['scopes']       = scopes
+                source['scoping']      = scoping
+                source['cm_refresh_patterns'] = cm_refresh_patterns
 
                 logger.info('registering source: %s',source)
                 nvim.call('cm#register_source',source)
@@ -220,8 +220,8 @@ class CoreHandler:
                     try:
                         sub_ctx = detector.sub_context(ctx, self._file_server.get_src(ctx))
                         if sub_ctx:
-                            # adjust offset to global based
-                            # and add the new context
+                            # adjust offset to global based and add the new
+                            # context
                             sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
                             sub_ctx['scope_lnum'] += ctx.get('scope_lnum',1)-1
                             if int(sub_ctx['lnum']) == 1:
@@ -252,12 +252,12 @@ class CoreHandler:
                 try:
 
                     if not self._check_scope(ctx,info):
-                        logger.info('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
+                        logger.debug('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
                         continue
 
                     if (name in self._matches) and not self._matches[name]['refresh']:
                         # no need to refresh
-                        logger.info('cached for <%s>, no need to refresh', name)
+                        logger.debug('cached for <%s>, no need to refresh', name)
                         continue
 
                     if not self._check_refresh_patterns(ctx['typed'],info):
@@ -306,14 +306,22 @@ class CoreHandler:
 
     # almost the same as `s:check_scope` in `autoload/cm.vim`
     def _check_scope(self,ctx,info):
-        scopes = info.get('scopes',['*'])
+        scopes = info.get('scopes',None)
         cur_scope = ctx.get('scope',ctx['filetype'])
+        is_root_scope = ( cur_scope==ctx['filetype'] )
+        if not scopes:
+            # scopes setting is None, means that this is a general purpose
+            # completion source, only complete for the root scope
+            if is_root_scope:
+                return True
+            else:
+                return False
         for scope in scopes:
-            # only match filetype for `*` scope, to prevent multiple notification
-            if scope=='*' and cur_scope==ctx['filetype']:
-                return True
             if scope==cur_scope:
-                return True
+                if info.get('scoping',False):
+                    return True
+                else:
+                    return is_root_scope
         return False
 
     def _refresh_completions(self,ctx):

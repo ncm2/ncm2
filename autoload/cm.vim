@@ -247,19 +247,17 @@ func! s:check_and_start_all_channels()
 endfunc
 
 func! s:check_scope(info)
-	" check scopes
-	let l:scopes = get(a:info,'scopes',['*'])
-	let l:cur_scopes = [&filetype]
+	let l:scopes = get(a:info,'scopes',[])
+	if empty(l:scopes)
+		" This is a general completion source
+		return 1
+	endif
+	" only check the root scope
+	let l:cur_scope = &filetype
 	for l:scope in l:scopes
-		if l:scope=='*'
-			" match any scope
+		if l:scope == l:cur_scope
 			return 1
 		endif
-		for l:cur in l:cur_scopes
-			if l:scope == l:cur
-				return 1
-			endif
-		endfor
 	endfor
 	return 0
 endfunc

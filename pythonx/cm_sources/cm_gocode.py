@@ -8,6 +8,7 @@ import cm
 cm.register_source(name='cm-gocode',
                    priority=9,
                    abbreviation='Go',
+                   scoping=True,
                    scopes=['go'],
                    detach=1)
 
