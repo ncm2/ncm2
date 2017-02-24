@@ -37,7 +37,27 @@ class Matcher(object):
         word = item['word']
         if len(base)>len(word):
             return None
-        p = -1
+
+        min_range = None
+        for i in range(len(word)-len(base)+1):
+            r = self._get_match_range(base,word,i)
+            if not r:
+                break
+            if not min_range:
+                min_range = r
+            if  r[1]-r[0] < min_range[1]-min_range[0]:
+                min_range = r
+
+        if not min_range:
+            return None
+
+        # return the score, the smaller the better
+        # prefer shorter match
+        # prefer fronter match
+        return (min_range[1]-min_range[0], min_range[0], word.swapcase())
+
+    def _get_match_range(self, base, word, start):
+        p = start-1
         pend = len(word)
         begin = pend
         for c in base:
@@ -50,9 +70,5 @@ class Matcher(object):
                     return None
             if p < begin:
                 begin = p
-
-        # return the score, the smaller the better
-        # prefer shorter match
-        # prefer fronter match
-        return (p-begin, begin, word.swapcase())
+        return (begin,p)
 
