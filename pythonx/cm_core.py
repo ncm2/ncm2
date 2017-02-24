@@ -68,24 +68,7 @@ class CoreHandler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,enable=True,events=[],scoping=False,detach=0,python='python3',**kwargs):
-
-                # " jedi
-                # " refresh 1 for call signatures
-                # " detach 0, jedi enters infinite loops sometime, don't know why.
-                # call cm#register_source({
-                # 		\ 'name' : 'cm-jedi',
-                # 		\ 'priority': 9, 
-                # 		\ 'abbreviation': 'Py',
-                # 		\ 'scopes': ['python'],
-                # 		\ 'refresh': 1, 
-                # 		\ 'channel': {
-                # 		\		'type': 'python3',
-                # 		\		'module': 'cm.sources.cm_jedi',
-                # 		\		'events': ['InsertLeave'],
-                # 		\		'detach': 0,
-                # 		\ },
-                # 		\ })
+            def register_source(name,abbreviation,priority,enable=True,events=[],detach=0,python='python3',**kwargs):
 
                 channel = dict(type=python,
                                module=modulename,
@@ -99,7 +82,6 @@ class CoreHandler:
                 source['enable']       = enable
                 source['abbreviation'] = abbreviation
                 source['enable']       = enable
-                source['scoping']      = scoping
                 for k in kwargs:
                     source[k] = kwargs[k]
 
