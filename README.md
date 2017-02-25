@@ -99,9 +99,14 @@ if !has('nvim')
 endif
 ```
 
-- Install the required pip modules for your neovim python3:
+- Install pip modules for your neovim python3:
 
 ```sh
+# neovim is the required pip module
+# jedi for python completion
+# mistune for markdown completion (optional)
+# psutil (optional)
+# setproctitle (optional)
 pip3 --user install neovim jedi mistune psutil setproctitle
 ```
 
