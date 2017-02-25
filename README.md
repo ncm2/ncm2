@@ -53,7 +53,7 @@ scoping features:
 extra sources:
 
 - Language server protocol via
-  [LanguageClient-neovim](https://github.com/roxma/LanguageClient-neovim)
+  [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 - PHP completion via
   [nvim-cm-php-language-server](https://github.com/roxma/nvim-cm-php-language-server)
   (experimental)
