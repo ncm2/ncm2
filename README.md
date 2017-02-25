@@ -39,9 +39,10 @@ plugin builtin sources:
 - Keyword from tmux session
 - Ultisnips hint
 - File path completion
-- Python code completion
-- Javascript code completion
-- Golang code completion
+- Python completion via [jedi](https://github.com/davidhalter/jedi)
+- Golang completion via [gocode](https://github.com/nsf/gocode)
+- Css completion via vim's builtin
+  [csscomplete#CompleteCSS](https://github.com/othree/csscomplete.vim)
 
 scoping features:
 
@@ -51,26 +52,25 @@ scoping features:
 
 extra sources:
 
-- [LanguageClient-neovim](https://github.com/roxma/LanguageClient-neovim)
-  which is a nice implementation of the language server protocol.
-- [PHP code completion](https://github.com/roxma/nvim-cm-php-language-server)
-  (experimental plugin for [language server
-  ](https://github.com/neovim/neovim/issues/5522 support))
-- [clang_complete](https://github.com/roxma/clang_complete). This plugin
+- Language server protocol via
+  [LanguageClient-neovim](https://github.com/roxma/LanguageClient-neovim)
+- PHP completion via
+  [nvim-cm-php-language-server](https://github.com/roxma/nvim-cm-php-language-server)
+  (experimental)
+- C/C++ completion via
+  [clang_complete](https://github.com/roxma/clang_complete). This plugin
   [requires
   python2](https://github.com/llvm-mirror/clang/commit/abdad67b94ad4dad2d655d48ff5f81d6ccf3852e)
   support for neovim.
+- Javascript completion via
+  [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)
 
 ## Requirements
 
-1. Neovim python3 support. (`pip3 install neovim`).
-- For **python code completion**, you need to install
-  [jedi](https://github.com/davidhalter/jedi) library. For python code
-  completion in markdown file, you need to install
-  [mistune](https://github.com/lepture/mistune)
-- For **Javascript code completion**, you need to install nodejs and npm on your
-  system.
-- For **Golang code completion**, you need to install
+1. Neovim python3 support. (`pip3 install neovim`). Or vim8 with
+   `has('python')` or `has('python3')`, and `python3` found in your `PATH`
+   environment variable.
+- For **Golang completion**, you need to install
   [gocode](https://github.com/nsf/gocode#setup).
 
 ## Installation
@@ -79,7 +79,9 @@ extra sources:
 
 ```vim
 " `npm install` For javascript code completion support
-Plug 'roxma/nvim-completion-manager', {'do': 'npm install'}
+Plug 'roxma/nvim-completion-manager'
+" javascript code completion
+Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
 " PHP code completion is moved to a standalone plugin
 Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
 ```
