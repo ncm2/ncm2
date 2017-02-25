@@ -78,11 +78,11 @@ extra sources:
 - Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
-" `npm install` For javascript code completion support
+" the framework
 Plug 'roxma/nvim-completion-manager'
-" javascript code completion
+" javascript completion
 Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
-" PHP code completion is moved to a standalone plugin
+" PHP completion
 Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
 ```
 
