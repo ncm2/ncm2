@@ -3,6 +3,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+import sys
 import os
 import re
 import logging
@@ -15,8 +16,10 @@ import json
 from neovim import attach
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import cm
+import subprocess
+import time
 
-logger = logging.getLogger(__name__)
+logger = cm.getLogger(__name__)
 
 # use a trick to only register the source withou loading the entire
 # module
@@ -29,6 +32,9 @@ class CoreHandler:
 
         self._nvim = nvim
 
+        # process control information on channels
+        self._channel_processes = {}
+
         # { '{source_name}': {'startcol': , 'matches'}
         self._matches = {}
         self._sources = {}
@@ -37,6 +43,12 @@ class CoreHandler:
         # should be True for supporting display menu directly without cm_refresh
         self._has_popped_up = True
         self._subscope_detectors = {}
+
+        self._servername = nvim.vars['_cm_servername']
+        self._start_py   = nvim.vars['_cm_start_py_path']
+        self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
+        self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
+
 
         scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
@@ -82,7 +94,6 @@ class CoreHandler:
                 source['priority']     = priority
                 source['enable']       = enable
                 source['abbreviation'] = abbreviation
-                source['enable']       = enable
                 for k in kwargs:
                     source[k] = kwargs[k]
 
@@ -93,6 +104,7 @@ class CoreHandler:
                 # module
                 raise CmSkipLoading()
 
+            old_handler = register_source
             cm.register_source = register_source
             try:
                 # register_source
@@ -102,7 +114,9 @@ class CoreHandler:
                 logger.info('source <%s> registered', modulename)
             except Exception as ex:
                 logger.exception("register_source for %s failed", modulename)
-
+            finally:
+                # restore
+                cm.register_source = old_handler
 
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
 
@@ -246,7 +260,7 @@ class CoreHandler:
             for name in srcs:
 
                 info = srcs[name]
-                if not info.get('enable',True):
+                if not info['enable']:
                     # ignore disabled source
                     continue
 
@@ -272,10 +286,7 @@ class CoreHandler:
                     if 'channel' in info:
                         channel = info['channel']
                         if 'id' not in channel:
-                            if channel.get('has_terminated',0)==0:
-                                logger.info('starting channels for %s',name)
-                                # has not been started yet, start it now
-                                self._nvim.call('cm#_start_channel',name,async=True)
+                            self._start_channel(info)
 
                     channel = info.get('channel',{})
                     if 'id' in channel:
@@ -446,4 +457,99 @@ class CoreHandler:
         self._nvim.call('cm#_core_complete', ctx, startcol, matches, async=True)
         self._last_matches = matches
         self._last_startcol = startcol
+
+
+    def _start_channel(self,info):
+
+        name = info['name']
+
+        if name not in self._channel_processes:
+            self._channel_processes[name] = {}
+        process_info = self._channel_processes[name]
+
+        # channel process already started
+        if 'pid' in process_info:
+            return
+        if 'channel' not in info:
+            return
+
+        channel = info['channel']
+        channel_type = channel.get('type','')
+
+        py = ''
+        if channel_type=='python3':
+            py = self._py3
+        elif channel_type=='python2':
+            py = self._py2
+        else:
+            logger.info("Unsupported channel_type [%s]",channel_type)
+
+        cmd = [py, self._start_py, 'channel', name, channel['module'], self._servername]
+
+        # has not been started yet, start it now
+        logger.info('starting channels for %s: %s',name, cmd)
+
+        proc = subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        self._channel_processes[name]['pid'] = proc.pid
+        self._channel_processes[name]['proc'] = proc
+
+        logger.info('pid: %s', proc.pid)
+
+    def cm_shutdown(self):
+
+        # wait for normal exit
+        time.sleep(1)
+
+        procs = []
+        for name in self._channel_processes:
+            pinfo = self._channel_processes[name]
+            proc = pinfo['proc']
+            try:
+                if proc.poll() is not None:
+                    logger.info("channel %s already terminated", name)
+                    continue
+                procs.append((name,proc))
+                logger.info("terminating channel %s", name)
+                proc.terminate()
+            except Exception as ex:
+                logger.exception("send terminate signal failed for %s", name)
+
+        if not procs:
+            return
+
+        # wait for terminated
+        time.sleep(1)
+
+        # kill all
+        for name,proc in procs:
+            try:
+                if proc.poll() is not None:
+                    logger.info("channel %s has terminated", name)
+                    continue
+                logger.info("killing channel %s", name)
+                proc.kill()
+                logger.info("hannel %s killed", name)
+            except Exception as ex:
+                logger.exception("send kill signal failed for %s", name)
+
+    def cm_start_channels(self,srcs,ctx):
+
+        for name in srcs:
+
+            info = srcs[name]
+
+            if not info['enable']:
+                continue
+
+            if 'channel' not in info:
+                continue
+
+            # channel already started
+            if info['channel'].get('id',None):
+                continue
+
+            if not self._check_scope(ctx,info):
+                continue
+
+            self._start_channel(info)
 

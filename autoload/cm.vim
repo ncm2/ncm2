@@ -77,7 +77,6 @@ func! cm#enable_for_buffer()
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave')
 		autocmd InsertEnter <buffer> call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
-		autocmd FileType,BufWinEnter <buffer> call s:check_and_start_all_channels()
 		autocmd BufEnter    <buffer> set completeopt=menu,menuone,noinsert,noselect
 		" working together with timer, the timer is for detecting changes
 		" popup menu is visible. TextChangedI will not be triggered when popup
@@ -87,7 +86,7 @@ func! cm#enable_for_buffer()
 	augroup END
 
 	call s:start_core_channel()
-	call s:check_and_start_all_channels()
+	call s:notify_core_channel('cm_start_channels',g:_cm_sources,cm#context())
 
 endfunc
 
@@ -177,15 +176,14 @@ func! cm#register_source(info)
 		return
 	endif
 
-	call s:check_and_start_channel(a:info)
+	call s:notify_core_channel('cm_start_channels',g:_cm_sources,cm#context())
 
 endfunc
 
-func! cm#remove_source(name)
+func! cm#disable_source(name)
 	try
 		let l:info = g:_cm_sources[a:name]
-		" remove from registry
-		unlet g:_cm_sources[a:name]
+		let l:info['enable'] = 0
 		call cm#_channel_cleanup(l:info)
 	catch
 		echom v:exception
@@ -228,7 +226,7 @@ let s:lasttick = ''
 let s:channel_jobid = -1
 let g:_cm_channel_id = -1
 let s:channel_started = 0
-let s:core_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
+let g:_cm_start_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
 " let s:complete_timer
 let s:complete_timer_ctx = {}
 
@@ -237,12 +235,6 @@ augroup cm
 	autocmd VimLeavePre * let s:leaving=1
 	" autocmd User PossibleTextChangedI call <sid>on_changed()
 augroup END
-
-func! s:check_and_start_all_channels()
-	for l:name in keys(g:_cm_sources)
-		call s:check_and_start_channel(g:_cm_sources[l:name])
-	endfor
-endfunc
 
 func! s:check_scope(info)
 	let l:scopes = get(a:info,'scopes',[])
@@ -260,69 +252,6 @@ func! s:check_scope(info)
 	return 0
 endfunc
 
-" check and start channels
-func! s:check_and_start_channel(info)
-	if a:info['enable'] == 0
-		return
-	endif
-	if s:check_scope(a:info)==0
-		return
-	endif
-	call cm#_start_channel(a:info)
-endfunc
-
-" called from pythonx/cm_start.py
-func! cm#_start_channel(info)
-
-	let l:info = a:info
-	if type(a:info)==type("")
-		" parameter is a name
-		let l:info = g:_cm_sources[a:info]
-	endif
-	if !has_key(l:info,'channel')
-		return
-	endif
-
-	let l:channel = l:info['channel']
-
-	if l:channel['type']=='python3' || l:channel['type']=='python2'
-
-		if get(l:channel, 'jobid',-1)!=-1
-			" channel already started
-			return
-		endif
-
-		" find interpreter path
-		let l:py = get(g:,'python3_host_prog','python3')
-		if l:channel['type']=='python2'
-			let l:py = get(g:,'python_host_prog','python2')
-		endif
-
-		let l:opt = {}
-		let l:opt['detach'] = get(l:channel,'detach',0)
-		let l:opt['_info'] = l:info
-
-		func l:opt.on_exit(job_id, data, event)
-
-			let l:info = self['_info']
-			call cm#_channel_cleanup(l:info)
-			if s:leaving
-				return
-			endif
-			if has_key(g:_cm_sources, l:info['name']) && l:info['enable']
-				" if source is not removed or disabled, than the channel must
-				" have been terminated unexpectedly
-				echom l:info['name'] . ' channel has exited'
-			endif
-
-		endfunc
-
-		" start channel
-		let l:channel['jobid'] = call(s:jobstart,[[l:py,s:core_py_path,'channel',l:channel['module'],l:info['name'],g:_cm_servername],l:opt])
-
-	endif
-
-endfunc
 
 func! cm#_channel_started(name,id)
 
@@ -418,13 +347,20 @@ endfunc
 
 " cm core channel functions
 " {
+
+
+function! s:on_core_channel_error(job_id, data, event)
+	echoe join(a:data,"\n")
+endfunction
+
 func! s:start_core_channel()
 	if s:channel_started
 		return
 	endif
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let s:channel_jobid = call(s:jobstart,[[l:py3,s:core_py_path,'core',g:_cm_servername],{'rpc':1,
+	let s:channel_jobid = call(s:jobstart,[[l:py3,g:_cm_start_py_path,'core',g:_cm_servername],{
 			\ 'on_exit' : function('s:on_core_channel_exit'),
+			\ 'on_stderr' : function('s:on_core_channel_error'),
 			\ 'detach'  : 1,
 			\ }])
 
@@ -436,7 +372,7 @@ fun s:on_core_channel_exit(job_id, data, event)
 	if s:leaving
 		return
 	endif
-	echom 'cm-core channel exit'
+	echom 'nvim-completion-manager core channel terminated'
 endf
 
 fun s:notify_core_channel(event,...)
