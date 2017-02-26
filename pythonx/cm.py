@@ -34,13 +34,6 @@ def register_source(name,abbreviation,priority,enable=True,events=[],detach=0,py
     # module
     return
 
-def context_changed(ctx1,ctx2):
-    # same as cm#context_changed
-    # return ctx1 is None or ctx2 is None or ctx1['changedtick']!=ctx2['changedtick'] or ctx1['curpos']!=ctx2['curpos']
-    # Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
-    # bug, use curpos as workaround
-    return ctx1 is None or ctx2 is None or ctx1['curpos']!=ctx2['curpos']
-
 def get_src(nvim,ctx):
     """
     :type nvim: Nvim
