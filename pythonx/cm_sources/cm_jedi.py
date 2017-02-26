@@ -11,7 +11,7 @@ register_source(name='cm-jedi',
                    abbreviation='Py',
                    scoping=True,
                    scopes=['python'],
-                   events=['InsertLeave'],
+                   cm_refresh_patterns=[r'^(import|from) ', r'[\w_]{3,}$',r'\.[\w_]*$',r'\(|\,\s*$'],
                    detach=0)
 
 import os
@@ -44,22 +44,10 @@ class Source:
             logger.info('ignore empty src [%s]', src)
             return
 
-        skip_completions = False
         show_sig = False
-
-        # completion pattern
-        if (re.search(r'^(import|from)', typed) 
-            or re.search(r'[\w_]{2,}$',typed)
-            or re.search(r'\.[\w_]*$',typed)
-            ):
-            skip_completions = False
-        else:
-            skip_completions = True
-            if kwtyped=="":
-                show_sig = True
-            else:
-                # skip and no show sig, no need to process
-                return
+        # show function signature when `(` or `,` is typed
+        if re.search(r'\(|\,\s*$', typed):
+            show_sig = True
 
         # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
         script = jedi.Script(src, lnum, len(typed), path)
@@ -69,9 +57,6 @@ class Source:
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 self._nvim.call('cm#complete', info['name'], ctx, col, matches, True, async=True)
-            return
-
-        if skip_completions:
             return
 
         completions = script.completions()
