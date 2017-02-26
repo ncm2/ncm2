@@ -2,6 +2,7 @@ import os
 import sys
 import importlib
 import logging
+import atexit
 from neovim.api import Nvim
 from neovim import setup_logging, attach
 
@@ -236,11 +237,10 @@ def _cm_event_loop(type,logger,nvim,handler):
 
         logger.debug('%s method %s completed', type, method)
 
-    nvim.run_loop(on_request, on_notification, on_setup)
-
-    # shutdown
+    # use at_exit to ensure the calling of cm_shutdown
     func = getattr(handler,'cm_shutdown',None)
     if func:
-        func()
+        atexit.register(func)
 
+    nvim.run_loop(on_request, on_notification, on_setup)
 
