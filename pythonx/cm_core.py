@@ -497,31 +497,40 @@ class CoreHandler:
 
     def cm_shutdown(self):
 
+        # wait for normal exit
         time.sleep(1)
+
+        procs = []
         for name in self._channel_processes:
             pinfo = self._channel_processes[name]
             proc = pinfo['proc']
             try:
                 if proc.poll() is not None:
+                    logger.info("channel %s already terminated", name)
                     continue
+                procs.append((name,proc))
                 logger.info("terminating channel %s", name)
                 proc.terminate()
             except Exception as ex:
                 logger.exception("send terminate signal failed for %s", name)
 
-        time.sleep(2)
+        if not procs:
+            return
+
+        # wait for terminated
+        time.sleep(1)
+
         # kill all
-        for name in self._channel_processes:
-            pinfo = self._channel_processes[name]
-            proc = pinfo['proc']
+        for name,proc in procs:
             try:
                 if proc.poll() is not None:
+                    logger.info("channel %s has terminated", name)
                     continue
                 logger.info("killing channel %s", name)
                 proc.kill()
                 logger.info("hannel %s killed", name)
-            except:
-                pass
+            except Exception as ex:
+                logger.exception("send kill signal failed for %s", name)
 
     def cm_start_channels(self,srcs,ctx):
 
