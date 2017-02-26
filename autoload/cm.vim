@@ -295,15 +295,6 @@ func! cm#_channel_cleanup(info)
 		unlet l:channel['id']
 	endif
 
-	if has_key(l:channel,'jobid')
-		try
-			call call(s:jobstop,[l:channel['jobid']])
-			unlet l:channel['jobid']
-		catch
-			" do nothing
-		endtry
-	endif
-
 	let l:channel['has_terminated'] = 1
 
 endfunc
