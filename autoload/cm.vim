@@ -358,7 +358,7 @@ func! s:start_core_channel()
 		return
 	endif
 	let l:py3 = get(g:,'python3_host_prog','python3')
-	let s:channel_jobid = call(s:jobstart,[[l:py3,g:_cm_start_py_path,'core',g:_cm_servername],{'rpc':1,
+	let s:channel_jobid = call(s:jobstart,[[l:py3,g:_cm_start_py_path,'core',g:_cm_servername],{
 			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ 'on_stderr' : function('s:on_core_channel_error'),
 			\ 'detach'  : 1,
