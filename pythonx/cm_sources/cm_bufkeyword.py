@@ -9,7 +9,7 @@ register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
                    events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-                   cm_refresh_patterns=[r'[0-9a-zA-Z_#]{3,}$'],
+                   cm_refresh_patterns=[r'[0-9a-zA-Z_#]{4,}$'],
                    detach=1)
 
 import os
