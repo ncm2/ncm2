@@ -26,8 +26,32 @@ class Scoper:
             last_data = None
 
             scope_info = None
+            skip = False
+
+            def handle_starttag(self,tag,attrs):
+
+                self.skip = False
+
+                if tag in ['style','script']:
+                    for attr in attrs:
+                        try:
+                            # avoid css completion for lang="stylus"
+                            if tag=='style' and attr[0]=='lang' and attr[1] and attr[1] not in ['css','scss']:
+                                self.skip = True
+                                return
+                            if tag=='style' and attr[0]=='type' and attr[1] and attr[1] not in ['text/css']:
+                                self.skip = True
+                                return
+                            if tag=='script' and attr[0]=='type' and attr[1] and attr[1] not in ['text/javascript']:
+                                self.skip = True
+                                return
+                        except:
+                            pass
 
             def handle_endtag(self, tag):
+
+                if self.skip:
+                    return
 
                 if tag in ['style','script']:
 
