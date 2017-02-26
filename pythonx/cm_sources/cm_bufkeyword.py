@@ -4,8 +4,8 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-import cm
-cm.register_source(name='cm-bufkeyword',
+from cm import register_source, getLogger, get_matcher
+register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
                    events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
@@ -14,9 +14,8 @@ cm.register_source(name='cm-bufkeyword',
 
 import os
 import re
-import logging
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 class Source:
 
@@ -73,7 +72,7 @@ class Source:
         startcol = col-len(kw)
 
         matches = (dict(word=word,icase=1)  for word in self._words)
-        matches = cm.get_matcher(self._nvim).process(info['name'], ctx, startcol, matches)
+        matches = get_matcher(self._nvim).process(info['name'], ctx, startcol, matches)
 
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
