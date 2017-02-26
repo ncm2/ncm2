@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 class Scoper:
 
-    scopes = ['html','xhtml','php','blade','jinja','jinja2','vue.html.javascript.css']
+    scopes = ['html','xhtml','php','blade','jinja','jinja2','vue.html.javascript.css','vue']
 
     def sub_context(self,ctx,src):
 
