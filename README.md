@@ -157,11 +157,14 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
   framework.
 
 ```vim
-" css
-" the omnifunc pattern is PCRE
+" css completion via `csscomplete#CompleteCSS`
+" The `'cm_refresh_patterns'` is PCRE.
+" Be careful with `'scoping': 1` here, not all sources, especially omnifunc,
+" can handle this feature properly.
 au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'priority': 9, 
 		\ 'scopes': ['css'],
+		\ 'scoping': 1,
 		\ 'abbreviation': 'css',
 		\ 'cm_refresh_patterns':['\w{2,}$',':\s+\w*$'],
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
