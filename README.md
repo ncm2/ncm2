@@ -153,8 +153,11 @@ let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
 inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 ```
 
-- If you have only `omnifunc` available, you may register it as a source to the
-  framework.
+- If you have only `omnifunc` available, you may register it as a source to
+  the framework.  ** Warning: `omnifunc` is implemented in a synchronouse
+  style, and vim-vimscript is single threaded, it would potentially block the
+  ui with the introduction of a heavy weight `omnifunc`, for example the
+  builtin phpcomplete.**
 
 ```vim
 " css completion via `csscomplete#CompleteCSS`
