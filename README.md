@@ -172,10 +172,10 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ })
 ```
 
-**Warning: `omnifunc` is implemented in a synchronouse style, and
+**Warning:** `omnifunc` is implemented in a synchronouse style, and
 vim-vimscript is single threaded, it would potentially block the ui with the
 introduction of a heavy weight `omnifunc`, for example the builtin
-phpcomplete.** If you get some time, please try implementing a source for NCM
+phpcomplete.If you get some time, please try implementing a source for NCM
 as a replacement for the old style omnifunc.
 
 
