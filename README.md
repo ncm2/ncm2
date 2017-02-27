@@ -154,11 +154,9 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
 ```
 
 - If you have only `omnifunc` available, you may register it as a source to
-  the framework.  ** Warning: `omnifunc` is implemented in a synchronouse
-  style, and vim-vimscript is single threaded, it would potentially block the
-  ui with the introduction of a heavy weight `omnifunc`, for example the
-  builtin phpcomplete.**
-
+  the framework.
+ 
+ 
 ```vim
 " css completion via `csscomplete#CompleteCSS`
 " The `'cm_refresh_patterns'` is PCRE.
@@ -173,6 +171,13 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 ```
+
+** Warning: `omnifunc` is implemented in a synchronouse style, and
+vim-vimscript is single threaded, it would potentially block the ui with the
+introduction of a heavy weight `omnifunc`, for example the builtin
+phpcomplete.** If you get some time, please try implementing a source for NCM
+as a replacement for the old style omnifunc.
+
 
 - There's no guarantee that this plugin will be compatible with other
   completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
