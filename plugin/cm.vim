@@ -1,7 +1,10 @@
 
+
+let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
+
 if get(g:,'cm_enable_for_all',1)
 	" simple ignore files larger than 1M, for performance
-	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<1000000) | call cm#enable_for_buffer() | endif
+	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<g:cm_buffer_size_limit) | call cm#enable_for_buffer() | endif
 
 	" disable clang default mapping by default,
 	" https://github.com/Rip-Rip/clang_complete/pull/515
@@ -27,14 +30,15 @@ if !exists('g:cm_completekeys')
 endif
 
 
-" wait for a while before popping up, in milliseconds, this would reduce the
-" popup menu flashes when multiple sources are updating the popup menu in a
-" short interval, use a interval which is long enough for computer and short
+" Wait for an interval before popping up, in milliseconds, this would reduce
+" the popup menu flickering when multiple sources are updating the popup menu
+" in a short interval, use an interval long enough for computer and short
 " enough for human
 let g:cm_complete_delay = get(g:,'cm_complete_delay',50)
 
-" automatically enable all registered sources
-" set this to 0 if you want to select sources manually
+" Automatically enable all registered sources by default. Set it to 0 if you
+" want to manually enable the registered sources you want by
+" g:cm_sources_override.
 let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 
 " used to override default options of sources

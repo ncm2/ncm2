@@ -1,0 +1,455 @@
+*nvim-completion-manager.txt*    Fast, Extensible, Async Completion Framework
+
+        Fast, Extensible, Async Completion Framework For Neovim~
+
+Author: roxma <roxma@qq.com>
+License: MIT
+
+nvim-completion-manager			    *nvim-completion-manager* *NCM* 
+
+1. Introduction					|NCM-introduction|
+2. Install					|NCM-install|
+3. Configuration Tips				|NCM-tips|
+4. Settings					|NCM-settings|
+5. API						|NCM-API|
+6. Why						|NCM-why|
+7. Minimal Source Exampels			|NCM-source-exampels|
+
+==============================================================================
+1. Introduction					*NCM-introduction*
+
+|NCM| (short for nvim-completion-manager) is a fast, extensible, async
+completion framework for neovim.
+
+Main features:
+
+1. Asynchronous completion support like |deoplete|.
+2. Faster, all completions should run in parallel.
+3. Smarter on files with different languages, for example, css/javascript
+completion in html style/script tag.
+4. Extensible async vimscript API and python3 API.
+
+
+==============================================================================
+2. Install					*NCM-install*	    
+
+Requirements:
+
+- Neovim.
+- Or vim8 with |has-python| or |has-python3|
+- `python3` found in your `$PATH` env variable or setting
+  |g:python3_host_prog| to the full path of your python3 executable..
+
+Install the required pip modules for your python3:
+>
+	# neovim module is required
+	# jedi library for python completion
+	# mistune for language specific completion on markdown
+	# psutil and setproctitle are optional utilities
+	pip3 --user install neovim jedi mistune psutil setproctitle
+
+Note: If you're using vim8, you also need to install the `neovim` pip module
+for the python, depending which on of `has("python")` has `has("python3")` you
+are using. You also need to install |vim-hug-neovim-rpc| Plugin:
+https://github.com/roxma/vim-hug-neovim-rpc
+
+==============================================================================
+3. Configuration Tips				*NCM-tips*
+
+Supress the annoying completion messages:
+>
+	" don't give |ins-completion-menu| messages.  For example,
+	" '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
+	set shortmess+=c
+
+Use tab to select the popup menu:
+>
+	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+If you have only 'omnifunc' available, you may register it as a source to the
+framework.
+>
+	" css completion via `csscomplete#CompleteCSS`
+	" The `'cm_refresh_patterns'` is PCRE.
+	" Be careful with `'scoping': 1` here, not all sources, especially omnifunc,
+	" can handle this feature properly.
+	au User CmSetup call cm#register_source({'name' : 'cm-css',
+			\ 'priority': 9, 
+			\ 'scopes': ['css'],
+			\ 'scoping': 1,
+			\ 'abbreviation': 'css',
+			\ 'cm_refresh_patterns':['\w{2,}$',':\s+\w*$'],
+			\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
+			\ })
+>
+Note: 'omnifunc' is implemented in a synchronouse style, and vim-vimscript is
+single threaded, it would potentially block the ui with the introduction of a
+heavy weight 'omnifunc', for example the builtin phpcomplete. If you get some
+time, please try implementing a source for NCM as a replacement for the old
+style 'omnifunc'.
+
+There's no guarantee that this plugin will be compatible with other completion
+plugin in the same buffer. Use `let g:cm_enable_for_all=0` and call
+|cm#enable_for_buffer()| to use this plugin for specific buffer.
+
+This example shows how to disable NCM's builtin tag completion. It's also
+possible to use |g:cm_sources_override| to override other default options of a
+completion source.
+>
+    let g:cm_sources_override = {
+	\ 'cm-tags': {'enable':0}
+	\ }
+<
+==============================================================================
+4. Settings					*NCM-settings*
+
+						*g:cm_enable_for_all*
+g:cm_enable_for_all
+			Enable the |NCM| for all buffers by default. unless
+			the buffer size reach the limit specified by
+			|g:cm_buffer_size_limit|.
+			Default: 1
+
+g:cm_buffer_size_limit
+			Used together with |g:cm_enable_for_all|.
+			Default: 1000000
+
+						*g:cm_sources_enable*
+g:cm_sources_enable	
+			Automatically enable all registered sources by
+			default. Set it to 0 if you want to manually enable
+			the registered sources you want by setting the
+			|g:cm_sources_override|.
+			Default: 1
+
+						*g:cm_sources_override*
+g:cm_sources_override
+			Override the options used to register the source.
+			This example shows how to disable NCM's builtin tag
+			completion: >
+			let g:cm_sources_override = {
+			    \ 'cm-tags': {'enable':0}
+			    \ }
+<			See |cm#register_source()| for more information.
+
+						*g:cm_complete_delay*
+g:cm_complete_delay		
+			Wait for an interval before popping up, in
+			milliseconds.  This would reduce the popup menu
+			flickering when multiple sources are updating the
+			popup menu in a short interval. Use an interval long
+			enough for computer and short enough for human.  
+			Default: 50
+
+						*g:cm_matcher*
+g:cm_matcher 
+			A |Dict| specifies the matcher for filtering and
+			sorting the completion candidates.
+			Default: 
+	    `{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})`
+			See |g:cm_matcher.module| and |g:cm_matcher.case|.
+
+						*g:cm_matcher.module*
+g:cm_matcher.module
+			The matcher module. Available options are:
+			`"cm_matchers.prefix_matcher"`  
+				Prefix matching. When you type "ab", it only
+				matches candidates start with with "ab".
+			`"cm_matchers.fuzzy_matcher"`
+				Fuzzy matching.
+				Note: Known issue #8 on github, there may be
+				undesired cursor flickering with fuzzy
+				matcher.
+
+						*g:cm_matcher.case*
+g:cm_matcher.case
+			Case sensitivity. Available options:
+			`"case"`
+				case-sensitive. 
+			`"icase"`
+				Ignore case.
+			`"smartcase"`
+				A lowercase typing will match lower and upper
+				case candidates. But an uppercase typing will
+				only match uppercase candidates.
+
+						*g:cm_completekeys*
+g:cm_completekeys
+			Available options:
+			`"\<Plug>(cm_complete)"`
+				This is the default.
+			`"\<Plug>(cm_completefunc)"`
+				This is the default when you're not using a
+				prefix matcher. This key uses the
+				|i_CTRL-X_CTRL-U| key to trigger the popup
+				menu, so which will change the behafior of
+				CTRL-U key. To avoid this behavior, use
+				`"\<Plug>(cm_omnifunc)"`.
+			`"\<Plug>(cm_omnifunc)"`
+
+==============================================================================
+5. API						*NCM-API*
+
+						*cm#register_source()*
+cm#register_source({source})
+	Register a completion source. {source} is a |Dict| that defines the
+	source, it may contain these fields:
+
+	name					*NCM-name*
+			Required, the unique name of the completion source.
+
+	abbreviation				*NCM-abbreviation*
+			May be displayed in the popup item to indicate which
+			completion source the item comes from.
+
+	enable		If it is zero, this source will not be used. 
+			Default: |g:cm_sources_enable|
+
+	priority				*NCM-priority*
+			Required, the priority is used to sort between other
+			sources. A higher value indicates that the completion
+			item of this source sorts before sources with lower
+			priority value.  
+
+			see |NCM-priority-values| for recommended values.
+
+	scopes					*NCM-scopes*
+			A |List| of scope. The source will be activated when
+			the current editting scope (e.g. current |filetype|)
+			is in the source's scopes list. 
+			If this field is not set, it means this is a general
+			purpose completion source, like keyword from buffer,
+			it will be activated for all buffers. 
+			See |NCM-scoping| for more information.
+
+	cm_refresh_patterns			*NCM-cm_refresh_patterns*
+			A |List| of PCRE patterns (python regex). If the typed
+			text matches any one of the pattern, a
+			|cm_refresh-notification| will be triggered for this
+			source. If this field is not set or empty, the
+			notification will be triggered for for each typing.
+
+	cm_refresh				*NCM-cm_refresh*
+			Required for |NCM-vimscript-source|. A handler for the
+			|cm_refresh-notification|.  It is usually a |String|
+			storing the name of the handler function.
+
+			This field should not be set for source implemented
+			via |NCM-python-source|.
+
+			If the handler is a legacy 'omnifunc', which confirms
+			to the |completion-functions| protocol, use a |Dict|
+			like this instead:
+
+				`{'omnifunc': 'csscomplete#CompleteCSS'}`
+
+						*NCM-priority-values*
+	Recommended priority definitions for |NCM-priority|: 
+	2		keyword from the otherfiles, from user's openning
+			browsers, etc
+	4		keyword from openning buffers
+	5		keyword from current buffer
+	6		file path
+	7		snippet hint
+	8		language specific keyword, but not smart
+	9		smart programming language aware completion
+
+						*cm#complete()*
+cm#complete({name}, {context}, {startcol}, {matches}[, {refresh}])
+	Call this function to trigger the popup menu whenever you have
+	completions candidates available. Usually this function is called
+	after a |cm_refresh-notification| is sent to a source.
+
+	{name} is the |NCM-name| used to register the source.
+
+	{context} is the second argument passed to the |NCM-cm_refresh|
+	handler.  This is used for synchronization, if the user types more
+	words before cm#complete is triggered, the framework will know the
+	{context} is outdated, and will ignore this |cm#complete()| call.
+
+	{startcol} and {matches} are used the same way as vim's builtin
+	|complete()|function.
+
+	{refresh} is 0 by default. Normally |NCM| will cache the result until
+	a space character is typed. And if there's caching result of a source,
+	the |cm_refresh-notification| will not be sent to the source. 
+
+	If {refresh} is set to 1, |NCM| will send the notification reguardless
+	of the caching of this |cm#complete()| call.
+
+						*NCM-CmSetup* *CmSetup*
+autocmd User CmSetup
+	This autocmd will be triggered once |NCM| started.
+	Registering a source via this autocmd will avoid error when |NCM| has
+	is not been installed yet. And it also avoid the loading of
+	autoload/cm.vim on neovim startup, so that |NCM| won't affect neovim's
+	startup time.
+
+						*cm#disable_source()*
+cm#disable_source({name})
+	Disable the registered source.
+
+						*cm#context()*
+cm#context()
+	Get the current typing context. This function returns a |Dict| with
+	the following fields:
+
+	bufnr		Current buffer number.
+	lnum		Current cursor line number.
+	col		Current cursor column.
+	filetype	Equivalent to the value of |filetype| of the buffer.
+	typed		The typed text. For example: >
+				foo bar|baz
+<			Where `|` is the cursor position. This field should be
+			"foo bar".
+	filepath	The path of current editting file. Equivalent to
+			`expand('%:p')` 
+
+	Note: When the context is passed via |cm_refresh-notification|, it has
+	some extra fields:
+	scope		Current editting scope. See |NCM-scoping|
+
+						*cm#context_changed()*
+cm#context_changed({context})
+	Check if the {context} is outdated.
+
+						*cm#enable_for_buffer()*
+cm#enable_for_buffer()
+	Enable |NCM| for current buffer.
+
+						*cm#disable_for_buffer()*
+cm#disable_for_buffer()
+	Disable |NCM| for current buffer.
+
+==============================================================================
+6. Why						*NCM-why*
+
+This project was started just for fun, and it's working pleasingly for me now.
+However, it seems there's lots of differences between deoplete, YCM, and
+nvim-completion-manager, by implementation.
+
+I haven't read the source of YCM yet. So here I'm describing the basic
+implementation of NCM (short for nvim-completion-manager) and some of the
+differences between deoplete and this plugin.
+
+						*NCM-async-architecture*
+						*cm_refresh-notification*
+6.1 Async architecture
+
+Each completion source should be a standalone process, the manager notifies
+the completion source for any text changing, even when popup menu is visible.
+The completion source notifies the manager if there's any complete matches
+available. After some basic priority sorting between completion sources, and
+some simple filtering, the completion popup menu will be triggered with the
+`complete()` function by the completion manager.
+
+If some of the completion source is calculating matches for a long long time,
+the popup menu will still be shown quickly if other completion sources work
+properly. And if the user hasn't changed anything, the popup menu will be
+updated after the slow completion source finishes the work.
+
+As the time as of this plugin being created, the completion sources of
+deoplete are gathered with `gather_candidates()` of the `Source` object,
+inside a for loop, in deoplete's process. A slow completion source may defer
+the display of popup menu. Of course it will not block the ui.
+
+IMHO, NCM is potentially faster because all completion sources run in parallel.
+
+6.2 Scoping					*NCM-scoping*
+
+I write markdown files with code blocks quite often, so I've also implemented
+[language specific completion for markdown
+file](#language-specific-completion-for-markdown). This is a framework
+feature, which is called scoping. It should work for any markdown code block
+whose language completion source is avaible to NCM. I've also added support
+for javascript completion in script tag of html files, and css completion in
+style tag.
+
+The idea was originated in
+[vim-syntax-compl-pop](https://github.com/roxma/vim-syntax-compl-pop). Since
+it's pure vimscript implementation, and there are some limitations currently
+with neovim's syntax api. It's very likely that vim-syntax-compl-pop doesn't
+work, for example, javascript completion in markdown or html script tag.  So I
+use custom parser in NCM to implement the scoping features.
+
+6.3 Experimental hacking
+
+Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
+changes even popup menu is visible, instead of using the `TextChangedI` event,
+which only triggers when no popup menu is visible. This is important for
+implementing the async architecture. I'm hoping one day neovim will offer
+better option rather than a timer or the limited `TextChangedI`.
+
+Deoplete and YCM are mature, they have tons of features I'm not offering
+currently, which should be considered a main difference too.
+
+==============================================================================
+7. Minimal Source Exampels			*NCM-source-examples*
+
+7.1 Implementation in pure vimscript		*NCM-vimscript-source*
+
+This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
+typed.
+
+Note: The `au User CmSetup` sould be place into your vimrc or the 'rtp'/plugin
+directory in order to register the autocmd before |NCM| started.
+>
+	au User CmSetup call cm#register_source({'name' : 'foo bar',
+		\ 'abbreviation': 'foo', 
+		\ 'priority': 8, 
+		\ 'cm_refresh_patterns': ['fo$'],
+		\ 'cm_refresh': 'g:Foo_auto_popup',
+		\ })
+
+	func! g:Foo_auto_popup(opt,ctx)
+		let l:matches = ['foo_bar','foo_baz']
+		let l:col = a:ctx['col']
+		let l:typed = a:ctx['typed']
+		let l:kw = matchstr(l:typed,'\v\S+$')
+		let l:kwlen = len(l:kw)
+		let l:startcol = l:col - l:kwlen
+		call cm#complete(a:opt, a:ctx, l:startcol, l:matches)
+	endfunc
+>
+7.2 Implementation via NCM python framework	*NCM-python-source*
+
+This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
+typed.
+
+For more complete example, you mignt need to read the source code of
+pythonx/cm_sources/cm_filepath.py of this plugin.
+
+Note: This file foo.py should be placed into 'rtp'/pythonx/cm_sources/
+directory.
+>
+	# -*- coding: utf-8 -*-
+
+	from cm import register_source
+	register_source(name='foo_bar',
+			   abbreviation='foo',
+			   cm_refresh_patterns=[r'fo$'],
+			   priority=8)
+
+	import re
+
+	class Source:
+
+	    def __init__(self,nvim):
+
+		self._nvim = nvim
+
+	    def cm_refresh(self,info,ctx):
+
+		matches = ['foo_bar','foo_baz']
+
+		col = ctx['col']
+		typed = ctx['typed']
+		kw = re.search(r'\w*?$',typed).group(0)
+		startcol = col-len(kw)
+
+		self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+<
+
+==============================================================================
+vim: tw=78:ts=8:softtabstop=8:sw=8:ft=help:norl:noexpandtab:fen:noet:

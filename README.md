@@ -40,7 +40,6 @@ plugin builtin sources:
 - Ultisnips hint
 - File path completion
 - Python completion via [jedi](https://github.com/davidhalter/jedi)
-- Golang completion via [gocode](https://github.com/nsf/gocode)
 - Css completion via vim's builtin
   [csscomplete#CompleteCSS](https://github.com/othree/csscomplete.vim)
 
@@ -64,14 +63,14 @@ extra sources:
   support for neovim.
 - Javascript completion via
   [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)
+- Golang completion via [gocode](https://github.com/nsf/gocode)
 
 ## Requirements
 
-1. Neovim python3 support. (`pip3 install neovim`). Or vim8 with
-   `has('python')` or `has('python3')`, and `python3` found in your `PATH`
-   environment variable.
-- For **Golang completion**, you need to install
-  [gocode](https://github.com/nsf/gocode#setup).
+- Neovim.
+- Or vim8 with `has("python")` or `has("python3")`
+- `python3` found in your `$PATH` env variable or setting
+  `g:python3_host_prog` to the full path of your python3 executable.
 
 ## Installation
 
@@ -86,7 +85,7 @@ Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
 Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
 ```
 
-- If you are **vim8 user**, You'll need
+- If you are **vim8 user**, you'll need
   [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc). The vim8
   support layer is still experimental, please 'upgrade' to
   [neovim](https://github.com/neovim/neovim) if it's possible.
@@ -137,7 +136,7 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 set shortmess+=c
 ```
 
-- **Tab Completion**
+- Use tab to select the popup menu:
 
 ```vim
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
@@ -183,8 +182,9 @@ a replacement for the old style omnifunc.
   completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
   `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 
-- To disable the tag completion source. It's also possible to use
-  `g:cm_sources_override` to override other options of a completion source.
+- This example shows how to disable NCM's builtin tag completion. It's also
+  possible to use `g:cm_sources_override` to override other default options of
+  a completion source.
 
 ```vim
 let g:cm_sources_override = {
@@ -235,7 +235,8 @@ deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course it will not block the ui.
 
-IMHO, NCM is potentially faster because all completion sources run in parallel.
+IMHO, NCM is potentially faster because all completion sources run in
+parallel.
 
 ### Scoping
 
