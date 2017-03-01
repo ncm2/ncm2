@@ -223,6 +223,7 @@ cm#register_source({source})
 			it will be activated for all buffers. 
 			See |NCM-scoping| for more information.
 
+						*cm_refresh_patterns*
 	cm_refresh_patterns			*NCM-cm_refresh_patterns*
 			A |List| of PCRE patterns (python regex). If the typed
 			text matches any one of the pattern, a
@@ -230,6 +231,7 @@ cm#register_source({source})
 			source. If this field is not set or empty, the
 			notification will be triggered for for each typing.
 
+						*cm_refresh*
 	cm_refresh				*NCM-cm_refresh*
 			Required for |NCM-vimscript-source|. A handler for the
 			|cm_refresh-notification|.  It is usually a |String|
@@ -263,10 +265,12 @@ cm#complete({name}, {context}, {startcol}, {matches}[, {refresh}])
 
 	{name} is the |NCM-name| used to register the source.
 
-	{context} is the second argument passed to the |NCM-cm_refresh|
-	handler.  This is used for synchronization, if the user types more
-	words before cm#complete is triggered, the framework will know the
-	{context} is outdated, and will ignore this |cm#complete()| call.
+	{context} is an arugment passed to the |NCM-cm_refresh| handler.  It
+	is used for synchronization, if the user types more characters before
+	|cm#complete()| is called, NCM will know the {context} is outdated,
+	and then ignore the {matches} from this call.
+
+	See |cm#context()| for more information.
 
 	{startcol} and {matches} are used the same way as vim's builtin
 	|complete()|function.
@@ -295,20 +299,49 @@ cm#context()
 	Get the current typing context. This function returns a |Dict| with
 	the following fields:
 
-	bufnr		Current buffer number.
-	lnum		Current cursor line number.
-	col		Current cursor column.
-	filetype	Equivalent to the value of |filetype| of the buffer.
-	typed		The typed text. For example: >
-				foo bar|baz
-<			Where `|` is the cursor position. This field should be
-			"foo bar".
-	filepath	The path of current editting file. Equivalent to
+	bufnr		
+			Current buffer number.
+	lnum		
+			Current cursor line number.
+	col		
+			Current cursor column.
+	filetype	
+			Equivalent to the value of |filetype| of the buffer.
+	typed					*cm#context().typed*
+			The typed text. For example: >
+				^foo bar|baz
+<			
+			Where `^` indicates the start of line, and `|`
+			indicates cursor position. This field should be: >
+			"foo bar"
+<
+	filepath	
+			The path of current editting file. Equivalent to
 			`expand('%:p')` 
 
 	Note: When the context is passed via |cm_refresh-notification|, it has
 	some extra fields:
-	scope		Current editting scope. See |NCM-scoping|
+
+	scope		
+			Current editting scope. See |NCM-scoping|
+	startcol	
+			If the pattern matched in |cm_refresh_patterns| has
+			regex group, and the end of last group is the end of
+			|cm#context().typed|, NCM will set this field to the
+			first character of the group. For example: >
+				cm_refresh_patterns=["\w{3,}$"]
+<			With the typed characters as: >
+				^foo barfoo| hello$
+<			Then startcol will be 5, which is the column number of
+			the "b" character.
+	base		
+			This field is available if startcol is present. The
+			value is the same as the {base} passed to
+			|complete-functions|. In previous example, this field
+			will be "barfoo".
+	
+	Other undocumented fields are necessary for the framework, a
+	completion source should not change these values.
 
 						*cm#context_changed()*
 cm#context_changed({context})
