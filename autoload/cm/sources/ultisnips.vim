@@ -1,13 +1,16 @@
 
-
 " If you're implementing your own completion source, add the setup code like
-" this into your vimrc, or plugin/foo.vim
+" this into your vimrc, or plugin/ultisnips.vim
 "
-"     autocmd User CmSetup call cm#register_source({'name' : 'cm-ultisnips',
-"		    \ 'priority': 7, 
-"		    \ 'abbreviation': 'Snips',
-"		    \ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
-"		    \ })
+"	" use did_plugin_ultisnips to detect the installation of ultisnips
+"	" https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
+"	au User CmSetup if exists('did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
+"			\ 'priority': 7, 
+"			\ 'abbreviation': 'Snip',
+"			\ 'default_word_pattern': '\S+',
+"			\ 'cm_refresh_patterns':['(\S{3,})$'],
+"			\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
+"			\ }) | endif
 "
 " An autocmd will avoid error when nvim-completion-manager is not installed
 " yet. And it also avoid the loading of autoload/cm.vim on neovim startup, so
@@ -15,46 +18,20 @@
 "
 func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 
-	if get(s:, 'disable', 0)
-		return
-	endif
-
-	try
-		" UltiSnips#SnippetsInCurrentScope
-		" {
-		"     "modeline": "Vim modeline",
-		"     "au": "augroup ... autocmd block",
-		"     ......
-		" }
-		let l:snips = UltiSnips#SnippetsInCurrentScope()
-	catch
-		" guess that ultisnips is not available
-		if get(s:, 'disable', -1)==-1
-			let s:disable =1
-		endif
-		return
-	endtry
-	" guess that ultisnips is available
-	let s:disable = 0
+	" UltiSnips#SnippetsInCurrentScope
+	" {
+	"     "modeline": "Vim modeline",
+	"     "au": "augroup ... autocmd block",
+	"     ......
+	" }
+	let l:snips = UltiSnips#SnippetsInCurrentScope()
 
 	let l:matches = []
 
-	let l:col = a:ctx['col']
-	let l:typed = a:ctx['typed']
-
-	let l:kw = matchstr(l:typed,'\v\S+$')
-	let l:kwlen = len(l:kw)
-	if l:kwlen<2 && !has_key(l:snips,l:kw)
-		return
-	endif
-
 	" The available snippet list is fairly small, simply dump the whole list
-	" here, leave the filtering work to cm's standard filter.  This would
+	" here, leave the filtering work to NCM's standard filter.  This would
 	" reduce the work done by vimscript.
 	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1,"info": l:snips[v:val]}')
-
-	" startcol is one-based
-	let l:startcol = l:col - l:kwlen
 
 	" call cm#complete to notify the completion framework for update.
 	"
@@ -86,7 +63,7 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 	" complete()`. They are used in the same way as vim's
 	" `complete({startcol}, {matches})` function.
 	"
-	call cm#complete(a:opt, a:ctx, l:startcol, l:matches)
+	call cm#complete(a:opt, a:ctx, a:ctx['startcol'], l:matches)
 
 endfunc
 

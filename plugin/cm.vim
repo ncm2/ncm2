@@ -46,13 +46,15 @@ let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 let g:cm_sources_override = get(g:,'cm_sources_override',{})
 
 
-au User CmSetup call cm#register_source({'name' : 'cm-ultisnips',
+" use did_plugin_ultisnips to detect the installation of ultisnips
+" https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
+au User CmSetup if exists('did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
 		\ 'priority': 7, 
 		\ 'abbreviation': 'Snip',
 		\ 'default_word_pattern': '\S+',
 		\ 'cm_refresh_patterns':['(\S{3,})$'],
 		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
-		\ })
+		\ }) | endif
 
 " css
 " the omnifunc pattern is PCRE
