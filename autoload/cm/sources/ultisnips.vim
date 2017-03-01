@@ -26,8 +26,6 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 	" }
 	let l:snips = UltiSnips#SnippetsInCurrentScope()
 
-	let l:matches = []
-
 	" The available snippet list is fairly small, simply dump the whole list
 	" here, leave the filtering work to NCM's standard filter.  This would
 	" reduce the work done by vimscript.
