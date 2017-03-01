@@ -4,11 +4,12 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import register_source
+from cm import register_source, getLogger
 register_source(name='cm-tags',
                    priority=6,
                    abbreviation='Tag',
                    events=['WinEnter'],
+                   cm_refresh_patterns=[r'(\w{4,})$'],
                    detach=1)
 
 import os
@@ -16,14 +17,13 @@ import re
 import logging
 import sys
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 class Source:
 
     def __init__(self,nvim):
 
         self._nvim = nvim
-        self._kw_pattern = r'[0-9a-zA-Z_]'
         self._files = self._nvim.call('tagfiles')
 
     def cm_event(self,event,ctx,*args):
@@ -32,21 +32,11 @@ class Source:
 
     def cm_refresh(self,info,ctx):
 
-        lnum = ctx['lnum']
-        col = ctx['col']
-        typed = ctx['typed']
-
-        kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
-        if len(kw)<4:
-            logger.info('skip for key [%s]', kw)
-            return
-        startcol = col-len(kw)
-
         tags = {}
 
         for file in self._files:
             try:
-                for line in binary_search_lines_by_prefix(kw,file):
+                for line in binary_search_lines_by_prefix(ctx['base'],file):
                     fields = line.split("\t")
                     if len(fields)<2:
                         continue
@@ -63,7 +53,7 @@ class Source:
         logger.info('matches len %s', len(matches))
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+        self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
 
 
 def binary_search_lines_by_prefix(prefix,filename):

@@ -7,12 +7,13 @@
 # loops sometime, don't know why.
 from cm import get_src, register_source
 register_source(name='cm-jedi',
-                   priority=9,
-                   abbreviation='Py',
-                   scoping=True,
-                   scopes=['python'],
-                   cm_refresh_patterns=[r'^(import|from) ', r'[\w_]{3,}$',r'\.[\w_]*$',r'\(|\,\s*$'],
-                   detach=0)
+                priority=9,
+                abbreviation='Py',
+                scoping=True,
+                scopes=['python'],
+                # The last two patterns is for displaying function signatures [r'\(\s?',r',\s?']
+                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$', r'(\w{3,})$',r'\.(\w*)$',r'\(\s?',r',\s?'],
+                detach=0)
 
 import os
 import re
@@ -30,13 +31,7 @@ class Source:
 
     def cm_refresh(self,info,ctx,*args):
 
-        lnum = ctx['lnum']
-        col = ctx['col']
-        typed = ctx['typed']
         path = ctx['filepath']
-
-        kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
-        startcol = col-len(kwtyped)
 
         src = get_src(self._nvim,ctx)
         if not src.strip():
@@ -44,19 +39,19 @@ class Source:
             logger.info('ignore empty src [%s]', src)
             return
 
-        show_sig = False
-        # show function signature when `(` or `,` is typed
-        if re.search(r'\(|\,\s*$', typed):
-            show_sig = True
-
         # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
-        script = jedi.Script(src, lnum, len(typed), path)
+        script = jedi.Script(src, ctx['lnum'], len(ctx['typed']), path)
 
-        if show_sig:
+        # if the framework doesn't pass the startcol, it means the pattern for
+        # displaying call signature has matched
+        if not ctx.get('startcol',None):
+            # try show the call signature
             signature_text = self._get_signature_text(script)
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
-                self._nvim.call('cm#complete', info['name'], ctx, col, matches, True, async=True)
+                # refresh=True
+                # call signature popup doesn't need to be cached by the framework
+                self._nvim.call('cm#complete', info['name'], ctx, ctx['col'], matches, True, async=True)
             return
 
         completions = script.completions()
@@ -66,7 +61,7 @@ class Source:
 
         for complete in completions:
             
-            item = dict(word=kwtyped+complete.complete,
+            item = dict(word=ctx['base']+complete.complete,
                         icase=1,
                         dup=1,
                         menu=complete.description,
@@ -78,7 +73,7 @@ class Source:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+        ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
         logger.info('matches %s, ret %s', matches, ret)
 
     def _get_signature_text(self,script):

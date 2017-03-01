@@ -9,7 +9,7 @@ register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
                    events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-                   cm_refresh_patterns=[r'[0-9a-zA-Z_#]{4,}$'],
+                   cm_refresh_patterns=[r'([\w#]{4,})$'],
                    detach=1)
 
 import os
@@ -24,8 +24,8 @@ class Source:
         self._nvim = nvim
         self._words = set()
 
-        self._split_pattern = r'[^0-9a-zA-Z_#]+'
-        self._kw_pattern = r'[0-9a-zA-Z_#]'
+        self._split_pattern = r'[^\w#]+'
+        self._kw_pattern = r'[\w#]'
 
         self._last_ctx = None
 
@@ -64,16 +64,9 @@ class Source:
 
     def cm_refresh(self,info,ctx):
 
-        lnum = ctx['lnum']
-        col = ctx['col']
-        typed = ctx['typed']
-        
-        kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
-        startcol = col-len(kw)
-
         matches = (dict(word=word,icase=1)  for word in self._words)
-        matches = get_matcher(self._nvim).process(info['name'], ctx, startcol, matches)
+        matches = get_matcher(self._nvim).process(info['name'], ctx, ctx['startcol'], matches)
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+        self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
 

@@ -275,7 +275,7 @@ class CoreHandler:
                         logger.debug('cached for <%s>, no need to refresh', name)
                         continue
 
-                    if not self._check_refresh_patterns(ctx['typed'],info):
+                    if not self._check_refresh_patterns(ctx,info):
                         continue
 
                     if 'cm_refresh' in info:
@@ -305,14 +305,23 @@ class CoreHandler:
             self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
     # check patterns for dict, if non dict, return True
-    def _check_refresh_patterns(self,typed,opt):
+    def _check_refresh_patterns(self,ctx,opt):
         if type(opt)!=type({}):
             return True
         patterns = opt.get('cm_refresh_patterns',None)
         if not patterns:
+            # no patterns means the soruce matches all patterns
             return True
+        typed = ctx['typed']
         for pattern in patterns:
-            if re.search(pattern,typed):
+            matched = re.search(pattern,typed)
+            if matched:
+                groups = matched.groups()
+                if groups and matched.end(len(groups))==len(typed):
+                    # last group at the end, calculate startcol for it
+                    ctx['startcol'] = ctx['col'] - len(groups[-1])
+                    ctx['base'] = groups[-1]
+                    pass
                 return True
         return False
 

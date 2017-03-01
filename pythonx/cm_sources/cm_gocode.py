@@ -3,15 +3,16 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import get_src, register_source
+from cm import get_src, register_source, get_pos, getLogger
 
 # detach=1 for exit vim quickly
 register_source(name='cm-gocode',
-                   priority=9,
-                   abbreviation='Go',
-                   scoping=True,
-                   scopes=['go'],
-                   detach=1)
+                priority=9,
+                abbreviation='Go',
+                scoping=True,
+                scopes=['go'],
+                cm_refresh_patterns=[r'(\w{3,})$',r'\.(\w*)$'],
+                detach=1)
 
 import os
 import re
@@ -23,7 +24,7 @@ import logging
 from urllib import request
 import json
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class Source:
@@ -34,42 +35,21 @@ class Source:
 
     def cm_refresh(self,info,ctx,*args):
 
-        lnum = ctx['lnum']
-        col = ctx['col']
-        typed = ctx['typed']
-
-        kwtyped = re.search(r'[0-9a-zA-Z_]*?$',typed).group(0)
-        startcol = col-len(kwtyped)
-
         src = get_src(self._nvim,ctx)
+        # convert lnum, col to offset
+        offset = get_pos(ctx['lnum'],ctx['col'],src)
 
-        # completion pattern
-        if (re.search(r'[\w_]{2,}$',typed)
-            or re.search(r'\.[\w_]*$',typed)
-            ):
-            pass
-        else:
-            return
+        # invoke gocode
+        proc = subprocess.Popen(args=['gocode','-f','json','autocomplete','%s' % offset], 
+                                stdin=subprocess.PIPE, 
+                                stdout=subprocess.PIPE, 
+                                stderr=subprocess.DEVNULL)
 
-        # compute offset
-        offset = 0
-        for i,line in enumerate(src.split("\n")):
-            if i+1==lnum:
-                offset += col-1
-                break
-            else:
-                # 1 for \n character
-                offset += len(line)+1
-        # offset = self._nvim.eval('line2byte(line("."))-1+col(".")-1')
-
-        logger.info('src[%s] offset [%s] lnum[%s] col[%s]', src, offset, lnum, col)
-
-        proc = subprocess.Popen(args=['gocode','-f','json','autocomplete','%s' % offset], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         result, errs = proc.communicate(src.encode('utf-8'),timeout=30)
         # result: [1, [{"class": "func", "name": "Print", "type": "func(a ...interface{}) (n int, err error)"}, ...]]
         result = json.loads(result.decode('utf-8')) 
+        logger.info("result %s", result)
         completions = result[1]
-        logger.info('completions %s', completions)
 
         if not completions:
             return
@@ -87,6 +67,6 @@ class Source:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, startcol, matches)
+        ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
         logger.info('matches %s, ret %s', matches, ret)
 

@@ -10,7 +10,7 @@ register_source(name='cm-tmux',
                    abbreviation='Tmux',
                    priority=4,
                    enable= 'TMUX' in os.environ,
-                   cm_refresh_patterns=[r'[0-9a-zA-Z_#]{3,}$'],
+                   cm_refresh_patterns=[r'(\w{4,})$'],
                    events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],
                    detach=1)
 
@@ -29,8 +29,8 @@ class Source:
 
         self._words = set()
 
-        self._split_pattern = r'[^0-9a-zA-Z_]+'
-        self._kw_pattern = r'[0-9a-zA-Z_]'
+        self._split_pattern = r'[^\w]+'
+        self._kw_pattern = r'\w'
 
         self.refresh_keyword()
 
@@ -80,12 +80,7 @@ class Source:
 
     def cm_refresh(self,info,ctx):
 
-        lnum = ctx['lnum']
-        col = ctx['col']
-        typed = ctx['typed']
- 
-        kw = re.search(self._kw_pattern+r'*?$',typed).group(0)
-        startcol = col-len(kw)
+        startcol = ctx['startcol']
 
         matches = (dict(word=word,icase=1)  for word in self._words)
         matches = get_matcher(self._nvim).process(info['name'], ctx, startcol, matches)
