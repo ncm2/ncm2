@@ -49,7 +49,9 @@ class CoreHandler:
         self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
 
-        self._default_word_pattern = r'\w+'
+        # https://github.com/roxma/nvim-completion-manager/issues/30#issuecomment-283281158
+        # catches numbers (including floating numbers) in the first group, and alphanum in the second
+        self._default_word_pattern = r'((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+))'
 
         scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
@@ -295,8 +297,9 @@ class CoreHandler:
                         if not m:
                             logger.debug('word patterns match failed for <%s>, no need to refresh', name)
                             continue
-                        ctx['startcol'] = ctx['col'] - len(m.string)
-                        ctx['base'] = m.string
+                        span = m.span()
+                        ctx['base'] = typed[span[0]:span[1]]
+                        ctx['startcol'] = ctx['col'] - len(ctx['base'])
 
                     if 'cm_refresh' in info:
                         # check patterns when necessary
