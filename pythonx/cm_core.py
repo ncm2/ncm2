@@ -49,9 +49,7 @@ class CoreHandler:
         self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
 
-        # https://github.com/roxma/nvim-completion-manager/issues/30#issuecomment-283281158
-        # catches numbers (including floating numbers) in the first group, and alphanum in the second
-        self._default_word_pattern = r'((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+))'
+        self._default_word_pattern = nvim.vars['cm_default_word_pattern']
 
         scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
@@ -285,7 +283,8 @@ class CoreHandler:
                         logger.debug('cached for <%s>, no need to refresh', name)
                         continue
 
-                    if not self._check_refresh_patterns(ctx,info) and not force:
+                    is_matched = self._check_refresh_patterns(ctx,info)
+                    if not is_matched and not force:
                         logger.debug('check patterns failed for <%s>, no need to refresh', name)
                         continue
 
@@ -294,12 +293,19 @@ class CoreHandler:
                         # TODO: configurable default word pattern
                         word_pattern = info.get('default_word_pattern', self._default_word_pattern)
                         m = re.search(word_pattern + "$",ctx['typed'])
-                        if not m:
-                            logger.debug('word patterns match failed for <%s>, no need to refresh', name)
+                        if m:
+                            span = m.span()
+                            ctx['base'] = ctx['typed'][span[0]:span[1]]
+                            ctx['startcol'] = ctx['col'] - len(ctx['base'])
+                        elif is_matched:
+                            # this is a source specific match, keep going with empty base
+                            ctx['base'] = ''
+                            ctx['startcol'] = ctx['col']
+                        else:
+                            # force==1, is_matched == False, word pattern match == False, skip this one
+                            logger.debug('force==1, is_matched == False, word pattern match == False, cm_refresh skip <%s>', name)
                             continue
-                        span = m.span()
-                        ctx['base'] = ctx['typed'][span[0]:span[1]]
-                        ctx['startcol'] = ctx['col'] - len(ctx['base'])
+
 
                     if 'cm_refresh' in info:
                         # check patterns when necessary

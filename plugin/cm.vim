@@ -45,6 +45,9 @@ let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 " used to override default options of sources
 let g:cm_sources_override = get(g:,'cm_sources_override',{})
 
+" https://github.com/roxma/nvim-completion-manager/issues/30#issuecomment-283281158
+" catches numbers (including floating numbers) in the first group, and alphanum in the second
+let g:cm_default_word_pattern = get(g:,'cm_default_word_pattern','((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\''\"\,\.\<\>\/\?\s]+))')
 
 " use did_plugin_ultisnips to detect the installation of ultisnips
 " https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
@@ -63,7 +66,7 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'scoping': 1,
 		\ 'scopes': ['css','scss'],
 		\ 'abbreviation': 'css',
-		\ 'cm_refresh_patterns':['\w{3,}$',':\s+(\w*)$'],
+		\ 'cm_refresh_patterns':['\w{3,}$',':\s+\w*$'],
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 
