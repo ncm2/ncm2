@@ -298,7 +298,7 @@ class CoreHandler:
                             logger.debug('word patterns match failed for <%s>, no need to refresh', name)
                             continue
                         span = m.span()
-                        ctx['base'] = typed[span[0]:span[1]]
+                        ctx['base'] = ctx['typed'][span[0]:span[1]]
                         ctx['startcol'] = ctx['col'] - len(ctx['base'])
 
                     if 'cm_refresh' in info:
