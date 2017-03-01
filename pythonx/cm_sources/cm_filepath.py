@@ -55,8 +55,6 @@ class Source:
         dir = os.path.dirname(pkw)
         dir = os.path.expandvars(dir)
         dir = os.path.expanduser(dir)
-        if dir=='' and len(nkw)<2:
-            return
 
         # full path of current file, current working dir
         cwd = self._nvim.call('getcwd')
