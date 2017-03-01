@@ -18,6 +18,9 @@ inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 inoremap <silent> <Plug>(cm_omnifunc) <c-x><c-o>
 
+" Show the popup menu, reguardless of the matching of cm_refresh_pattern
+inoremap <silent> <Plug>(cm_force_refresh) <C-r>=cm#_force_refresh()<CR>
+
 
 let s:rpcnotify = 'rpcnotify'
 let s:jobstart = 'jobstart'
@@ -336,6 +339,12 @@ func! cm#_complete()
 	return ''
 endfunc
 
+func! cm#_force_refresh()
+	" force=1
+	call s:notify_core_channel('cm_refresh',g:_cm_sources,cm#context(),1)
+	return ''
+endfunc
+
 " cm core channel functions
 " {
 
@@ -426,7 +435,7 @@ func! s:on_changed()
 
 	let l:ctx = cm#context()
 
-	call s:notify_core_channel('cm_refresh',g:_cm_sources,l:ctx)
+	call s:notify_core_channel('cm_refresh',g:_cm_sources,l:ctx,0)
 
 	" TODO
 	" detect popup item selected event then notify sources

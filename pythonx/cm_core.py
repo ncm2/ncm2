@@ -49,6 +49,7 @@ class CoreHandler:
         self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
 
+        self._default_word_pattern = r'\w+'
 
         scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
@@ -206,14 +207,20 @@ class CoreHandler:
             self._refresh_completions(ctx)
             self._has_popped_up = True
 
-    # The completion core itself
-    def cm_refresh(self,srcs,root_ctx,*args):
+    def cm_refresh(self,srcs,root_ctx,force=0,*args):
+
+        if force:
+            # if this is forcing refresh, clear the cached variable to avoid
+            # being filtered by the self._complete function
+            self._last_matches = []
+            self._last_startcol = 0
 
         # update file server
         self._ctx = root_ctx
 
         # initial scope
         root_ctx['scope'] = root_ctx['filetype']
+        root_ctx['force'] = force
 
         self._sources = srcs
         self._has_popped_up = False
@@ -256,8 +263,9 @@ class CoreHandler:
         refreshes_channels = []
 
         # get the sources that need to be notified
-        for ctx in ctx_lists:
+        for ctx_item in ctx_lists:
             for name in srcs:
+                ctx = copy.deepcopy(ctx_item)
 
                 info = srcs[name]
                 if not info['enable']:
@@ -270,13 +278,25 @@ class CoreHandler:
                         logger.debug('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
                         continue
 
-                    if (name in self._matches) and not self._matches[name]['refresh']:
+                    if (name in self._matches) and not self._matches[name]['refresh'] and not force:
                         # no need to refresh
                         logger.debug('cached for <%s>, no need to refresh', name)
                         continue
 
-                    if not self._check_refresh_patterns(ctx,info):
+                    if not self._check_refresh_patterns(ctx,info) and not force:
+                        logger.debug('check patterns failed for <%s>, no need to refresh', name)
                         continue
+
+                    if 'startcol' not in ctx:
+                        # default word pattern
+                        # TODO: configurable default word pattern
+                        word_pattern = info.get('default_word_pattern', self._default_word_pattern)
+                        m = re.search(word_pattern + "$",ctx['typed'])
+                        if not m:
+                            logger.debug('word patterns match failed for <%s>, no need to refresh', name)
+                            continue
+                        ctx['startcol'] = ctx['col'] - len(m.string)
+                        ctx['base'] = m.string
 
                     if 'cm_refresh' in info:
                         # check patterns when necessary
@@ -301,7 +321,7 @@ class CoreHandler:
             self._has_popped_up = True
         else:
             logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
-            logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', refreshes_calls, refreshes_channels, root_ctx)
+            logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
             self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
     # check patterns for dict, if non dict, return True
