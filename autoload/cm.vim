@@ -78,14 +78,18 @@ func! cm#enable_for_buffer()
 		autocmd! * <buffer>
 		autocmd InsertEnter <buffer> call s:notify_core_channel('cm_insert_enter')
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave')
-		autocmd InsertEnter <buffer> call s:change_tick_start()
+		if g:cm_auto_popup
+			autocmd InsertEnter <buffer>  call s:change_tick_start()
+		endif
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 		autocmd BufEnter    <buffer> set completeopt=menu,menuone,noinsert,noselect
 		" working together with timer, the timer is for detecting changes
 		" popup menu is visible. TextChangedI will not be triggered when popup
 		" menu is visible, but TextChangedI is more efficient and faster than
 		" timer when popup menu is not visible.
-		autocmd TextChangedI <buffer> call s:check_changes()
+		if g:cm_auto_popup
+			autocmd TextChangedI <buffer> call s:check_changes()
+		endif
 	augroup END
 
 	call s:start_core_channel()

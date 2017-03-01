@@ -188,6 +188,13 @@ g:cm_completekeys
 				`"\<Plug>(cm_omnifunc)"`.
 			`"\<Plug>(cm_omnifunc)"`
 
+						*g:cm_auto_popup*
+g:cm_auto_popup
+			If set to 0, then you have to map the
+			`<Plug>(cm_force_refresh)` key, and use this key to
+			trigger the popup menu.
+			Default: 1
+
 ==============================================================================
 5. API						*NCM-API*
 

@@ -29,6 +29,7 @@ if !exists('g:cm_completekeys')
 	endif
 endif
 
+let g:cm_auto_popup = get(g:,'cm_auto_popup',1)
 
 " Wait for an interval before popping up, in milliseconds, this would reduce
 " the popup menu flickering when multiple sources are updating the popup menu
