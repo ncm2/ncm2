@@ -11,8 +11,8 @@ register_source(name='cm-jedi',
                 abbreviation='Py',
                 scoping=True,
                 scopes=['python'],
-                # The last two patterns is for displaying function signatures [r'\(\s?',r',\s?']
-                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$', r'(\w{3,})$',r'\.(\w*)$',r'\(\s?',r',\s?'],
+                # The last two patterns is for displaying function signatures [r'\(\s?(\w*)$',r',(\s?\w*)$']
+                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$', r'(\w{3,})$',r'\.(\w*)$',r'\(\s?(\w*)$',r',(\s?\w*)$'],
                 detach=0)
 
 import os
@@ -32,6 +32,7 @@ class Source:
     def cm_refresh(self,info,ctx,*args):
 
         path = ctx['filepath']
+        typed = ctx['typed']
 
         src = get_src(self._nvim,ctx)
         if not src.strip():
@@ -42,9 +43,7 @@ class Source:
         # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
         script = jedi.Script(src, ctx['lnum'], len(ctx['typed']), path)
 
-        # if the framework doesn't pass the startcol, it means the pattern for
-        # displaying call signature has matched
-        if not ctx.get('startcol',None):
+        if re.search(r'^(?!from|import).*?[\(\,]\s*$', typed):
             # try show the call signature
             signature_text = self._get_signature_text(script)
             if signature_text:
