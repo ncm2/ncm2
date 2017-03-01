@@ -163,10 +163,10 @@ inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ult
 " can handle this feature properly.
 au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'priority': 9, 
-		\ 'scopes': ['css'],
 		\ 'scoping': 1,
+		\ 'scopes': ['css','scss'],
 		\ 'abbreviation': 'css',
-		\ 'cm_refresh_patterns':['\w{2,}$',':\s+\w*$'],
+		\ 'cm_refresh_patterns':['\w{3,}$',':\s+(\w*)$'],
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 ```
