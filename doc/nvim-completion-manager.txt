@@ -222,6 +222,12 @@ cm#register_source({source})
 			purpose completion source, like keyword from buffer,
 			it will be activated for all buffers. 
 			See |NCM-scoping| for more information.
+	default_word_pattern			*NCM-default_word_pattern*
+			The default pattern used to calculating startcol.
+			Defaults to  >
+ r'((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+))'
+<
+			See |NCM-startcol| for more information.
 
 						*cm_refresh_patterns*
 	cm_refresh_patterns			*NCM-cm_refresh_patterns*
@@ -331,22 +337,28 @@ cm#context()
 
 	scope		
 			Current editting scope. See |NCM-scoping|
-	startcol	
+
+	startcol				*NCM-startcol*
 			If the pattern matched in |cm_refresh_patterns| has
 			regex group, and the end of last group is the end of
 			|cm#context().typed|, NCM will set this field to the
-			first character of the group. For example: >
+			first character of the group. 
+
+			For example: >
 				cm_refresh_patterns=["\w{3,}$"]
 <			With the typed characters as: >
 				^foo barfoo| hello$
 <			Then startcol will be 5, which is the column number of
 			the "b" character.
-	base		
-			This field is available if startcol is present. The
-			value is the same as the {base} passed to
-			|complete-functions|. In previous example, this field
-			will be "barfoo".
-	
+
+			If the pattern doesn't have regex group,
+			|NCM-default_word_pattern| will be used to determine
+			startcol.
+	base
+			Set according to the startcol. The value is the same
+			as the {base} passed to |complete-functions|. In
+			previous example, this field will be "barfoo".
+
 	Other undocumented fields are necessary for the framework, a
 	completion source should not change these values.
 
