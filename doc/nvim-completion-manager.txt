@@ -300,11 +300,12 @@ cm#context()
 	the following fields:
 
 	bufnr		
-			Current buffer number.
+			Current buffer number. Same result as `bufnr('%')`.
 	lnum		
-			Current cursor line number.
+			Current cursor line number. Same result as
+			`line('.')`.
 	col		
-			Current cursor column.
+			Current cursor column. Same result as `col('.')`.
 	filetype	
 			Equivalent to the value of |filetype| of the buffer.
 	typed					*cm#context().typed*
@@ -315,6 +316,12 @@ cm#context()
 			indicates cursor position. This field should be: >
 			"foo bar"
 <
+			Note: In python, the value of `len(context["typed"])`
+			may be different from the value of `context["col"]-1`.
+			As specified by to |col()| function, the column number
+			is the by index of the column position. This only
+			matters if you're dealing with non English Unicode
+			characters.
 	filepath	
 			The path of current editting file. Equivalent to
 			`expand('%:p')` 
