@@ -122,9 +122,12 @@ func! cm#context()
 	let l:ret['lnum'] = l:ret['curpos'][1]
 	let l:ret['col'] = l:ret['curpos'][2]
 	let l:ret['filetype'] = &filetype
-	" string is necessary here, otherwise empty filepath is somehow converted
-	" to None in vim's python binding.
-	let l:ret['filepath'] = string(expand('%:p'))
+	let l:ret['filepath'] = expand('%:p')
+	if l:ret['filepath'] == ''
+		" this is necessary here, otherwise empty filepath is somehow
+		" converted to None in vim's python binding.
+		let l:ret['filepath'] = ""
+	endif
 	let l:ret['typed'] = strpart(getline(l:ret['lnum']),0,l:ret['col']-1)
 	return l:ret
 endfunc
