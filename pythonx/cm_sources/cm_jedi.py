@@ -3,7 +3,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import get_src, register_source
+from cm import get_src, register_source, getLogger
 register_source(name='cm-jedi',
                 priority=9,
                 abbreviation='Py',
@@ -18,7 +18,7 @@ import logging
 import jedi
 from neovim import attach, setup_logging
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 class Source:
 
@@ -36,6 +36,8 @@ class Source:
             # empty src may possibly block jedi execution, don't know why
             logger.info('ignore empty src [%s]', src)
             return
+
+        logger.info('context [%s]', ctx)
 
         # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
         script = jedi.Script(src, ctx['lnum'], len(ctx['typed']), path)
