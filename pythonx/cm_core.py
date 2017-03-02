@@ -490,6 +490,7 @@ class CoreHandler:
                 e['word'] = item
             else:
                 e = copy.deepcopy(item)
+            e['icase'] = 1
             formalized.append(e)
 
         # filtering and sorting
