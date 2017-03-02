@@ -38,6 +38,10 @@ class Source:
         compiled = re.compile(info['word_pattern'])
 
         typed = ctx['typed']
+        if typed.strip()=='' and not force:
+            # At the beginning of the line, need force to trigger the popup,
+            # Otherwise this will be annoying.
+            return
         try:
             # fetch the previous line for better sorting
             last_line = self._nvim.current.buffer[ctx['lnum']-2]
