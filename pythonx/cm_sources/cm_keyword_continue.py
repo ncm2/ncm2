@@ -102,7 +102,7 @@ class Source:
                 for word,span,line,last_line in word_generator():
                     if tmp_prev_word==prev_word:
                         hint = line[span[1]:]
-                        matched = re.compile('\s*(\S+\s+)*').search(hint,0,50)
+                        matched = re.compile('\s*(\S+(\s+|$))*').search(hint,0,50)
                         logger.info('hint: [%s]', hint)
                         if matched:
                             hint = matched.group()
