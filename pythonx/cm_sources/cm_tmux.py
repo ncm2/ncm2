@@ -81,7 +81,7 @@ class Source:
         startcol = ctx['startcol']
 
         matches = (dict(word=word,icase=1)  for word in self._words)
-        matches = get_matcher(self._nvim).process(info['name'], ctx, startcol, matches)
+        matches = get_matcher(self._nvim).process(info, ctx, startcol, matches)
 
         # cm#complete(src, context, startcol, matches)
         self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)

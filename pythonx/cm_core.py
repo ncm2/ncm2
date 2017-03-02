@@ -479,7 +479,8 @@ class CoreHandler:
 
     def process_matches(self,name,ctx,startcol,matches):
 
-        abbr = self._sources[name].get('abbreviation','')
+        info = self._sources[name]
+        abbr = info.get('abbreviation','')
 
         # formalize datastructure
         formalized = []
@@ -492,7 +493,7 @@ class CoreHandler:
             formalized.append(e)
 
         # filtering and sorting
-        result = cm.get_matcher(self._nvim).process(name,ctx,startcol,formalized)
+        result = cm.get_matcher(self._nvim).process(info,ctx,startcol,formalized)
 
         # fix some text
         for e in result:

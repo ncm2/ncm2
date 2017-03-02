@@ -6,7 +6,7 @@ class Matcher(object):
     def __init__(self,nvim,chcmp,*args):
         self._chcmp = chcmp
 
-    def process(self,name,ctx,startcol,matches):
+    def process(self,info,ctx,startcol,matches):
 
         # fix for chinese characters
         # `你好 abcd|` 
@@ -20,9 +20,10 @@ class Matcher(object):
 
         ret = [m for m in matches if self._match(base,m)]
 
-        # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
-        # sorting before 'A'
-        ret.sort(key=lambda e: e['word'].swapcase())
+        if info['sort']:
+            # in python, 'A' sort's before 'a', we need to swapcase for the 'a'
+            # sorting before 'A'
+            ret.sort(key=lambda e: e['word'].swapcase())
 
         return ret
 

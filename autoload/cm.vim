@@ -197,6 +197,9 @@ func! cm#register_source(info)
 		endif
 	endif
 
+	" wether or not use the framework's standard sorting
+	let a:info['sort'] = get(a:info,'sort',1)
+
 	let g:_cm_sources[l:name] = a:info
 
 	" check and start channels

@@ -6,7 +6,7 @@ class Matcher(object):
     def __init__(self,nvim,chcmp,*args):
         self._chcmp = chcmp
 
-    def process(self,name,ctx,startcol,matches):
+    def process(self,info,ctx,startcol,matches):
 
         # fix for chinese characters
         # `你好 abcd|` 
@@ -26,8 +26,9 @@ class Matcher(object):
                 continue
             tmp.append((item,score))
 
-        # sort by score, the smaller the better
-        tmp.sort(key=lambda e: e[1])
+        if info['sort']:
+            # sort by score, the smaller the better
+            tmp.sort(key=lambda e: e[1])
 
         return [e[0] for e in tmp]
 
