@@ -402,6 +402,15 @@ cm#context()
 			as the {base} passed to |complete-functions|. In
 			previous example, this field will be "barfoo".
 
+	force		
+			Non-zero value if this notification is triggered by
+			`<Plug>(cm_force_refresh)`.
+	
+	early_cache
+			Non-zero value if this notification is triggered by
+			early caching, the popup menu will no be updated for
+			early caching.
+
 	Other undocumented fields are necessary for the framework, a
 	completion source should not change these values.
 

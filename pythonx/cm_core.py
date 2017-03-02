@@ -193,7 +193,7 @@ class CoreHandler:
                 self._matches[name]['refresh'] = refresh
                 self._matches[name]['matches'] = matches
                 self._matches[name]['context'] = ctx
-                self._matches[name]['enable'] = not ctx.get('is_early_cache',False)
+                self._matches[name]['enable'] = not ctx.get('early_cache',False)
 
         # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
@@ -273,8 +273,8 @@ class CoreHandler:
         for ctx_item in ctx_lists:
             for name in srcs:
                 ctx = copy.deepcopy(ctx_item)
-                ctx['is_early_cache'] = False
-                ctx['is_force'] = force
+                ctx['early_cache'] = False
+                ctx['force'] = force
 
                 info = srcs[name]
                 if not info['enable']:
@@ -293,7 +293,7 @@ class CoreHandler:
                     if not is_matched and not force and not self._check_refresh_patterns(info,ctx,force):
                         if not force and self._check_refresh_patterns(info,ctx,True):
                             # early cache
-                            ctx['is_early_cache'] = True
+                            ctx['early_cache'] = True
                         else:
                             logger.debug('check patterns failed for <%s>, no need to refresh', name)
                             continue
@@ -301,7 +301,7 @@ class CoreHandler:
                     if is_matched:
                         # match the triggering
                         if name in self._matches:
-                            # enable previous is_early_cache, if available
+                            # enable previous early_cache, if available
                             self._matches[name]['enable'] = True
 
                     if (name in self._matches) and not self._matches[name]['refresh'] and not force and self._matches[name]['startcol']==ctx['startcol']:
@@ -423,7 +423,7 @@ class CoreHandler:
 
                 self._matches[name]['last_matches'] = []
 
-                # may be disabled due to is_early_cache
+                # may be disabled due to early_cache
                 if not self._matches[name].get('enable',True):
                     continue
 
