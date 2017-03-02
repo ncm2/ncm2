@@ -247,8 +247,17 @@ cm#register_source({source})
 			sources. A higher value indicates that the completion
 			item of this source sorts before sources with lower
 			priority value.  
+						*NCM-priority-values*
+			Recommended priority definitions: 
+			2	keyword from the otherfiles, from user's
+				openning browsers, etc.
+			4	keyword from openning buffers
+			5	keyword from current buffer
+			6	file path
+			7	snippet hint
+			8	language specific keyword, but not smart
+			9	smart programming language aware completion
 
-			see |NCM-priority-values| for recommended values.
 
 	scopes					*NCM-scopes*
 			A |List| of scope. The source will be activated when
@@ -294,17 +303,13 @@ cm#register_source({source})
 			source.
 
 			Default: |g:cm_refresh_default_min_word_len|
-
-						*NCM-priority-values*
-	Recommended priority definitions for |NCM-priority|: 
-	2		keyword from the otherfiles, from user's openning
-			browsers, etc
-	4		keyword from openning buffers
-	5		keyword from current buffer
-	6		file path
-	7		snippet hint
-	8		language specific keyword, but not smart
-	9		smart programming language aware completion
+	
+						*NCM-source-options*
+	options					*NCM-options*
+			This field is ignored by NCM framework, but it will be
+			passed to the source handler when handling
+			|cm_refresh-notification|, it is recommended to use
+			this field to store source specific options.
 
 						*cm#complete()*
 cm#complete({name}, {context}, {startcol}, {matches}[, {refresh}])
