@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# For debugging
+# For debugging, use this command to start neovim:
+#
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
-
+#
+#
+# Please register source before executing any other code, this allow cm_core to
+# read basic information about the source without loading the whole module, and
+# modules required by this module
 from cm import get_src, register_source, get_pos, getLogger
 
-# detach=1 for exit vim quickly
 register_source(name='cm-gocode',
                 priority=9,
                 abbreviation='Go',
@@ -34,7 +38,14 @@ class Source:
 
     def cm_refresh(self,info,ctx,*args):
 
+        # Note:
+        # 
+        # If you'r implementing you own source, and you want to get the content
+        # of the file, Please use `cm.get_src()` instead of
+        # `"\n".join(self._nvim.current.buffer[:])`
+
         src = get_src(self._nvim,ctx)
+
         # convert lnum, col to offset
         offset = get_pos(ctx['lnum'],ctx['col'],src)
 

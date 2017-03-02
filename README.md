@@ -110,8 +110,8 @@ pip3 --user install neovim jedi mistune psutil setproctitle
 ```
 
 (Optional) It's easier to use
-[python-support.nvim](/roxma/python-support.nvim) to help manage your pip
-modules for neovim:
+[python-support.nvim](https://github.com/roxma/python-support.nvim) to help
+manage your pip modules for neovim:
 
 ```vim
 Plug 'roxma/python-support.nvim'
@@ -197,9 +197,9 @@ let g:cm_sources_override = {
 - For really simple, light weight completion candidate calculation, or
   avoiding python, refer to
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
-- For really async completion source (strongly encoraged), refer to the file
-  path completion example:
-  [pythonx/cm_sources/cm_filepath.py](pythonx/cm_sources/cm_filepath.py)
+- For really async completion source (strongly encoraged), refer to the gocode
+  completion:
+  [pythonx/cm_sources/cm_gocode.py](pythonx/cm_sources/cm_gocode.py)
 
 Please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
@@ -241,12 +241,11 @@ parallel.
 ### Scoping
 
 I write markdown files with code blocks quite often, so I've also implemented
-[language specific completion for markdown
-file](#language-specific-completion-for-markdown). This is a framework
-feature, which is called scoping. It should work for any markdown code block
-whose language completion source is avaible to NCM. I've also added support
-for javascript completion in script tag of html files, and css completion in
-style tag.
+language specific completion for markdown file. This is a framework feature,
+which is called scoping. It should work for any markdown code block whose
+language completion source is avaible to NCM. I've also added support for
+javascript completion in script tag of html files, and css completion in style
+tag.
 
 The idea was originated in
 [vim-syntax-compl-pop](https://github.com/roxma/vim-syntax-compl-pop). Since

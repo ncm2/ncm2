@@ -39,29 +39,9 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 	" doing the whole bunch of work in the same cm_refresh handler. Otherwise
 	" it will block neovim's ui, since vimscript is single-threaded.
 	"
-	" The `a:opt` here tells the manager to identify the source. You may also
-	" use `a:opt['name']` or simply `'cm-ultisnips'` as the name of the
-	" source.
+	" Read more information on `:help cm#complete()`
 	"
-	"     cm#complete('cm-ultisnips', a:ctx, l:startcol, l:matches)
-	"
-	" The `a:ctx` tells completion manager which cm_refresh request you are
-	" responding to. If the user type more words before you call cm#complete,
-	" the manager will ignore this call since `a:ctx` is outdated.  And the
-	" manager will send a new cm_refresh request to the handler.
-	"
-	" If the list it not complete, further typing results in recomputing this
-	" list, you should append an extra `1` as the 5-th parameter. Then the
-	" manager will not cache the result, and send a new cm_refresh request for
-	" futher typing.
-	"
-	"     cm#complete(a:opt, a:ctx, l:startcol, l:matches, 1)
-	"
-	" For more information on `startcol` and `matches`, please refer to `:help
-	" complete()`. They are used in the same way as vim's
-	" `complete({startcol}, {matches})` function.
-	"
-	call cm#complete(a:opt, a:ctx, a:ctx['startcol'], l:matches)
+	call cm#complete(a:opt['name'], a:ctx, a:ctx['startcol'], l:matches)
 
 endfunc
 

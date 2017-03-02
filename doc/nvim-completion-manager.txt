@@ -475,12 +475,11 @@ IMHO, NCM is potentially faster because all completion sources run in parallel.
 6.2 Scoping					*NCM-scoping*
 
 I write markdown files with code blocks quite often, so I've also implemented
-[language specific completion for markdown
-file](#language-specific-completion-for-markdown). This is a framework
-feature, which is called scoping. It should work for any markdown code block
-whose language completion source is avaible to NCM. I've also added support
-for javascript completion in script tag of html files, and css completion in
-style tag.
+language specific completion for markdown file. This is a framework feature,
+which is called scoping. It should work for any markdown code block whose
+language completion source is avaible to NCM. I've also added support for
+javascript completion in script tag of html files, and css completion in style
+tag.
 
 The idea was originated in
 [vim-syntax-compl-pop](https://github.com/roxma/vim-syntax-compl-pop). Since
@@ -504,6 +503,9 @@ better option rather than a timer or the limited `TextChangedI`.
 
 This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
 typed.
+
+For more complete example, you mignt need to read the source code of
+autoload/cm/sources/ultisnips.vim of this plugin.
 
 Note: The `au User CmSetup` sould be place into your vimrc or the 'rtp'/plugin
 directory in order to register the autocmd before |NCM| started.
@@ -531,7 +533,7 @@ This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
 typed.
 
 For more complete example, you mignt need to read the source code of
-pythonx/cm_sources/cm_filepath.py of this plugin.
+pythonx/cm_sources/cm_gocode.py of this plugin.
 
 Note: This file foo.py should be placed into 'rtp'/pythonx/cm_sources/
 directory.

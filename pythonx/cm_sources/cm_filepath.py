@@ -41,12 +41,6 @@ class Source:
         typed = ctx['typed']
         filepath = ctx['filepath']
 
-        # Note:
-        # 
-        # If you'r implementing you own source, and you want to get the content
-        # of the file, Please use `cm.get_src()` instead of
-        # `"\n".join(self._nvim.current.buffer[:])`
- 
         pkw = re.search(self._path_kw_pattern+r'*?$',typed).group(0)
         nkw = re.search(self._name_kw_pattern+r'*?$',typed).group(0)
         startcol = col-len(nkw)
