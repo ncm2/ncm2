@@ -197,13 +197,26 @@ g:cm_auto_popup
 
 						*g:cm_default_word_pattern*
 g:cm_default_word_pattern		
+			The default value for |NCM-word_pattern|.
+
 			Default: >
  '((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\''\"\,\.\<\>\/\?\s]+))'
 <
 						*g:cm_refresh_default_min_word_len*
 g:cm_refresh_default_min_word_len
-			Format: [ [ min priority, min length ], ... ]		
+			The default value for |cm_refresh_min_word_len|.
+
 			Default: `[[1,4],[7,3]]`
+			Format: a |List| as [[ min priority, min len ],...],
+			or single integer value.
+
+			The default value means that sources with priority
+			between 1 and 6 will have the value of 4, and sources
+			with priority >= 7 will have the value of 3.  
+
+			Priority >= 7 is more semantic completion source, So
+			it's better to use a smaller value to trigger the
+			popup than others.
 
 ==============================================================================
 5. API						*NCM-API*
