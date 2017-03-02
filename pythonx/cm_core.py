@@ -121,7 +121,10 @@ class CoreHandler:
 
         self._ctx = None
 
-    def _is_kw_futher_typing(self,oldctx,curctx):
+    def _is_kw_futher_typing(self,info,oldctx,curctx):
+
+        # is_matched = self._check_refresh_patterns(info,ctx,force)
+
         old_typed = oldctx['typed']
         cur_typed = curctx['typed']
 
@@ -131,13 +134,16 @@ class CoreHandler:
         if cur_len < old_len:
             return False
 
-        if cur_typed[0:old_len] != old_typed:
+        tmp_ctx1 = copy.deepcopy(oldctx)
+        tmp_ctx2 = copy.deepcopy(curctx)
+
+        if not self._check_refresh_patterns(info,tmp_ctx1,True):
+            return False
+        if not self._check_refresh_patterns(info,tmp_ctx2,True):
             return False
 
-        if re.match(r'^[a-zA-Z0-9_]*$',cur_typed[old_len:]):
-            return True
-
-        return False
+        # startcol is set in self._check_refresh_patterns
+        return tmp_ctx1['startcol'] == tmp_ctx2['startcol']
 
     def cm_complete(self,srcs,name,ctx,startcol,matches,refresh,outdated,current_ctx):
 
@@ -148,10 +154,12 @@ class CoreHandler:
             logger.error("invalid completion source name [%s]", name)
             return
 
+        info = srcs[name]
+
         # be careful when completion matches context is outdated
         if outdated:
             logger.info("[%s] outdated matches, old typed [%s] cur typed[%s]", name, ctx['typed'], current_ctx['typed'])
-            if refresh or not self._is_kw_futher_typing(ctx,current_ctx):
+            if refresh or not self._is_kw_futher_typing(info,ctx,current_ctx):
                 logger.info("[%s] matches is outdated. ignore them.", name)
                 return
             logger.info("[%s] matches is outdated by keyword futher typing. I'm gonna keep it.", name)
@@ -185,6 +193,8 @@ class CoreHandler:
                 self._matches[name]['startcol'] = startcol
                 self._matches[name]['refresh'] = refresh
                 self._matches[name]['matches'] = matches
+                self._matches[name]['context'] = ctx
+                self._matches[name]['enable'] = not ctx.get('is_early_cache',False)
 
         # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
@@ -264,6 +274,8 @@ class CoreHandler:
         for ctx_item in ctx_lists:
             for name in srcs:
                 ctx = copy.deepcopy(ctx_item)
+                ctx['is_early_cache'] = False
+                ctx['is_force'] = force
 
                 info = srcs[name]
                 if not info['enable']:
@@ -276,16 +288,26 @@ class CoreHandler:
                         logger.debug('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
                         continue
 
-                    if (name in self._matches) and not self._matches[name]['refresh'] and not force:
-                        # no need to refresh
-                        logger.debug('cached for <%s>, no need to refresh', name)
-                        continue
-
                     # check if enough to trigger cm_refresh
                     # if ok, set startcol for it
                     is_matched = self._check_refresh_patterns(info,ctx,force)
-                    if not is_matched:
-                        logger.debug('check patterns failed for <%s>, no need to refresh', name)
+                    if not is_matched and not force and not self._check_refresh_patterns(info,ctx,force):
+                        if not force and self._check_refresh_patterns(info,ctx,True):
+                            # early cache
+                            ctx['is_early_cache'] = True
+                        else:
+                            logger.debug('check patterns failed for <%s>, no need to refresh', name)
+                            continue
+
+                    if is_matched:
+                        # match the triggering
+                        if name in self._matches:
+                            # enable previous is_early_cache, if available
+                            self._matches[name]['enable'] = True
+
+                    if (name in self._matches) and not self._matches[name]['refresh'] and not force:
+                        # no need to refresh if it's already cached
+                        logger.debug('cached for <%s>, no need to refresh', name)
                         continue
 
                     if 'cm_refresh' in info:
@@ -314,7 +336,7 @@ class CoreHandler:
             logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
             self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
-    def _check_refresh_patterns(self,info,ctx,force):
+    def _check_refresh_patterns(self,info,ctx,force=False):
 
         patterns = info.get('cm_refresh_patterns',None)
         typed = ctx['typed']
@@ -402,6 +424,10 @@ class CoreHandler:
 
                 self._matches[name]['last_matches'] = []
 
+                # may be disabled due to is_early_cache
+                if not self._matches[name].get('enable',True):
+                    continue
+
                 source_startcol = self._matches[name]['startcol']
                 if source_startcol>col or source_startcol==0:
                     self._matches[name]['last_matches'] = []
@@ -424,7 +450,7 @@ class CoreHandler:
                 logger.exception('_refresh_completions process exception: %s', inst)
                 continue
 
-        # merge processing results of sources
+        # merge results of sources
         for name in names:
 
             try:
