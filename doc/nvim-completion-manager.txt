@@ -218,6 +218,12 @@ g:cm_refresh_default_min_word_len
 			it's better to use a smaller value to trigger the
 			popup than others.
 
+			By the way, There are users who tend to use longer
+			typing to trigger the popup to keep them from
+			distraction. In this case, I would recommend using the
+			`<Plug>(cm_force_refresh)` key to trigger popup
+			manually with short typing.
+
 ==============================================================================
 5. API						*NCM-API*
 
@@ -410,6 +416,13 @@ cm#enable_for_buffer()
 						*cm#disable_for_buffer()*
 cm#disable_for_buffer()
 	Disable |NCM| for current buffer.
+
+						*<Plug>(cm_force_refresh)*
+<Plug>(cm_force_refresh)
+			A key to trigger the popup manually. 
+
+			Disable |g:cm_auto_popup| to display popup only with
+			this key.
 
 ==============================================================================
 6. Why						*NCM-why*
