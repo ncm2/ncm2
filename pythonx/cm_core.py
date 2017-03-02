@@ -290,7 +290,7 @@ class CoreHandler:
                     # check if enough to trigger cm_refresh
                     # if ok, set startcol for it
                     is_matched = self._check_refresh_patterns(info,ctx,force)
-                    if not is_matched and not force and not self._check_refresh_patterns(info,ctx,force):
+                    if not is_matched:
                         if not force and self._check_refresh_patterns(info,ctx,True):
                             # early cache
                             ctx['early_cache'] = True
