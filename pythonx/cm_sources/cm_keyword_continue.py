@@ -125,9 +125,10 @@ class Source:
         if matches:
             # add rest_of_line completion for the highest rank
             e = copy.deepcopy(matches[0])
-            e['abbr'] = e['word'] + e['menu'] + '...'
+            # e['abbr'] = e['word'] + e['menu'] + '...'
+            e['abbr'] = '<the rest> '
+            e['menu'] = e['word'] + e['menu'] + '...'
             e['word'] = e['word'].rstrip() + e['_rest_of_line']
-            e['menu'] = ''
             matches.insert(1,e)
 
         if not force:
