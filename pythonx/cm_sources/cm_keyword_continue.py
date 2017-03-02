@@ -21,6 +21,7 @@ register_source(name='cm-keyword-continue',
                 cm_refresh_patterns=[r'\s+$',r'^$'],)
 
 import re
+import copy
 
 logger = getLogger(__name__)
 
@@ -105,20 +106,29 @@ class Source:
                 tmp_prev_word = ''
                 for word,span,line,last_line in word_generator():
                     if tmp_prev_word==prev_word:
-                        hint = line[span[1]:]
-                        matched = re.compile('\s*(\S+(\s+|$))*').search(hint,0,50)
+                        rest_of_line = line[span[1]:]
+                        hint = rest_of_line
+                        matched = re.compile('\s*(\S+(\s+|$))*').search(rest_of_line,0,50)
                         logger.info('hint: [%s]', hint)
                         if matched:
                             hint = matched.group()
                             logger.info('new hint: [%s]', hint)
                         hint = hint.strip()
-                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], menu=hint, _rank=get_rank(word,span,line,last_line)))
+                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], menu=hint, _rest_of_line=rest_of_line, _rank=get_rank(word,span,line,last_line)))
                     tmp_prev_word = word
             except Exception as ex:
                 logger.exception("Parsing buffer [%s] failed", buffer)
 
         # sort the result based on total match
         matches.sort(key=lambda e: e['_rank'], reverse=True)
+
+        if matches:
+            # add rest_of_line completion for the highest rank
+            e = copy.deepcopy(matches[0])
+            e['abbr'] = e['word'] + e['menu'] + '...'
+            e['word'] = e['word'].rstrip() + e['_rest_of_line']
+            e['menu'] = ''
+            matches.insert(1,e)
 
         if not force:
             # filter by ranking
