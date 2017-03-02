@@ -8,7 +8,7 @@
 # Please register source before executing any other code, this allow cm_core to
 # read basic information about the source without loading the whole module, and
 # modules required by this module
-from cm import get_src, register_source, get_pos, getLogger
+from cm import get_src, register_source, get_pos, getLogger, get_matcher
 
 # A completion source with CTRL-X CTRL-N like feature
 #
@@ -89,18 +89,29 @@ class Source:
                     break
             return ret
 
+        lnum = ctx['lnum']
+        bufnr = self._nvim.current.buffer.number
+
         for buffer in self._nvim.buffers:
 
+            this_bufnr = buffer.number
             def word_generator():
                 step = 200
                 line_cnt = len(buffer)
+                this_lnum = 1
                 for i in range(0,line_cnt,step):
                     lines = buffer[i:i+step]
                     last_line = ''
                     for line in lines:
-                        for word in re.finditer(compiled,line):
-                            yield word.group(),word.span(),line,last_line
-                        last_line = line
+                        try:
+                            if this_lnum==lnum and bufnr==this_bufnr:
+                                # pass current editting line
+                                continue
+                            for word in re.finditer(compiled,line):
+                                yield word.group(),word.span(),line,last_line
+                        finally:
+                            last_line = line
+                            this_lnum += 1
 
             try:
                 tmp_prev_word = ''
@@ -122,6 +133,14 @@ class Source:
         # sort the result based on total match
         matches.sort(key=lambda e: e['_rank'], reverse=True)
 
+        if not force:
+            # filter by ranking
+            matches = [e for e in matches if e['_rank']>=3 ]
+
+        # filter the result here, so that the result of line completion will be
+        # displayed properly
+        matches = get_matcher(self._nvim).process(info, ctx, ctx['startcol'], matches)
+
         if matches:
             # add rest_of_line completion for the highest rank
             e = copy.deepcopy(matches[0])
@@ -130,10 +149,6 @@ class Source:
             e['menu'] = e['word'] + e['menu'] + '...'
             e['word'] = e['_rest_of_line']
             matches.insert(1,e)
-
-        if not force:
-            # filter by ranking
-            matches = [e for e in matches if e['_rank']>=3 ]
 
         logger.info('matches %s', matches)
         ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
