@@ -18,7 +18,7 @@ register_source(name='cm-keyword-continue',
                 abbreviation='',
                 word_pattern=r'\S+',
                 sort=0,
-                cm_refresh_patterns=[r'\s+$'],)
+                cm_refresh_patterns=[r'\s+$',r'^$'],)
 
 import re
 
@@ -101,7 +101,14 @@ class Source:
                 tmp_prev_word = ''
                 for word,span,line,last_line in word_generator():
                     if tmp_prev_word==prev_word:
-                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], info=line[span[1]:], _rank=get_rank(word,span,line,last_line)))
+                        hint = line[span[1]:]
+                        matched = re.compile('\s*(\S+\s+)*').search(hint,0,50)
+                        logger.info('hint: [%s]', hint)
+                        if matched:
+                            hint = matched.group()
+                            logger.info('new hint: [%s]', hint)
+                        hint = hint.strip()
+                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], menu=hint, _rank=get_rank(word,span,line,last_line)))
                     tmp_prev_word = word
             except Exception as ex:
                 logger.exception("Parsing buffer [%s] failed", buffer)
