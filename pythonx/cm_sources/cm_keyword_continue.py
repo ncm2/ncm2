@@ -106,7 +106,7 @@ class Source:
                 tmp_prev_word = ''
                 for word,span,line,last_line in word_generator():
                     if tmp_prev_word==prev_word:
-                        rest_of_line = line[span[1]:]
+                        rest_of_line = line[span[0]:]
                         hint = rest_of_line
                         matched = re.compile('\s*(\S+(\s+|$))*').search(rest_of_line,0,50)
                         logger.info('hint: [%s]', hint)
@@ -126,9 +126,9 @@ class Source:
             # add rest_of_line completion for the highest rank
             e = copy.deepcopy(matches[0])
             # e['abbr'] = e['word'] + e['menu'] + '...'
-            e['abbr'] = '<the rest> '
+            e['abbr'] = 'the rest> '
             e['menu'] = e['word'] + e['menu'] + '...'
-            e['word'] = e['word'].rstrip() + e['_rest_of_line']
+            e['word'] = e['_rest_of_line']
             matches.insert(1,e)
 
         if not force:
