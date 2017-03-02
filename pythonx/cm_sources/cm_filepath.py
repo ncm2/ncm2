@@ -12,8 +12,7 @@ from cm import register_source
 register_source(name='cm-filepath',
                    abbreviation='path',
                    cm_refresh_patterns=[r'[0-9a-zA-Z_\-\.\\\/~\$]{4,}$',r'(\.[\/\\]|[a-zA-Z]:\\|~\/)[0-9a-zA-Z_\-\.\\\/~\$]*$'],
-                   priority=6,
-                   detach=1)
+                   priority=6,)
 
 import os
 import re

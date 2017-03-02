@@ -8,8 +8,7 @@ from cm import register_source, getLogger
 register_source(name='cm-tags',
                    priority=6,
                    abbreviation='Tag',
-                   events=['WinEnter'],
-                   detach=1)
+                   events=['WinEnter'],)
 
 import os
 import re
@@ -46,13 +45,17 @@ class Source:
         # unique
         matches = list(tags.values())
 
-        # simply limit the number of matches here, avoid overwhelming neovim
-        matches = matches[0:1024]
+        # there are huge tag files sometimes, be careful here. it's meaningless
+        # to have huge amout of results.
+        refresh = False
+        if len(matches)>100:
+            matches = matches[0:100]
+            refresh = True
 
         logger.info('matches len %s', len(matches))
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
+        self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, refresh, async=True)
 
 
 def binary_search_lines_by_prefix(prefix,filename):

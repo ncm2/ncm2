@@ -11,8 +11,7 @@ register_source(name='cm-gocode',
                 abbreviation='Go',
                 scoping=True,
                 scopes=['go'],
-                cm_refresh_patterns=[r'\.(\w*)$'],
-                detach=1)
+                cm_refresh_patterns=[r'\.(\w*)$'],)
 
 import os
 import re

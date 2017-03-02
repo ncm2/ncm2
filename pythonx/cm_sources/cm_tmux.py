@@ -7,11 +7,10 @@
 from cm import register_source, get_matcher
 import os
 register_source(name='cm-tmux',
-                   abbreviation='Tmux',
-                   priority=4,
-                   enable= 'TMUX' in os.environ,
-                   events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],
-                   detach=1)
+                abbreviation='Tmux',
+                priority=4,
+                enable= 'TMUX' in os.environ,
+                events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],)
 
 import os
 import re

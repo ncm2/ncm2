@@ -80,11 +80,10 @@ class CoreHandler:
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,enable=True,events=[],detach=0,python='python3',**kwargs):
+            def register_source(name,abbreviation,priority,enable=True,events=[],python='python3',**kwargs):
 
                 channel = dict(type=python,
                                module=modulename,
-                               detach=detach,
                                events=events)
 
                 source = {}

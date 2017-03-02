@@ -3,8 +3,6 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-# detach 1 for quick shutdown for neovim, detach 0, 'cause jedi enters infinite
-# loops sometime, don't know why.
 from cm import get_src, register_source
 register_source(name='cm-jedi',
                 priority=9,
@@ -12,8 +10,7 @@ register_source(name='cm-jedi',
                 scoping=True,
                 scopes=['python'],
                 # The last two patterns is for displaying function signatures [r'\(\s?(\w*)$',r',(\s?\w*)$']
-                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$',r'\.\w*$',r'\(\s?(\w*)$',r',\s?(\w*)$'],
-                detach=0)
+                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$',r'\.\w*$',r'\(\s?(\w*)$',r',\s?(\w*)$'],)
 
 import os
 import re

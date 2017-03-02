@@ -8,8 +8,7 @@ from cm import register_source, getLogger, get_matcher
 register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
-                   events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-                   detach=1)
+                   events=['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],)
 
 import os
 import re
