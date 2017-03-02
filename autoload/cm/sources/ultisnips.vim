@@ -7,7 +7,7 @@
 "	au User CmSetup if exists('did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
 "			\ 'priority': 7, 
 "			\ 'abbreviation': 'Snip',
-"			\ 'default_word_pattern': '\S+',
+"			\ 'word_pattern': '\S+',
 "			\ 'cm_refresh_patterns':['(\S{3,})$'],
 "			\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
 "			\ }) | endif

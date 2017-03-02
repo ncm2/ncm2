@@ -10,7 +10,6 @@ register_source(name='cm-tmux',
                    abbreviation='Tmux',
                    priority=4,
                    enable= 'TMUX' in os.environ,
-                   cm_refresh_patterns=[r'(\w{4,})$'],
                    events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],
                    detach=1)
 

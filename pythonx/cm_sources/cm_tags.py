@@ -9,7 +9,6 @@ register_source(name='cm-tags',
                    priority=6,
                    abbreviation='Tag',
                    events=['WinEnter'],
-                   cm_refresh_patterns=[r'(\w{4,})$'],
                    detach=1)
 
 import os

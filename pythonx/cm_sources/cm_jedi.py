@@ -12,7 +12,7 @@ register_source(name='cm-jedi',
                 scoping=True,
                 scopes=['python'],
                 # The last two patterns is for displaying function signatures [r'\(\s?(\w*)$',r',(\s?\w*)$']
-                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$', r'(\w{3,})$',r'\.(\w*)$',r'\(\s?(\w*)$',r',(\s?\w*)$'],
+                cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$',r'\.\w*$',r'\(\s?(\w*)$',r',\s?(\w*)$'],
                 detach=0)
 
 import os

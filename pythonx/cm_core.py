@@ -49,8 +49,6 @@ class CoreHandler:
         self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
 
-        self._default_word_pattern = nvim.vars['cm_default_word_pattern']
-
         scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
         # auto find scopers
@@ -283,29 +281,12 @@ class CoreHandler:
                         logger.debug('cached for <%s>, no need to refresh', name)
                         continue
 
-                    is_matched = self._check_refresh_patterns(ctx,info)
-                    if not is_matched and not force:
+                    # check if enough to trigger cm_refresh
+                    # if ok, set startcol for it
+                    is_matched = self._check_refresh_patterns(info,ctx,force)
+                    if not is_matched:
                         logger.debug('check patterns failed for <%s>, no need to refresh', name)
                         continue
-
-                    if 'startcol' not in ctx:
-                        # default word pattern
-                        # TODO: configurable default word pattern
-                        word_pattern = info.get('default_word_pattern', self._default_word_pattern)
-                        m = re.search(word_pattern + "$",ctx['typed'])
-                        if m:
-                            span = m.span()
-                            ctx['base'] = ctx['typed'][span[0]:span[1]]
-                            ctx['startcol'] = ctx['col'] - len(ctx['base'])
-                        elif is_matched:
-                            # this is a source specific match, keep going with empty base
-                            ctx['base'] = ''
-                            ctx['startcol'] = ctx['col']
-                        else:
-                            # force==1, is_matched == False, word pattern match == False, skip this one
-                            logger.debug('force==1, is_matched == False, word pattern match == False, cm_refresh skip <%s>', name)
-                            continue
-
 
                     if 'cm_refresh' in info:
                         # check patterns when necessary
@@ -333,26 +314,50 @@ class CoreHandler:
             logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
             self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
-    # check patterns for dict, if non dict, return True
-    def _check_refresh_patterns(self,ctx,opt):
-        if type(opt)!=type({}):
-            return True
-        patterns = opt.get('cm_refresh_patterns',None)
-        if not patterns:
-            # no patterns means the soruce matches all patterns
-            return True
+    def _check_refresh_patterns(self,info,ctx,force):
+
+        patterns = info.get('cm_refresh_patterns',None)
         typed = ctx['typed']
-        for pattern in patterns:
-            matched = re.search(pattern,typed)
-            if matched:
-                groups = matched.groups()
-                if groups and matched.end(len(groups))==len(typed):
-                    # last group at the end, calculate startcol for it
-                    ctx['startcol'] = ctx['col'] - len(groups[-1])
-                    ctx['base'] = groups[-1]
-                    pass
-                return True
-        return False
+        is_matched = False
+
+        # check source specific patterns
+        if patterns:
+            for pattern in patterns:
+                matched = re.search(pattern,typed)
+                if matched:
+                    groups = matched.groups()
+                    if groups and matched.end(len(groups))==len(typed):
+                        # last group at the end, calculate startcol for it
+                        ctx['startcol'] = ctx['col'] - len(groups[-1])
+                        ctx['base'] = groups[-1]
+                    else:
+                        word_pattern = info['word_pattern']
+                        m = re.search(word_pattern + "$",typed)
+                        if m:
+                            span = m.span()
+                            ctx['base'] = ctx['typed'][span[0]:span[1]]
+                            ctx['startcol'] = ctx['col'] - len(ctx['base'])
+                        else:
+                            # this is a source specific match, keep going with empty base
+                            ctx['base'] = ''
+                            ctx['startcol'] = ctx['col']
+                    return True
+
+        word_pattern = info['word_pattern']
+        m = re.search(word_pattern + "$",typed)
+
+        if not m:
+            return False
+
+        span = m.span()
+        ctx['base'] = ctx['typed'][span[0]:span[1]]
+        ctx['startcol'] = ctx['col'] - len(ctx['base'])
+
+        minimum_length = info['cm_refresh_min_word_len']
+        if len(ctx['base']) < minimum_length and not force:
+            return False
+        else:
+            return True
 
     # almost the same as `s:check_scope` in `autoload/cm.vim`
     def _check_scope(self,ctx,info):

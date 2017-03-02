@@ -166,7 +166,7 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'scoping': 1,
 		\ 'scopes': ['css','scss'],
 		\ 'abbreviation': 'css',
-		\ 'cm_refresh_patterns':['\w{3,}$',':\s+(\w*)$'],
+		\ 'cm_refresh_patterns':[':\s+\w*$'],
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 ```

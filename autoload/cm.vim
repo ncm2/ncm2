@@ -176,6 +176,27 @@ func! cm#register_source(info)
 
 	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
 
+	let a:info['word_pattern'] = get(a:info,'word_pattern', g:cm_default_word_pattern)
+
+	" calculating cm_refresh_min_word_len
+	if !has_key(a:info,'cm_refresh_min_word_len')
+		if type(g:cm_refresh_default_min_word_len)==type(1)
+			let a:info['cm_refresh_min_word_len'] = g:cm_refresh_default_min_word_len
+		else
+			" format: [ [ minimal priority, min length ], []]
+			"
+			" Configure by min priority level. Use the max priority setting
+			" available
+			let l:max = -1
+			for l:e in g:cm_refresh_default_min_word_len
+				if (a:info['priority'] >= l:e[0]) && (l:e[0] > l:max)
+					let a:info['cm_refresh_min_word_len'] = l:e[1]
+					let l:max = l:e[0]
+				endif
+			endfor
+		endif
+	endif
+
 	let g:_cm_sources[l:name] = a:info
 
 	" check and start channels

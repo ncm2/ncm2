@@ -79,7 +79,7 @@ framework.
 			\ 'scoping': 1,
 			\ 'scopes': ['css','scss'],
 			\ 'abbreviation': 'css',
-			\ 'cm_refresh_patterns':['\w{3,}$',':\s+(\w*)$'],
+			\ 'cm_refresh_patterns':[':\s+\w*$'],
 			\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 			\ })
 >
@@ -195,6 +195,16 @@ g:cm_auto_popup
 			trigger the popup menu.
 			Default: 1
 
+						*g:cm_default_word_pattern*
+g:cm_default_word_pattern		
+			Default: >
+ '((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\''\"\,\.\<\>\/\?\s]+))'
+<
+						*g:cm_refresh_default_min_word_len*
+g:cm_refresh_default_min_word_len
+			Format: [ [ min priority, min length ], ... ]		
+			Default: `[[1,4],[7,3]]`
+
 ==============================================================================
 5. API						*NCM-API*
 
@@ -229,20 +239,16 @@ cm#register_source({source})
 			purpose completion source, like keyword from buffer,
 			it will be activated for all buffers. 
 			See |NCM-scoping| for more information.
-	default_word_pattern			*NCM-default_word_pattern*
-			The default pattern used to calculating startcol.
-			Defaults to  >
- r'((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+))'
-<
-			See |NCM-startcol| for more information.
+
+	word_pattern				*NCM-word_pattern*
+			The default pattern used to calculate |NCM-startcol|.
+			Default: |g:cm_default_word_pattern|
 
 						*cm_refresh_patterns*
 	cm_refresh_patterns			*NCM-cm_refresh_patterns*
-			A |List| of PCRE patterns (python regex). If the typed
-			text matches any one of the pattern, a
-			|cm_refresh-notification| will be triggered for this
-			source. If this field is not set or empty, the
-			notification will be triggered for for each typing.
+			An extra |List| of PCRE patterns (python regex),
+			besides |cm_refresh_min_word_len|, for auto triggering
+			popup menu. 
 
 						*cm_refresh*
 	cm_refresh				*NCM-cm_refresh*
@@ -258,6 +264,17 @@ cm#register_source({source})
 			like this instead:
 
 				`{'omnifunc': 'csscomplete#CompleteCSS'}`
+
+						*NCM-cm_refresh_min_word_len*
+	cm_refresh_min_word_len			*cm_refresh_min_word_len*
+			The minimum length of the matching word for auto
+			triggering popup menu.
+
+			If len(matching word) >= cm_refresh_min_word_len, a
+			|cm_refresh-notification| will be triggered for this
+			source.
+
+			Default: |g:cm_refresh_default_min_word_len|
 
 						*NCM-priority-values*
 	Recommended priority definitions for |NCM-priority|: 
@@ -359,8 +376,8 @@ cm#context()
 			the "b" character.
 
 			If the pattern doesn't have regex group,
-			|NCM-default_word_pattern| will be used to determine
-			startcol.
+			|NCM-word_pattern| will be used to determine startcol.
+
 	base
 			Set according to the startcol. The value is the same
 			as the {base} passed to |complete-functions|. In
