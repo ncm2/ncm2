@@ -19,7 +19,7 @@ inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 inoremap <silent> <Plug>(cm_omnifunc) <c-x><c-o>
 
 " Show the popup menu, reguardless of the matching of cm_refresh_pattern
-inoremap <silent> <Plug>(cm_force_refresh) <C-r>=cm#_force_refresh()<CR>
+inoremap <silent> <expr> <Plug>(cm_force_refresh) (cm#menu_selected()?"\<c-y>\<c-r>=cm#_force_refresh()\<CR>":"\<c-r>=cm#_force_refresh()\<CR>")
 
 
 let s:rpcnotify = 'rpcnotify'
@@ -330,9 +330,9 @@ func! cm#_channel_cleanup(info)
 
 endfunc
 
-func! cm#_core_complete(context, startcol, matches)
+func! cm#_core_complete(context, startcol, matches, not_changed)
 
-	if get(b:,'cm_enable',0) == 0
+	if ! get(b:,'cm_enable',0)
 		return
 	endif
 
@@ -341,9 +341,13 @@ func! cm#_core_complete(context, startcol, matches)
 		return
 	endif
 
+	if a:not_changed && pumvisible()
+		return
+	endif
+
 	" from core channel
 	" something selected by user, do not refresh the menu
-	if s:menu_selected()
+	if cm#menu_selected()
 		return
 	endif
 
@@ -418,7 +422,9 @@ func! s:changetick()
 	" return [b:changedtick , getcurpos()]
 	" Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
 	" bug, use curpos as workaround
-	return getcurpos()
+	" 
+	" when the menu selection changed, it should trigger cm_refresh
+	return [getcurpos(),cm#menu_selected()]
 endfunc
 
 func! s:change_tick_start()
@@ -533,7 +539,7 @@ func! s:complete_timeout(timer)
 	call s:notify_core_channel('cm_complete_timeout',g:_cm_sources,s:complete_timer_ctx)
 endfunc
 
-func! s:menu_selected()
+func! cm#menu_selected()
 	" when the popup menu is visible, v:completed_item will be the
 	" current_selected item
 	" if v:completed_item is empty, no item is selected

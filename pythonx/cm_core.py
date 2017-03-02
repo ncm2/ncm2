@@ -520,10 +520,11 @@ class CoreHandler:
             # no need to fire complete message
             logger.info('matches==0, _last_matches==0, ignore')
             return
+        not_changed = 0
         if self._last_startcol==startcol and self._last_matches==matches:
+            not_changed = 1
             logger.info('ignore _complete call: self._last_startcol==startcol and self._last_matches==matches')
-            return
-        self._nvim.call('cm#_core_complete', ctx, startcol, matches, async=True)
+        self._nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed)
         self._last_matches = matches
         self._last_startcol = startcol
 

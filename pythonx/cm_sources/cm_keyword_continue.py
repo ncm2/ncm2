@@ -91,7 +91,7 @@ class Source:
                 tmp_prev_word = ''
                 for word,span,line in word_generator():
                     if tmp_prev_word==prev_word:
-                        matches.append(dict(word=word, info=line[span[1]:], _rank=get_rank(word,span,line)))
+                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], info=line[span[1]:], _rank=get_rank(word,span,line)))
                     tmp_prev_word = word
             except Exception as ex:
                 logger.exception("Parsing buffer [%s] failed", buffer)
