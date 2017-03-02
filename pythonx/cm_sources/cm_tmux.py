@@ -10,7 +10,7 @@ register_source(name='cm-tmux',
                 abbreviation='Tmux',
                 priority=4,
                 enable= 'TMUX' in os.environ,
-                events=['CursorHold','CursorHoldI','FocusGained','WinEnter'],)
+                events=['CursorHold','CursorHoldI','FocusGained','BufEnter'],)
 
 import os
 import re
@@ -67,7 +67,6 @@ class Source:
                 except Exception as ex:
                     logger.exception('exception, failed to decode output, %s', ex)
                     pass
-
 
         for pane in panes:
             for word in re.split(pat,pane):
