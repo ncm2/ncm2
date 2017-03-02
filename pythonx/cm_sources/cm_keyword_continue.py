@@ -37,7 +37,15 @@ class Source:
 
         compiled = re.compile(info['word_pattern'])
 
-        typed_words = re.findall(compiled,ctx['typed'])
+        typed = ctx['typed']
+        try:
+            # fetch the previous line for better sorting
+            last_line = self._nvim.current.buffer[ctx['lnum']-2]
+            typed = last_line + '\n' + typed
+        except:
+            pass
+
+        typed_words = re.findall(compiled,typed)
 
         if not typed_words:
             return
@@ -60,8 +68,8 @@ class Source:
         matches = []
 
         # rank for sorting
-        def get_rank(word,span,line):
-            prev = line[0:span[0]]
+        def get_rank(word,span,line,last_line):
+            prev = last_line+"\n"+line[0:span[0]]
             words = re.findall(compiled,prev)
             if not words:
                 return 0
@@ -83,15 +91,17 @@ class Source:
                 line_cnt = len(buffer)
                 for i in range(0,line_cnt,step):
                     lines = buffer[i:i+step]
+                    last_line = ''
                     for line in lines:
                         for word in re.finditer(compiled,line):
-                            yield word.group(),word.span(),line
+                            yield word.group(),word.span(),line,last_line
+                        last_line = line
 
             try:
                 tmp_prev_word = ''
-                for word,span,line in word_generator():
+                for word,span,line,last_line in word_generator():
                     if tmp_prev_word==prev_word:
-                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], info=line[span[1]:], _rank=get_rank(word,span,line)))
+                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], info=line[span[1]:], _rank=get_rank(word,span,line,last_line)))
                     tmp_prev_word = word
             except Exception as ex:
                 logger.exception("Parsing buffer [%s] failed", buffer)
