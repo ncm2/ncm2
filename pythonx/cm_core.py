@@ -304,7 +304,7 @@ class CoreHandler:
                             # enable previous is_early_cache, if available
                             self._matches[name]['enable'] = True
 
-                    if (name in self._matches) and not self._matches[name]['refresh'] and not force:
+                    if (name in self._matches) and not self._matches[name]['refresh'] and not force and self._matches['startcol']==ctx['startcol']:
                         # no need to refresh if it's already cached
                         logger.debug('cached for <%s>, no need to refresh', name)
                         continue
