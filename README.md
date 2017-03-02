@@ -258,13 +258,10 @@ use custom parser in NCM to implement the scoping features.
 ### Experimental hacking
 
 Note that there's some hacking done in NCM. It uses a per 30ms timer to detect
-changes even popup menu is visible, instead of using the `TextChangedI` event,
+changes even popup menu is visible, as well as using the `TextChangedI` event,
 which only triggers when no popup menu is visible. This is important for
 implementing the async architecture. I'm hoping one day neovim will offer
 better option rather than a timer or the limited `TextChangedI`.
-
-Deoplete and YCM are mature, they have tons of features I'm not offering
-currently, which should be considered a main difference too.
 
 ## FAQ
 
