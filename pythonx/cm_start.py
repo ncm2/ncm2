@@ -10,7 +10,6 @@ import importlib
 from neovim import attach, setup_logging
 from cm import getLogger
 import atexit
-import greenlet
 
 logger = getLogger(__name__)
 
@@ -123,8 +122,6 @@ def setup_neovim(serveraddr):
     return nvim
 
 def run_event_loop(type,logger,nvim,handler):
-
-    # greenlet.
 
     def on_setup():
         logger.info('on_setup')
