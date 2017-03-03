@@ -14,7 +14,7 @@ from cm import get_src, register_source, get_pos, getLogger, get_matcher
 #
 # sort=0 for not using NCM's builtin sorting
 register_source(name='cm-keyword-continue',
-                priority=6,
+                priority=4,
                 abbreviation='',
                 word_pattern=r'\S+',
                 sort=0,
