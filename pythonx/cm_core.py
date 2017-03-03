@@ -18,6 +18,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import cm
 import subprocess
 import time
+import cm_default
 
 logger = cm.getLogger(__name__)
 
@@ -341,6 +342,8 @@ class CoreHandler:
         typed = ctx['typed']
         is_matched = False
 
+        word_pattern = info.get('word_pattern',None) or cm_default.word_pattern(ctx)
+
         # check source specific patterns
         if patterns:
             for pattern in patterns:
@@ -352,7 +355,6 @@ class CoreHandler:
                         ctx['startcol'] = ctx['col'] - len(groups[-1])
                         ctx['base'] = groups[-1]
                     else:
-                        word_pattern = info['word_pattern']
                         m = re.search(word_pattern + "$",typed)
                         if m:
                             span = m.span()
@@ -364,7 +366,6 @@ class CoreHandler:
                             ctx['startcol'] = ctx['col']
                     return True
 
-        word_pattern = info['word_pattern']
         m = re.search(word_pattern + "$",typed)
 
         if not m:
@@ -385,6 +386,7 @@ class CoreHandler:
         scopes = info.get('scopes',None)
         cur_scope = ctx.get('scope',ctx['filetype'])
         is_root_scope = ( cur_scope==ctx['filetype'] )
+        ctx['scope_match'] = ''
         if not scopes:
             # scopes setting is None, means that this is a general purpose
             # completion source, only complete for the root scope
@@ -394,6 +396,7 @@ class CoreHandler:
                 return False
         for scope in scopes:
             if scope==cur_scope:
+                ctx['scope_match'] = scope
                 if info.get('scoping',False):
                     return True
                 else:

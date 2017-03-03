@@ -45,11 +45,6 @@ let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 " used to override default options of sources
 let g:cm_sources_override = get(g:,'cm_sources_override',{})
 
-" https://github.com/roxma/nvim-completion-manager/issues/30#issuecomment-283281158
-" The default word pattern, catches numbers (including floating numbers) in
-" the first group, and alphanum in the second
-let g:cm_default_word_pattern = get(g:,'cm_default_word_pattern','((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\''\"\,\.\<\>\/\?\s]+))')
-
 " format: [ (minimal priority, min length), ()]
 let g:cm_refresh_default_min_word_len = get(g:,'cm_refresh_default_min_word_len',[[1,4],[7,3]])
 

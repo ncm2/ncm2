@@ -179,8 +179,6 @@ func! cm#register_source(info)
 
 	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
 
-	let a:info['word_pattern'] = get(a:info,'word_pattern', g:cm_default_word_pattern)
-
 	" calculating cm_refresh_min_word_len
 	if !has_key(a:info,'cm_refresh_min_word_len')
 		if type(g:cm_refresh_default_min_word_len)==type(1)
