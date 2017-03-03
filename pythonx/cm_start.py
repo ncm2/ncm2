@@ -152,14 +152,15 @@ def run_event_loop(type,logger,nvim,handler):
         atexit.register(func)
 
     while True:
-        msg = nvim.next_message()
-        if not msg:
-            break
-        if msg[0] != 'notification':
-            logger.error('unrecognized message: %s', msg)
-            continue
-        method = ''
         try:
+            msg = nvim.next_message()
+            if not msg:
+                logger.info("received falsy value[%s], exitting",msg)
+                break
+            if msg[0] != 'notification':
+                logger.error('unrecognized message: %s', msg)
+                continue
+            method = ''
             method = msg[1]
             on_notification(method,msg[2])
         except Exception as ex:
