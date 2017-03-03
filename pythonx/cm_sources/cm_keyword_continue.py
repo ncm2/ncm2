@@ -96,10 +96,10 @@ class Source:
 
             this_bufnr = buffer.number
             def word_generator():
-                step = 200
+                step = 500
                 line_cnt = len(buffer)
                 this_lnum = 1
-                for i in range(0,line_cnt,step):
+                for i in range(0,min(line_cnt,5000),step):
                     lines = buffer[i:i+step]
                     last_line = ''
                     for line in lines:
