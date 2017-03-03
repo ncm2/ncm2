@@ -203,6 +203,9 @@ func! cm#register_source(info)
 	" wether or not use the framework's standard sorting
 	let a:info['sort'] = get(a:info,'sort',1)
 
+	" disable early_cache by default for vimscript source
+	let a:info['early_cache'] = get(a:info,'early_cache', !has_key(a:info,'cm_refresh'))
+
 	let g:_cm_sources[l:name] = a:info
 
 	" check and start channels

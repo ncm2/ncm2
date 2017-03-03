@@ -291,11 +291,12 @@ class CoreHandler:
                     # if ok, set startcol for it
                     is_matched = self._check_refresh_patterns(info,ctx,force)
                     if not is_matched:
-                        if not force and self._check_refresh_patterns(info,ctx,True):
+                        if not force and info['early_cache'] and self._check_refresh_patterns(info,ctx,True):
                             # early cache
                             ctx['early_cache'] = True
+                            logger.debug('<%s> early_caching', name)
                         else:
-                            logger.debug('check patterns failed for <%s>, no need to refresh', name)
+                            logger.debug('cm_refresh ignore <%s>, force[%s] early_cache[%s]', name, force, info['early_cache'])
                             continue
 
                     if is_matched:
@@ -305,13 +306,12 @@ class CoreHandler:
                             self._matches[name]['enable'] = True
 
                     if (name in self._matches) and not self._matches[name]['refresh'] and not force and self._matches[name]['startcol']==ctx['startcol']:
-                        # no need to refresh if it's already cached
-                        logger.debug('cached for <%s>, no need to refresh', name)
+                        logger.debug('cached <%s>, ignore cm_refresh', name)
                         continue
 
                     if 'cm_refresh' in info:
                         # check patterns when necessary
-                        refreshes_calls.append(dict(name=name,context=ctx))
+                        refreshes_calls.append(dict(name=name, context=ctx))
 
                     # start channels on demand here
                     if 'channel' in info:
@@ -321,9 +321,9 @@ class CoreHandler:
 
                     channel = info.get('channel',{})
                     if 'id' in channel:
-                        refreshes_channels.append(dict(name=name,id=channel['id'],context=ctx))
-                except Exception as inst:
-                    logger.exception('cm_refresh process exception: %s', inst)
+                        refreshes_channels.append(dict(name=name, id=channel['id'], context=ctx))
+                except Exception as ex:
+                    logger.exception('cm_refresh exception: %s', ex)
                     continue
 
         if not refreshes_calls and not refreshes_channels:

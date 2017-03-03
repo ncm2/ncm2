@@ -304,6 +304,15 @@ cm#register_source({source})
 
 			Default: |g:cm_refresh_default_min_word_len|
 	
+	early_cache				NCM-early_cache
+			Cache the completion candidates whenever a word
+			pattern matches, before then amout of characters hit
+			the |cm_refresh_min_word_len| or the typing matches
+			|cm_refresh_patterns|.
+
+			Default: 0 for ||NCM-vimscript-source| registered.  1
+				for |NCM-python-source| .
+
 						*NCM-source-options*
 	options					*NCM-options*
 			This field is ignored by NCM framework, but it will be
