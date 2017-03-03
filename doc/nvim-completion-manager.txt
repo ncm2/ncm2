@@ -195,13 +195,6 @@ g:cm_auto_popup
 			trigger the popup menu.
 			Default: 1
 
-						*g:cm_default_word_pattern*
-g:cm_default_word_pattern		
-			The default value for |NCM-word_pattern|.
-
-			Default: >
- '((-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\''\"\,\.\<\>\/\?\s]+))'
-<
 						*g:cm_refresh_default_min_word_len*
 g:cm_refresh_default_min_word_len
 			The default value for |cm_refresh_min_word_len|.
@@ -270,7 +263,7 @@ cm#register_source({source})
 
 	word_pattern				*NCM-word_pattern*
 			The default pattern used to calculate |NCM-startcol|.
-			Default: |g:cm_default_word_pattern|
+			Default: see pythonx/cm_default.py
 
 						*cm_refresh_patterns*
 	cm_refresh_patterns			*NCM-cm_refresh_patterns*
