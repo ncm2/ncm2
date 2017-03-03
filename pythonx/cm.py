@@ -1,9 +1,7 @@
 import os
-import sys
 import importlib
 import logging
 from neovim.api import Nvim
-from neovim import setup_logging, attach
 
 def getLogger(name):
 

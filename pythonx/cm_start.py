@@ -5,7 +5,6 @@
 
 import os
 import sys
-import re
 import importlib
 from neovim import attach, setup_logging
 from cm import getLogger
