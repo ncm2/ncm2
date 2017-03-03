@@ -261,7 +261,7 @@ cm#register_source({source})
 
 	scopes					*NCM-scopes*
 			A |List| of scope. The source will be activated when
-			the current editting scope (e.g. current |filetype|)
+			the current editting scope (e.g. current 'filetype')
 			is in the source's scopes list. 
 			If this field is not set, it means this is a general
 			purpose completion source, like keyword from buffer,
@@ -281,7 +281,7 @@ cm#register_source({source})
 						*cm_refresh*
 	cm_refresh				*NCM-cm_refresh*
 			Required for |NCM-vimscript-source|. A handler for the
-			|cm_refresh-notification|.  It is usually a |String|
+			|cm_refresh-notification|.  It is normally a |String|
 			storing the name of the handler function.
 
 			This field should not be set for source implemented
@@ -303,7 +303,7 @@ cm#register_source({source})
 			source.
 
 			Default: |g:cm_refresh_default_min_word_len|
-	
+
 	early_cache				NCM-early_cache
 			Cache the completion candidates whenever a word
 			pattern matches, before then amout of characters hit
@@ -339,18 +339,19 @@ cm#complete({name}, {context}, {startcol}, {matches}[, {refresh}])
 	|complete()|function.
 
 	{refresh} is 0 by default. Normally |NCM| will cache the result until
-	a space character is typed. And if there's caching result of a source,
-	the |cm_refresh-notification| will not be sent to the source. 
+	another word started. And if there's cached result of a source, the
+	|cm_refresh-notification| will not be sent to the source. 
 
-	If {refresh} is set to 1, |NCM| will send the notification reguardless
-	of the caching of this |cm#complete()| call.
+	If {refresh} is 1, |NCM| will send the notification reguardless of the
+	cache of this |cm#complete()| call.
 
 						*NCM-CmSetup* *CmSetup*
 autocmd User CmSetup
 	This autocmd will be triggered once |NCM| started.
+
 	Registering a source via this autocmd will avoid error when |NCM| has
-	is not been installed yet. And it also avoid the loading of
-	autoload/cm.vim on neovim startup, so that |NCM| won't affect neovim's
+	not been installed yet. And it also avoid the loading of
+	autoload/cm.vim at neovim startup, so that |NCM| won't affect neovim's
 	startup time.
 
 						*cm#disable_source()*
@@ -370,7 +371,7 @@ cm#context()
 	col		
 			Current cursor column. Same result as `col('.')`.
 	filetype	
-			Equivalent to the value of |filetype| of the buffer.
+			Equivalent to the value of 'filetype' of the buffer.
 	typed					*cm#context().typed*
 			The typed text. For example: >
 				^foo bar|baz
@@ -425,7 +426,7 @@ cm#context()
 	force		
 			Non-zero value if this notification is triggered by
 			`<Plug>(cm_force_refresh)`.
-	
+
 	early_cache
 			Non-zero value if this notification is triggered by
 			early caching, the popup menu will no be updated for
@@ -534,9 +535,15 @@ directory in order to register the autocmd before |NCM| started.
 
 	func! g:Foo_auto_popup(opt,ctx)
 		let l:matches = ['foo_bar','foo_baz']
-		call cm#complete(a:opt, a:ctx, a:ctx['startcol'], l:matches)
+		call cm#complete(a:opt['name'], a:ctx, a:ctx['startcol'], l:matches)
 	endfunc
 >
+There're two arguments pass to |cm_refresh| handler. 
+
+The first {opt} is the {source} which is used for |cm#register_source()|. 
+
+See |cm#context()| for more information on the second argument {ctx}.
+
 7.2 Implementation via NCM python framework	*NCM-python-source*
 
 This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
