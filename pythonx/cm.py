@@ -16,6 +16,12 @@ def getLogger(name):
                     level)
             if isinstance(l, int):
                 level = l
+        if 'NVIM_NCM_LOG_LEVEL' in os.environ:
+            l = getattr(logging,
+                    os.environ['NVIM_NCM_LOG_LEVEL'].strip(),
+                    level)
+            if isinstance(l, int):
+                level = l
         return level
 
     logger = logging.getLogger(__name__)
