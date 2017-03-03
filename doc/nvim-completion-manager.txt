@@ -396,6 +396,9 @@ cm#context()
 			Current editting scope. See |NCM-scoping|
 
 	startcol				*NCM-startcol*
+			Calaulated by NCM for convenience to pass it as an
+			argument to the |cm#complete()| function.
+
 			If the pattern matched in |cm_refresh_patterns| has
 			regex group, and the end of last group is the end of
 			|cm#context().typed|, NCM will set this field to the
@@ -410,6 +413,9 @@ cm#context()
 
 			If the pattern doesn't have regex group,
 			|NCM-word_pattern| will be used to determine startcol.
+
+			Note: You're not required to use this value provided
+			by NCM.
 
 	base
 			Set according to the startcol. The value is the same
@@ -528,12 +534,7 @@ directory in order to register the autocmd before |NCM| started.
 
 	func! g:Foo_auto_popup(opt,ctx)
 		let l:matches = ['foo_bar','foo_baz']
-		let l:col = a:ctx['col']
-		let l:typed = a:ctx['typed']
-		let l:kw = matchstr(l:typed,'\v\S+$')
-		let l:kwlen = len(l:kw)
-		let l:startcol = l:col - l:kwlen
-		call cm#complete(a:opt, a:ctx, l:startcol, l:matches)
+		call cm#complete(a:opt, a:ctx, a:ctx['startcol'], l:matches)
 	endfunc
 >
 7.2 Implementation via NCM python framework	*NCM-python-source*
@@ -564,15 +565,8 @@ directory.
 		self._nvim = nvim
 
 	    def cm_refresh(self,info,ctx):
-
 		matches = ['foo_bar','foo_baz']
-
-		col = ctx['col']
-		typed = ctx['typed']
-		kw = re.search(r'\w*?$',typed).group(0)
-		startcol = col-len(kw)
-
-		self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+		self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
 <
 
 ==============================================================================
