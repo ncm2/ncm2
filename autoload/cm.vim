@@ -57,11 +57,15 @@ func! cm#enable_for_buffer()
 		let s:already_setup = 1
 	endif
 
-	" Notice: Workaround for neovim's bug. When the popup menu is visible, and
-	" no item is selected, an enter key will close the popup menu, change and
-	" move nothong, and then trigger TextChangedI and CursorMovedI
-	" https://github.com/neovim/neovim/issues/5997
-	inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+	" remove to avoid conflict: #34
+	" NCM uses cursorpos to detect changes currently, There's no need to keep
+	" this mapping.
+	"
+	" " Notice: Workaround for neovim's bug. When the popup menu is visible, and
+	" " no item is selected, an enter key will close the popup menu, change and
+	" " move nothong, and then trigger TextChangedI and CursorMovedI
+	" " https://github.com/neovim/neovim/issues/5997
+	" inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 
 	let b:cm_enable = 1
 
