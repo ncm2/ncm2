@@ -8,7 +8,7 @@
 # Please register source before executing any other code, this allow cm_core to
 # read basic information about the source without loading the whole module, and
 # modules required by this module
-from cm import register_source
+from cm import register_source, get_matcher
 register_source(name='cm-filepath',
                 abbreviation='path',
                 cm_refresh_patterns=[r'[0-9a-zA-Z_\-\.\\\/~\$]{4,}$',r'(\.[\/\\]|[a-zA-Z]:\\|~\/)[0-9a-zA-Z_\-\.\\\/~\$]*$'],
@@ -77,9 +77,13 @@ class Source:
             menu = file
             matches.append(dict(word=word,icase=1,menu=menu,dup=1))
 
-        # simply limit the number of matches here, not to explode neovim
-        matches = matches[0:1024]
+        # pre filtering
+        matches = get_matcher(self._nvim).process(info, ctx, startcol, matches)
+        refresh = 0
+        if len(matches)>1024:
+            refresh = 1
+            matches = matches[0:1024]
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, refresh, async=True)
 
