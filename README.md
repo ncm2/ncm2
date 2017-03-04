@@ -37,7 +37,8 @@ plugin builtin sources:
 - Keyword from current buffer
 - Tag completion. (`:help 'tags'`, `:help tagfiles()`)
 - Keyword from tmux session
-- Ultisnips hint
+- Ultisnips hint, if you have installed ultisnips
+- Neosnippets hint, if you have installed neosnippets
 - File path completion
 - Python completion via [jedi](https://github.com/davidhalter/jedi)
 - Css completion via vim's builtin
