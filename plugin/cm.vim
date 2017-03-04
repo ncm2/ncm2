@@ -1,6 +1,4 @@
 
-imap <c-g> <Plug>(cm_force_refresh)
-
 let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
 
 if get(g:,'cm_enable_for_all',1)
