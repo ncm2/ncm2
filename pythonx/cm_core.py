@@ -119,8 +119,6 @@ class CoreHandler:
 
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
 
-        self._ctx = None
-
     def _is_kw_futher_typing(self,info,oldctx,curctx):
 
         # is_matched = self._check_refresh_patterns(info,ctx,force)
@@ -222,9 +220,6 @@ class CoreHandler:
             # being filtered by the self._complete function
             self._last_matches = []
             self._last_startcol = 0
-
-        # update file server
-        self._ctx = root_ctx
 
         # initial scope
         root_ctx['scope'] = root_ctx['filetype']
