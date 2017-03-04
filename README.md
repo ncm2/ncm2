@@ -80,10 +80,6 @@ extra sources:
 ```vim
 " the framework
 Plug 'roxma/nvim-completion-manager'
-" javascript completion
-Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
-" PHP completion
-Plug 'roxma/nvim-cm-php-language-server',  {'do': 'composer install && composer run-script parse-stubs'}
 ```
 
 - If you are **vim8 user**, you'll need
@@ -125,6 +121,17 @@ let g:python_support_python3_requirements = add(get(g:,'python_support_python3_r
 let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
 let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
+```
+
+- (Optional) Install typical completion sources
+```vim
+" (optional) javascript completion
+Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
+" (optional) language server protocol framework
+Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+" (optional) php completion via LanguageClient-neovim
+Plug 'roxma/LanguageServer-php-neovim',  {'do': 'composer install && composer run-script parse-stubs'}
+autocmd FileType php LanguageClientStart
 ```
 
 ## Configuration Tips
