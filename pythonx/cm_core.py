@@ -215,57 +215,34 @@ class CoreHandler:
 
     def cm_refresh(self,srcs,root_ctx,force=0,*args):
 
+        root_ctx['scope'] = root_ctx['filetype']
+        root_ctx['force'] = force
+
+        # Note: get_src function asks neovim for data, during which another
+        # greenlet coroutine could start or run, calculate this as soon as
+        # possible to avoid concurrent issue
+        ctx_list = self._get_ctx_list(root_ctx)
+
+        self._sources = srcs
+
         if force:
             # if this is forcing refresh, clear the cached variable to avoid
             # being filtered by the self._complete function
             self._last_matches = []
             self._last_startcol = 0
 
-        # initial scope
-        root_ctx['scope'] = root_ctx['filetype']
-        root_ctx['force'] = force
-
-        self._sources = srcs
-
         # simple complete done
         if root_ctx['typed'] == '':
             self._matches = {}
-        elif re.match(r'[^0-9a-zA-Z_]',root_ctx['typed'][-1]):
+        elif re.match(r'\s',root_ctx['typed'][-1]):
             self._matches = {}
-
-        ctx_lists = [root_ctx,]
-
-        # scoping
-        i = 0
-        while i<len(ctx_lists):
-            ctx = ctx_lists[i]
-            scope = ctx['scope']
-            if scope in self._subscope_detectors:
-                for detector in self._subscope_detectors[scope]:
-                    try:
-                        sub_ctx = detector.sub_context(ctx, cm.get_src(self._nvim,ctx))
-                        if sub_ctx:
-                            # adjust offset to global based and add the new
-                            # context
-                            sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
-                            sub_ctx['scope_lnum'] += ctx.get('scope_lnum',1)-1
-                            if int(sub_ctx['lnum']) == 1:
-                                sub_ctx['typed'] = sub_ctx['typed'][sub_ctx['scope_col']-1:]
-                                sub_ctx['scope_col'] += ctx.get('scope_col',1)-1
-                                logger.info('adjusting scope_col')
-                            ctx_lists.append(sub_ctx)
-                            logger.info('new sub context: %s', sub_ctx)
-                    except Exception as ex:
-                        logger.exception("exception on scope processing: %s", ex)
-
-            i += 1
 
         # do notify_sources_to_refresh
         refreshes_calls = []
         refreshes_channels = []
 
         # get the sources that need to be notified
-        for ctx_item in ctx_lists:
+        for ctx_item in ctx_list:
             for name in srcs:
                 ctx = copy.deepcopy(ctx_item)
                 ctx['early_cache'] = False
@@ -295,7 +272,6 @@ class CoreHandler:
                             continue
 
                     if is_matched:
-                        # match the triggering
                         if name in self._matches:
                             # enable previous early_cache, if available
                             self._matches[name]['enable'] = True
@@ -305,7 +281,6 @@ class CoreHandler:
                         continue
 
                     if 'cm_refresh' in info:
-                        # check patterns when necessary
                         refreshes_calls.append(dict(name=name, context=ctx))
 
                     # start channels on demand here
@@ -330,6 +305,38 @@ class CoreHandler:
             logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
             logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
             self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
+
+
+    def _get_ctx_list(self,root_ctx):
+        ctx_list = [root_ctx,]
+
+        # scoping
+        i = 0
+        while i<len(ctx_list):
+            ctx = ctx_list[i]
+            scope = ctx['scope']
+            if scope in self._subscope_detectors:
+                for detector in self._subscope_detectors[scope]:
+                    try:
+                        sub_ctx = detector.sub_context(ctx, cm.get_src(self._nvim,ctx))
+                        if sub_ctx:
+                            # adjust offset to global based and add the new
+                            # context
+                            sub_ctx['scope_offset'] += ctx.get('scope_offset',0)
+                            sub_ctx['scope_lnum'] += ctx.get('scope_lnum',1)-1
+                            if int(sub_ctx['lnum']) == 1:
+                                sub_ctx['typed'] = sub_ctx['typed'][sub_ctx['scope_col']-1:]
+                                sub_ctx['scope_col'] += ctx.get('scope_col',1)-1
+                                logger.info('adjusting scope_col')
+                            ctx_list.append(sub_ctx)
+                            logger.info('new sub context: %s', sub_ctx)
+                    except Exception as ex:
+                        logger.exception("exception on scope processing: %s", ex)
+
+            i += 1
+
+            return ctx_list
+
 
     def _check_refresh_patterns(self,info,ctx,force=False):
 
