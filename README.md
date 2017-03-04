@@ -53,9 +53,10 @@ extra sources:
 
 - Language server protocol via
   [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+    - [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)
 - PHP completion via
   [nvim-cm-php-language-server](https://github.com/roxma/nvim-cm-php-language-server)
-  (experimental)
+  (deprecated)
 - C/C++ completion via
   [clang_complete](https://github.com/roxma/clang_complete). This plugin
   [requires
