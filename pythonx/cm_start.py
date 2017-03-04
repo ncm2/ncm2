@@ -125,6 +125,15 @@ def run_event_loop(type,logger,nvim,handler):
     def on_setup():
         logger.info('on_setup')
 
+    def on_request(method, args):
+
+        func = getattr(handler,method,None)
+        if func is None:
+            logger.info('method: %s not implemented, ignore this request', method)
+            return None
+
+        func(*args)
+
     def on_notification(method, args):
         logger.debug('%s method: %s, args: %s', type, method, args)
 
@@ -151,21 +160,25 @@ def run_event_loop(type,logger,nvim,handler):
     if func:
         atexit.register(func)
 
-    while True:
-        try:
-            msg = nvim.next_message()
-            if not msg:
-                logger.info("received falsy value[%s], exitting",msg)
-                break
-            if msg[0] != 'notification':
-                logger.error('unrecognized message: %s', msg)
-                continue
-            method = ''
-            method = msg[1]
-            on_notification(method,msg[2])
-        except Exception as ex:
-            logger.exception("Error processing notification <%s>, msg: ", msg)
-    # nvim.run_loop(on_request, on_notification, on_setup)
+    # Use next_message is simpler, as a handler doesn't need to deal with
+    # concurrent issue, but it has serious issue,
+    # https://github.com/roxma/nvim-completion-manager/issues/35#issuecomment-284049103
+    # 
+    # while True:
+    #     try:
+    #         msg = nvim.next_message()
+    #         if not msg:
+    #             logger.info("received falsy value[%s], exitting",msg)
+    #             break
+    #         if msg[0] != 'notification':
+    #             logger.error('unrecognized message: %s', msg)
+    #             continue
+    #         method = ''
+    #         method = msg[1]
+    #         on_notification(method,msg[2])
+    #     except Exception as ex:
+    #         logger.exception("Error processing notification <%s>, msg: ", msg)
+    nvim.run_loop(on_request, on_notification, on_setup)
 
 main()
 
