@@ -231,7 +231,6 @@ class CoreHandler:
         root_ctx['force'] = force
 
         self._sources = srcs
-        self._has_popped_up = False
 
         # simple complete done
         if root_ctx['typed'] == '':
@@ -327,6 +326,7 @@ class CoreHandler:
                     logger.exception('cm_refresh exception: %s', ex)
                     continue
 
+        self._has_popped_up = False
         if not refreshes_calls and not refreshes_channels:
             logger.info('not notifying any channels, _refresh_completions now')
             self._refresh_completions(root_ctx)
