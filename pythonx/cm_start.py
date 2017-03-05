@@ -122,38 +122,52 @@ def setup_neovim(serveraddr):
 
 def run_event_loop(type,logger,nvim,handler):
 
+    handler.cm_running_ = False
+    handler.cm_msgs_ = []
+
     def on_setup():
         logger.info('on_setup')
 
     def on_request(method, args):
-
-        func = getattr(handler,method,None)
-        if func is None:
-            logger.info('method: %s not implemented, ignore this request', method)
-            return None
-
-        func(*args)
+        logger.error('method: %s not implemented, ignore this request', method)
 
     def on_notification(method, args):
-        logger.debug('%s method: %s, args: %s', type, method, args)
 
-        if type=='channel' and method=='cm_refresh':
-            ctx = args[1]
-            # The refresh calculation may be heavy, and the notification queue
-            # may have outdated refresh events, it would be  meaningless to
-            # process these event
-            if nvim.call('cm#context_changed',ctx):
-                logger.info('context_changed, ignoring context: %s', ctx)
-                return
-
-        func = getattr(handler,method,None)
-        if func is None:
-            logger.info('method: %s not implemented, ignore this message', method)
+        # A trick to get rid of the greenlet coroutine without using the
+        # next_message API.
+        handler.cm_msgs_.append( (method,args) )
+        if handler.cm_running_:
             return
 
-        func(*args)
+        handler.cm_running_ = True
 
-        logger.debug('%s method %s completed', type, method)
+        while handler.cm_msgs_:
+
+            method, args = handler.cm_msgs_.pop(0)
+
+            try:
+                logger.debug('%s method: %s, args: %s', type, method, args)
+
+                if type=='channel' and method=='cm_refresh':
+                    ctx = args[1]
+                    # The refresh calculation may be heavy, and the notification queue
+                    # may have outdated refresh events, it would be  meaningless to
+                    # process these event
+                    if nvim.call('cm#context_changed',ctx):
+                        logger.info('context_changed, ignoring context: %s', ctx)
+                        continue
+
+                func = getattr(handler,method,None)
+                if func is None:
+                    logger.info('method: %s not implemented, ignore this message', method)
+                    continue
+
+                func(*args)
+                logger.debug('%s method %s completed', type, method)
+            except Exception as ex:
+                logger.exception("Failed processing method: %s, args: %s", method, args)
+
+        handler.cm_running_ = False
 
     # use at_exit to ensure the calling of cm_shutdown
     func = getattr(handler,'cm_shutdown',None)
@@ -163,21 +177,6 @@ def run_event_loop(type,logger,nvim,handler):
     # Use next_message is simpler, as a handler doesn't need to deal with
     # concurrent issue, but it has serious issue,
     # https://github.com/roxma/nvim-completion-manager/issues/35#issuecomment-284049103
-    # 
-    # while True:
-    #     try:
-    #         msg = nvim.next_message()
-    #         if not msg:
-    #             logger.info("received falsy value[%s], exitting",msg)
-    #             break
-    #         if msg[0] != 'notification':
-    #             logger.error('unrecognized message: %s', msg)
-    #             continue
-    #         method = ''
-    #         method = msg[1]
-    #         on_notification(method,msg[2])
-    #     except Exception as ex:
-    #         logger.exception("Error processing notification <%s>, msg: ", msg)
     nvim.run_loop(on_request, on_notification, on_setup)
 
 main()
