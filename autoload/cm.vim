@@ -105,9 +105,6 @@ func! cm#enable_for_buffer(...)
 endfunc
 
 func! cm#disable_for_buffer()
-	if get(b:,'cm_enable',0)
-		iunmap <buffer> <CR>
-	endif
 	let b:cm_enable = 0
 	augroup cm
 		autocmd! * <buffer>
