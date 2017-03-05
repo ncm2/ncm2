@@ -430,9 +430,7 @@ func! s:changetick()
 	" return [b:changedtick , getcurpos()]
 	" Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
 	" bug, use curpos as workaround
-	" 
-	" when the menu selection changed, it should trigger cm_refresh
-	return [getcurpos(),cm#menu_selected()]
+	return getcurpos()
 endfunc
 
 func! s:change_tick_start()
