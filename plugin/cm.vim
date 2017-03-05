@@ -1,14 +1,29 @@
 
+" simply ignore files larger than 1M, for performance
 let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
 
-if get(g:,'cm_enable_for_all',1)
-	" simple ignore files larger than 1M, for performance
-	au BufWinEnter * if (exists('b:cm_enable')==0 && line2byte(line("$") + 1)<g:cm_buffer_size_limit) | call cm#enable_for_buffer() | endif
+if get(g:,'cm_smart_enable',1)
+
+	func! s:auto_enable_check()
+		if exists('b:cm_enable') && b:cm_enable!=2
+			return
+		endif
+		if (&buftype=='' &&  line2byte(line("$") + 1)<g:cm_buffer_size_limit) 
+			" 2 for auto enable
+			call cm#enable_for_buffer(2)
+		else
+			call cm#disable_for_buffer()
+		endif
+	endfunc
+
+	au BufWinEnter * call s:auto_enable_check()
+	" Unite's `buftype` is not set when BufWinEnter is triggered, use this as
+	" workaround
+	au OptionSet buftype call s:auto_enable_check()
 
 	" disable clang default mapping by default,
 	" https://github.com/Rip-Rip/clang_complete/pull/515
 	let g:clang_make_default_keymappings = get(g:,'clang_make_default_keymappings',0)
-
 endif
 
 let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})

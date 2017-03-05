@@ -41,7 +41,7 @@ endif
 " do nothing, place it here only to avoid the message 'No matching autocommands'
 autocmd User CmSetup silent 
 
-func! cm#enable_for_buffer()
+func! cm#enable_for_buffer(...)
 
 	if has('nvim')==0
 		try
@@ -68,6 +68,9 @@ func! cm#enable_for_buffer()
 	" inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 
 	let b:cm_enable = 1
+	if len(a:000)
+		let b:cm_enable = a:1
+	endif
 
 	" TODO this override the global options, any way to fix this?
 	set completeopt=menu,menuone,noinsert,noselect

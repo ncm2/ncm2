@@ -210,7 +210,7 @@ a replacement for the old style omnifunc.
 
 
 - There's no guarantee that this plugin will be compatible with other
-  completion plugin in the same buffer. Use `let g:cm_enable_for_all=0` and
+  completion plugin in the same buffer. Use `let g:cm_smart_enable=0` and
   `call cm#enable_for_buffer()` to use this plugin for specific buffer.
 
 - This example shows how to disable NCM's builtin tag completion. It's also

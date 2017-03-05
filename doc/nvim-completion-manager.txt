@@ -91,7 +91,7 @@ time, please try implementing a source for NCM as a replacement for the old
 style 'omnifunc'.
 
 There's no guarantee that this plugin will be compatible with other completion
-plugin in the same buffer. Use `let g:cm_enable_for_all=0` and call
+plugin in the same buffer. Use `let g:cm_smart_enable=0` and call
 |cm#enable_for_buffer()| to use this plugin for specific buffer.
 
 This example shows how to disable NCM's builtin tag completion. It's also
@@ -105,15 +105,16 @@ completion source.
 ==============================================================================
 4. Settings					*NCM-settings*
 
-						*g:cm_enable_for_all*
-g:cm_enable_for_all
-			Enable the |NCM| for all buffers by default. unless
-			the buffer size reach the limit specified by
-			|g:cm_buffer_size_limit|.
+						*g:cm_smart_enable*
+g:cm_smart_enable
+			Enable the |NCM| for buffers automatically. unless the
+			buffer size reach the limit specified by
+			|g:cm_buffer_size_limit|, or 'buftype' option is not
+			empty, which means that it's not a normal buffer.
 			Default: 1
 
 g:cm_buffer_size_limit
-			Used together with |g:cm_enable_for_all|.
+			Used together with |g:cm_smart_enable|.
 			Default: 1000000
 
 						*g:cm_sources_enable*
