@@ -16,9 +16,9 @@ from cm import get_src, register_source, get_pos, getLogger, get_matcher
 register_source(name='cm-keyword-continue',
                 priority=4,
                 abbreviation='',
-                word_pattern=r'\S+',
-                sort=0,
-                cm_refresh_patterns=[r'\s+$',r'^$'],)
+                word_pattern=r'\w+',
+                cm_refresh_min_word_len=0,
+                sort=0,)
 
 import re
 import copy
@@ -89,6 +89,15 @@ class Source:
                     break
             return ret
 
+        def compact_hint(rest_of_line,maxlen):
+            words = list(compiled.finditer(rest_of_line))
+            # to the last non word sequence
+            words_in_range = [e for e in words if e.span()[0]<=maxlen]
+            if not words_in_range:
+                return ''
+            end = words_in_range[-1].span()[0]
+            return rest_of_line[0:end]
+
         lnum = ctx['lnum']
         bufnr = self._nvim.current.buffer.number
 
@@ -115,18 +124,27 @@ class Source:
 
             try:
                 tmp_prev_word = ''
+                tmp_prev_span = (0,0)
                 for word,span,line,last_line in word_generator():
                     if tmp_prev_word==prev_word:
+
                         rest_of_line = line[span[0]:]
-                        hint = rest_of_line
-                        matched = re.compile('\s*(\S+(\s+|$))*').search(rest_of_line,0,50)
-                        logger.info('hint: [%s]', hint)
-                        if matched:
-                            hint = matched.group()
-                            logger.info('new hint: [%s]', hint)
-                        hint = hint.strip()
-                        matches.append(dict(word=word + re.findall(r'\s*',line[span[1]:])[0], menu=hint, _rest_of_line=rest_of_line, _rank=get_rank(word,span,line,last_line)))
+
+                        if len(rest_of_line)<50:
+                            hint = rest_of_line
+                        else:
+                            hint = compact_hint(rest_of_line,50)
+
+                        rest_of_line_without_this = line[span[1]:]
+                        next_word = compiled.search(rest_of_line_without_this)
+                        if not next_word:
+                            next_non_word = rest_of_line
+                        else:
+                            next_non_word = rest_of_line_without_this[0: next_word.span()[0]]
+                        # word = word + next_non_word_sequence
+                        matches.append(dict(word=word + next_non_word, menu=hint, _rest_of_line=rest_of_line, _rank=get_rank(word,span,line,last_line)))
                     tmp_prev_word = word
+                    tmp_prev_span = span
             except Exception as ex:
                 logger.exception("Parsing buffer [%s] failed", buffer)
 
@@ -146,9 +164,15 @@ class Source:
             e = copy.deepcopy(matches[0])
             # e['abbr'] = e['word'] + e['menu'] + '...'
             e['abbr'] = 'the rest> '
-            e['menu'] = e['word'] + e['menu'] + '...'
+            hint = e['menu']
+            if len(hint) < len(e['_rest_of_line']):
+                hint += ' ...'
+            e['menu'] = e['word'] + hint
             e['word'] = e['_rest_of_line']
             matches.insert(1,e)
+
+        # if not matches:
+        #     return
 
         logger.info('matches %s', matches)
         ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
