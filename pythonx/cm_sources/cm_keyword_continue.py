@@ -138,7 +138,7 @@ class Source:
                         rest_of_line_without_this = line[span[1]:]
                         next_word = compiled.search(rest_of_line_without_this)
                         if not next_word:
-                            next_non_word = rest_of_line
+                            next_non_word = rest_of_line_without_this
                         else:
                             next_non_word = rest_of_line_without_this[0: next_word.span()[0]]
                         # word = word + next_non_word_sequence
