@@ -368,16 +368,21 @@ class CoreHandler:
                             ctx['startcol'] = ctx['col']
                     return True
 
+        minimum_length = info['cm_refresh_min_word_len']
         m = re.search(word_pattern + "$",typed)
 
         if not m:
+            if minimum_length==0:
+                # always trigger
+                ctx['base'] = ''
+                ctx['startcol'] = ctx['col']
+                return True
             return False
 
         span = m.span()
         ctx['base'] = ctx['typed'][span[0]:span[1]]
         ctx['startcol'] = ctx['col'] - len(ctx['base'])
 
-        minimum_length = info['cm_refresh_min_word_len']
         if len(ctx['base']) < minimum_length and not force:
             return False
         else:
