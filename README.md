@@ -104,7 +104,7 @@ endif
 # mistune for markdown completion (optional)
 # psutil (optional)
 # setproctitle (optional)
-pip3 --user install neovim jedi mistune psutil setproctitle
+pip3 install --user neovim jedi mistune psutil setproctitle
 ```
 
 (Optional) It's easier to use

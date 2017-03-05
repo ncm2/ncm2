@@ -46,7 +46,7 @@ Install the required pip modules for your python3:
 	# jedi library for python completion
 	# mistune for language specific completion on markdown
 	# psutil and setproctitle are optional utilities
-	pip3 --user install neovim jedi mistune psutil setproctitle
+	pip3 install --user neovim jedi mistune psutil setproctitle
 
 Note: If you're using vim8, you also need to install the `neovim` pip module
 for the python, depending which on of `has("python")` has `has("python3")` you
