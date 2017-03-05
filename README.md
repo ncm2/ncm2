@@ -153,12 +153,33 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 ```
 
-- Trigger Ultisnips or show popup hints [with the same
-  key](https://github.com/roxma/nvim-completion-manager/issues/12#issuecomment-278605326)
-  `<c-u>`
+- If you're using ultisnips too, and you also want to use `<Tab>` to trigger
+  ultisnips, this is what I'm using currently. And if there's an openning
+  popup menu get in the way when you want ultisnips, use `<c-y>` to close the
+  popup menu. Or simple imap another key, `<c-u>` in this example, to trigger
+  ultisnips.
 
 ```vim
-let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
+let g:UltiSnipsExpandTrigger        = "<Plug>(ultisnips_expand)"
+let g:UltiSnipsJumpForwardTrigger   = "<Plug>(ultisnips_expand)"
+let g:UltiSnipsJumpBackwardTrigger  = "<Plug>(ultisnips_backward)"
+let g:UltiSnipsListSnippets         = "<Plug>(ultisnips_list)"
+let g:UltiSnipsRemoveSelectModeMappings = 0 
+
+vnoremap <expr> <Plug>(ultisnip_expand_or_jump_result) g:ulti_expand_or_jump_res?'':"\<Tab>"
+inoremap <expr> <Plug>(ultisnip_expand_or_jump_result) g:ulti_expand_or_jump_res?'':"\<Tab>"
+imap <silent> <expr> <Tab> (pumvisible() ? "\<C-n>" : "\<C-r>=UltiSnips#ExpandSnippetOrJump()\<cr>\<Plug>(ultisnip_expand_or_jump_result)")
+xmap <Tab> <Plug>(ultisnips_expand)
+smap <Tab> <Plug>(ultisnips_expand)
+
+vnoremap <expr> <Plug>(ultisnips_backwards_result) g:ulti_jump_backwards_res?'':"\<S-Tab>"
+inoremap <expr> <Plug>(ultisnips_backwards_result) g:ulti_jump_backwards_res?'':"\<S-Tab>"
+imap <silent> <expr> <S-Tab> (pumvisible() ? "\<C-p>" : "\<C-r>=UltiSnips#JumpBackwards()\<cr>\<Plug>(ultisnips_backwards_result)")
+xmap <S-Tab> <Plug>(ultisnips_backward)
+smap <S-Tab> <Plug>(ultisnips_backward)
+
+" optional mapping provided by NCM. If you press `<c-u>` and nothing has been
+" typed, it will popup a list of snippets available
 inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 ```
 
