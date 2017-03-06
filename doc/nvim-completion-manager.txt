@@ -264,7 +264,7 @@ cm#register_source({source})
 			See |NCM-scoping| for more information.
 
 	word_pattern				*NCM-word_pattern*
-			The default pattern used to calculate |NCM-startcol|.
+			The pattern used to calculate |NCM-startcol|.
 			Default: see pythonx/cm_default.py
 
 						*cm_refresh_patterns*
@@ -395,22 +395,12 @@ cm#context()
 			Calaulated by NCM for convenience to pass it as an
 			argument to the |cm#complete()| function.
 
-			If the pattern matched in |cm_refresh_patterns| has
-			regex group, and the end of last group is the end of
-			|cm#context().typed|, NCM will set this field to the
-			first character of the group. 
+			NCM use |NCM-word_pattern| to get the last typed word,
+			then set startcol to the beginning of the word. If the
+			typing ends with non-word-sequence, startcol will be
+			set to current col.
 
-			For example: >
-				cm_refresh_patterns=["\w{3,}$"]
-<			With the typed characters as: >
-				^foo barfoo| hello$
-<			Then startcol will be 5, which is the column number of
-			the "b" character.
-
-			If the pattern doesn't have regex group,
-			|NCM-word_pattern| will be used to determine startcol.
-
-			Note: You're not required to use this value provided
+			Note: You're not required to use the startcol provided
 			by NCM.
 
 	base

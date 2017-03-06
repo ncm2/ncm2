@@ -351,21 +351,16 @@ class CoreHandler:
             for pattern in patterns:
                 matched = re.search(pattern,typed)
                 if matched:
-                    groups = matched.groups()
-                    if groups and matched.end(len(groups))==len(typed):
-                        # last group at the end, calculate startcol for it
-                        ctx['startcol'] = ctx['col'] - len(groups[-1])
-                        ctx['base'] = groups[-1]
+                    # calculate startcol
+                    m = re.search(word_pattern + "$",typed)
+                    if m:
+                        span = m.span()
+                        ctx['base'] = ctx['typed'][span[0]:span[1]]
+                        ctx['startcol'] = ctx['col'] - len(ctx['base'])
                     else:
-                        m = re.search(word_pattern + "$",typed)
-                        if m:
-                            span = m.span()
-                            ctx['base'] = ctx['typed'][span[0]:span[1]]
-                            ctx['startcol'] = ctx['col'] - len(ctx['base'])
-                        else:
-                            # this is a source specific match, keep going with empty base
-                            ctx['base'] = ''
-                            ctx['startcol'] = ctx['col']
+                        # this is a source specific match, keep going with empty base
+                        ctx['base'] = ''
+                        ctx['startcol'] = ctx['col']
                     return True
 
         minimum_length = info['cm_refresh_min_word_len']
