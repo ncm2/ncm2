@@ -354,9 +354,8 @@ class CoreHandler:
                     # calculate startcol
                     m = re.search(word_pattern + "$",typed)
                     if m:
-                        span = m.span()
-                        ctx['base'] = ctx['typed'][span[0]:span[1]]
-                        ctx['startcol'] = ctx['col'] - len(ctx['base'])
+                        ctx['base'] = m.group()
+                        ctx['startcol'] = ctx['col'] - len(ctx['base'].encode('utf-8'))
                     else:
                         # this is a source specific match, keep going with empty base
                         ctx['base'] = ''
@@ -374,9 +373,8 @@ class CoreHandler:
                 return True
             return False
 
-        span = m.span()
-        ctx['base'] = ctx['typed'][span[0]:span[1]]
-        ctx['startcol'] = ctx['col'] - len(ctx['base'])
+        ctx['base'] = m.group()
+        ctx['startcol'] = ctx['col'] - len(ctx['base'].encode('utf-8'))
 
         if len(ctx['base']) < minimum_length and not force:
             return False
