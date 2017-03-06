@@ -2,9 +2,11 @@
 # sane default for programming languages
 
 
-WORD_PATTERN = {}
-WORD_PATTERN['*'] =   r'(-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
-WORD_PATTERN['php'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
+_patterns = {}
+_patterns['*'] =   r'(-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
+_patterns['php'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
+_patterns['vim'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)'
 
 def word_pattern(ctx):
-    return WORD_PATTERN.get(ctx.get('scope_match','').lower(), None) or WORD_PATTERN['*']
+    scope = ctx.get('scope',ctx.get('filetype','')).lower()
+    return _patterns.get(scope, None) or _patterns['*']
