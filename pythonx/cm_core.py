@@ -137,10 +137,13 @@ class CoreHandler:
         tmp_ctx2 = copy.deepcopy(curctx)
 
         if not self._check_refresh_patterns(info,tmp_ctx1,True):
+            logger.debug('oldctx _check_refresh_patterns failed')
             return False
         if not self._check_refresh_patterns(info,tmp_ctx2,True):
+            logger.debug('curctx _check_refresh_patterns failed')
             return False
 
+        logger.debug('old ctx [%s] cur ctx [%s]', tmp_ctx1, tmp_ctx2)
         # startcol is set in self._check_refresh_patterns
         return tmp_ctx1['startcol'] == tmp_ctx2['startcol']
 
@@ -158,7 +161,10 @@ class CoreHandler:
         # be careful when completion matches context is outdated
         if outdated:
             logger.info("[%s] outdated matches, old typed [%s] cur typed[%s]", name, ctx['typed'], current_ctx['typed'])
-            if refresh or not self._is_kw_futher_typing(info,ctx,current_ctx):
+            if refresh:
+                logger.info("[%s] ignore outdated matching refresh=1", name)
+                return
+            if not self._is_kw_futher_typing(info,ctx,current_ctx):
                 logger.info("[%s] matches is outdated. ignore them.", name)
                 return
             logger.info("[%s] matches is outdated by keyword futher typing. I'm gonna keep it.", name)
@@ -173,6 +179,7 @@ class CoreHandler:
 
             # process the matches early to eliminate unnecessary complete function call
             result = self.process_matches(name,ctx,startcol,matches)
+            logger.debug('<%s> preprocessing result startcol: %s matches: %s', name, startcol, result)
 
             if (not result) and (not self._matches.get(name,{}).get('last_matches',[])):
                 # not popping up, ignore this request
@@ -189,11 +196,17 @@ class CoreHandler:
             if len(matches)==0:
                 del self._matches[name]
             else:
-                self._matches[name]['startcol'] = startcol
-                self._matches[name]['refresh'] = refresh
-                self._matches[name]['matches'] = matches
-                self._matches[name]['context'] = ctx
-                self._matches[name]['enable'] = not ctx.get('early_cache',False)
+                complete_info = self._matches[name]
+                if 'startcol' in complete_info and startcol==complete_info['startcol'] and complete_info['enable']:
+                    # don't disable if it's already enabled with the same startcol
+                    enable = True
+                else:
+                    enable = not ctx.get('early_cache',False)
+                complete_info['startcol'] = startcol
+                complete_info['refresh']  = refresh
+                complete_info['matches']  = matches
+                complete_info['context']  = ctx
+                complete_info['enable']   = enable
 
         # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
@@ -433,6 +446,7 @@ class CoreHandler:
 
                 # may be disabled due to early_cache
                 if not self._matches[name].get('enable',True):
+                    logger.debug('<%s> ignore by disabled', name)
                     continue
 
                 source_startcol = self._matches[name]['startcol']
