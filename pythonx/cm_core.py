@@ -261,7 +261,7 @@ class CoreHandler:
                         continue
 
                     if not force and not info['auto_popup']:
-                        logger.debug('<%s> is not auto_popup', name, ctx['scope'])
+                        logger.debug('<%s> is not auto_popup', name)
                         continue
 
                     # check if enough to trigger cm_refresh
