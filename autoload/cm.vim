@@ -268,6 +268,7 @@ let s:channel_started = 0
 let g:_cm_start_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
 " let s:complete_timer
 let s:complete_timer_ctx = {}
+let s:snippets = []
 
 augroup cm
 	autocmd!
@@ -338,7 +339,7 @@ func! cm#_channel_cleanup(info)
 
 endfunc
 
-func! cm#_core_complete(context, startcol, matches, not_changed)
+func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
 	if ! get(b:,'cm_enable',0)
 		return
@@ -362,6 +363,7 @@ func! cm#_core_complete(context, startcol, matches, not_changed)
 	let s:context = a:context
 	let s:startcol = a:startcol
 	let s:matches = a:matches
+	let s:snippets = a:snippets
 
 	call feedkeys(g:cm_completekeys)
 
@@ -458,6 +460,21 @@ func! s:check_changes(...)
 	if l:tick!=s:lasttick
 		let s:lasttick = l:tick
 		call s:on_changed()
+	endif
+	call s:check_and_inject_snippet()
+endfunc
+
+func! s:check_and_inject_snippet()
+	if empty(v:completed_item) || !has_key(v:completed_item,'info') || empty(v:completed_item.info) || has_key(v:completed_item,'snippet')
+		return
+	endif
+	let l:last_line = split(v:completed_item.info,'\n')[-1]
+	if l:last_line[0:len('snippet@')-1]!='snippet@'
+		return
+	endif
+	let l:snippet_id = str2nr(l:last_line[len('snippet@'):])
+	if l:snippet_id<len(s:snippets) && l:snippet_id>=0
+		let v:completed_item.snippet = s:snippets[l:snippet_id]
 	endif
 endfunc
 

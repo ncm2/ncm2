@@ -49,6 +49,7 @@ class CoreHandler:
         self._start_py   = nvim.vars['_cm_start_py_path']
         self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
+        self._completed_snippet_enable = nvim.vars['cm_completed_snippet_enable']
 
         scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
@@ -528,7 +529,32 @@ class CoreHandler:
         if self._last_startcol==startcol and self._last_matches==matches:
             not_changed = 1
             logger.info('ignore _complete call: self._last_startcol==startcol and self._last_matches==matches')
-        self._nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed)
+
+        # Note: The snippet field will not be kept in v:completed_item.  Use
+        # this trick to to hack
+        snippets = []
+        if self._completed_snippet_enable:
+            for m in matches:
+                if 'snippet' not in m or not m['snippet']:
+                    continue
+                if 'info' not in m or not m['info']:
+                    m['info'] = 'snippet@%s' % len(snippets)
+                else:
+                    m['info'] += '\nsnippet@%s' % len(snippets)
+                # indicates that this completion item is expandable
+                snippets.append(m['snippet'])
+
+            if snippets:
+                # add expand sign if snippets exist
+                for m in matches:
+                    if 'menu' not in m:
+                        m['menu'] = ''
+                    if 'snippet' not in m or not m['snippet']:
+                        m['menu'] = '  ' + m['menu']
+                    else:
+                        m['menu'] = '+ ' + m['menu']
+
+        self._nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
         self._last_matches = matches
         self._last_startcol = startcol
 

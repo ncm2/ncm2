@@ -58,13 +58,29 @@ class Source:
         matches = []
 
         for complete in completions:
-            
+
             item = dict(word=ctx['base']+complete.complete,
                         icase=1,
                         dup=1,
                         menu=complete.description,
                         info=complete.docstring()
                         )
+
+            if complete.type == 'function':
+                params = complete.params
+                placeholders = []
+                num = 1
+                for param in params:
+                    logger.info('name: %s, description: %s', param.name, param.description)
+                    if re.match(r'^[\w\s]+$', param.description):
+                        # param without default value
+                        placeholders.append('${%s:%s}' % (num,param.name) )
+                    else:
+                        break
+                    num += 1
+                snippet = '(%s)${0}' % ', '.join(placeholders)
+                item['snippet'] = snippet
+                logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
             # Fix the user typed case
             if item['word'].lower()==complete.name.lower():
                 item['word'] = complete.name
