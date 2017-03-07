@@ -205,6 +205,9 @@ func! cm#register_source(info)
 	" wether or not use the framework's standard sorting
 	let a:info['sort'] = get(a:info,'sort',1)
 
+	" similar to g:cm_auto_popup
+	let a:info['auto_popup'] = get(a:info,'auto_popup',1)
+
 	" disable early_cache by default for vimscript source
 	let a:info['early_cache'] = get(a:info,'early_cache', !has_key(a:info,'cm_refresh'))
 

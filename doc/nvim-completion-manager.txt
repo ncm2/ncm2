@@ -315,6 +315,11 @@ cm#register_source({source})
 			Default: 0 for ||NCM-vimscript-source| registered.  1
 				for |NCM-python-source| .
 
+	auto_popup
+			If 0, only the |<Plug>(cm_force_refresh)| key can
+			trigger the |cm_refresh-notification| for this source.
+			Default: 1
+
 						*NCM-source-options*
 	options					*NCM-options*
 			This field is ignored by NCM framework, but it will be

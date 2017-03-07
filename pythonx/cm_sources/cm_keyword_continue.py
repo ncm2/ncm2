@@ -13,11 +13,13 @@ from cm import get_src, register_source, get_pos, getLogger, get_matcher
 # A completion source with CTRL-X CTRL-N like feature
 #
 # sort=0 for not using NCM's builtin sorting
+# auto_popup=0, this source is kinkd of heavy weight (scan all buffers)
 register_source(name='cm-keyword-continue',
-                priority=4,
+                priority=5,
                 abbreviation='',
                 word_pattern=r'\w+',
                 cm_refresh_min_word_len=0,
+                auto_popup=0,
                 sort=0,)
 
 import re

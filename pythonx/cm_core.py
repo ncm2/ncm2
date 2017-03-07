@@ -260,6 +260,10 @@ class CoreHandler:
                         logger.debug('_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
                         continue
 
+                    if not force and not info['auto_popup']:
+                        logger.debug('<%s> is not auto_popup', name, ctx['scope'])
+                        continue
+
                     # check if enough to trigger cm_refresh
                     # if ok, set startcol for it
                     is_matched = self._check_refresh_patterns(info,ctx,force)
