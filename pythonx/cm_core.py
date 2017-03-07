@@ -545,18 +545,18 @@ class CoreHandler:
                     m['info'] = 'snippet@%s' % len(snippets)
                 else:
                     m['info'] += '\nsnippet@%s' % len(snippets)
-                # indicates that this completion item is expandable
                 snippets.append(m['snippet'])
 
             if snippets:
-                # add expand sign if snippets exist
                 for m in matches:
                     if 'menu' not in m:
                         m['menu'] = ''
                     if 'snippet' not in m or not m['snippet']:
-                        m['menu'] = '  ' + m['menu']
+                        m['menu'] = '[ ] ' + m['menu']
                     else:
-                        m['menu'] = '+ ' + m['menu']
+                        # [+] sign indicates that this completion item is
+                        # expandable
+                        m['menu'] = '[+] ' + m['menu']
 
         self._nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
         self._last_matches = matches
