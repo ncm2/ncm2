@@ -276,7 +276,6 @@ let s:snippets = []
 augroup cm
 	autocmd!
 	autocmd VimLeavePre * let s:leaving=1
-	" autocmd User PossibleTextChangedI call <sid>on_changed()
 augroup END
 
 func! s:check_scope(info)
