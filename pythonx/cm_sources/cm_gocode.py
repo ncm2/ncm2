@@ -8,7 +8,7 @@
 # Please register source before executing any other code, this allow cm_core to
 # read basic information about the source without loading the whole module, and
 # modules required by this module
-from cm import get_src, register_source, get_pos, getLogger
+from cm import register_source, getLogger, Base
 
 register_source(name='cm-gocode',
                 priority=9,
@@ -17,24 +17,16 @@ register_source(name='cm-gocode',
                 scopes=['go'],
                 cm_refresh_patterns=[r'\.(\w*)$'],)
 
-import os
-import re
-import logging
-from neovim import attach, setup_logging
-import re
 import subprocess
-import logging
-from urllib import request
 import json
 
 logger = getLogger(__name__)
 
 
-class Source:
+class Source(Base):
 
     def __init__(self,nvim):
-
-        self._nvim = nvim
+        super(Source,self).__init__(nvim)
 
     def cm_refresh(self,info,ctx,*args):
 
@@ -44,10 +36,10 @@ class Source:
         # of the file, Please use `cm.get_src()` instead of
         # `"\n".join(self._nvim.current.buffer[:])`
 
-        src = get_src(self._nvim,ctx)
+        src = self.get_src(ctx)
 
         # convert lnum, col to offset
-        offset = get_pos(ctx['lnum'],ctx['col'],src)
+        offset = self.get_pos(ctx['lnum'],ctx['col'],src)
 
         # invoke gocode
         proc = subprocess.Popen(args=['gocode','-f','json','autocomplete','%s' % offset], 
@@ -67,7 +59,7 @@ class Source:
         matches = []
 
         for complete in completions:
-            
+ 
             item = dict(word=complete['name'],
                         icase=1,
                         dup=1,
@@ -77,6 +69,6 @@ class Source:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
+        ret = self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
         logger.info('matches %s, ret %s', matches, ret)
 

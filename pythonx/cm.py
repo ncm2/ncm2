@@ -37,86 +37,101 @@ def register_source(name,abbreviation,priority,enable=True,events=[],python='pyt
     # module
     return
 
-def get_src(nvim,ctx):
-    """
-    :type nvim: Nvim
-    """
 
-    bufnr = ctx['bufnr']
-    changedtick = ctx['changedtick']
+# base class for source handler
+class Base:
 
-    key = (bufnr,changedtick)
-    if key != getattr(get_src,'_cache_key',None):
-        lines = nvim.buffers[bufnr][:]
-        get_src._cache_src = "\n".join(lines)
-        get_src._cache_key = key
+    def __init__(self,nvim):
 
-    scope_offset = ctx.get('scope_offset',0)
-    scope_len = ctx.get('scope_len',len(get_src._cache_src))
+        """
+        :type nvim: Nvim
+        """
 
-    return get_src._cache_src[scope_offset:scope_offset+scope_len]
+        self.nvim = nvim
+        self.logger = getLogger(self.__module__)
 
+    # allow a source to preprocess inputs before committing to the manager
+    @property
+    def matcher(self):
 
-# convert (lnum, col) to pos
-def get_pos(lnum,col,src):
+        nvim = self.nvim
 
-    # curpos
-    lines = src.split('\n')
-    pos = 0
-    for i in range(lnum-1):
-        pos += len(lines[i])+1
-    pos += col-1
+        if not hasattr(self,'_matcher'):
 
-    return pos
+            # from cm.matchers.prifex_matcher import Matcher
+            matcher_opt = nvim.eval('g:cm_matcher')
+            m = importlib.import_module(matcher_opt['module'])
 
-def get_lnum_col(pos,src):
-    splited = src.split("\n")
-    p = 0
-    for idx,line in enumerate(splited):
-        if p<=pos and p+len(line)>=pos:
-            return (idx+1,pos-p+1)
-        p += len(line)+1
+            chcmp_smartcase = lambda a,b: a==b if a.isupper() else a==b.lower()
+            chcmp_case = lambda a,b: a==b
+            chcmp_icase = lambda a,b: a.lower()==b.lower()
 
-# allow a source to preprocess inputs before commit to the manager
-def get_matcher(nvim):
+            case = matcher_opt.get('case','')
+            if case not in ['case','icase','smartcase']:
+                ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
+                if smartcase:
+                    chcmp = chcmp_smartcase
+                elif ignorecase:
+                    chcmp = chcmp_icase
+                else:
+                    chcmp = chcmp_case
+            elif case=='case':
+                chcmp = chcmp_case
+            elif case=='icase':
+                chcmp = chcmp_icase
+            else:
+                # smartcase
+                chcmp = chcmp_smartcase
 
-    if hasattr(get_matcher,'matcher'):
-        return get_matcher.matcher
+            # cache result
+            self._matcher = m.Matcher(nvim,chcmp)
 
-    # from cm.matchers.prifex_matcher import Matcher
-    matcher_opt = nvim.eval('g:cm_matcher')
-    m = importlib.import_module(matcher_opt['module'])
+        return self._matcher
 
-    def chcmp_smartcase(a,b):
-        if a.isupper():
-            return a==b
-        else:
-            return a == b.lower()
+    def get_pos(self, lnum , col, src):
+        """
+        convert vim's lnum, col into pos
+        """
+        lines = src.split('\n')
+        pos = 0
+        for i in range(lnum-1):
+            pos += len(lines[i])+1
+        pos += col-1
 
-    def chcmp_case(a,b):
-        return a==b
+        return pos
 
-    def chcmp_icase(a,b):
-        return a.lower()==b.lower()
+    # convert pos into vim's lnum, col
+    def get_lnum_col(self, pos, src):
+        """
+        convert pos into vim's lnum, col
+        """
+        splited = src.split("\n")
+        p = 0
+        for idx,line in enumerate(splited):
+            if p<=pos and p+len(line)>=pos:
+                return (idx+1,pos-p+1)
+            p += len(line)+1
 
-    chcmp = None
-    case = matcher_opt.get('case','')
-    if case not in ['case','icase','smartcase']:
-        ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
-        if smartcase:
-            chcmp = chcmp_smartcase
-        elif ignorecase:
-            chcmp = chcmp_icase
-        else:
-            chcmp = chcmp_case
-    elif case=='case':
-        chcmp = chcmp_case
-    elif case=='icase':
-        chcmp = chcmp_icase
-    elif case=='smartcase':
-        chcmp = chcmp_smartcase
+    def get_src(self,ctx):
 
-    # cache result
-    get_matcher.matcher = m.Matcher(nvim,chcmp)
-    return get_matcher.matcher
+        """
+        Get the source code of current scope identified by the ctx object.
+        """
+
+        nvim = self.nvim
+
+        bufnr = ctx['bufnr']
+        changedtick = ctx['changedtick']
+
+        key = (bufnr,changedtick)
+        if key != getattr(self,'_cache_key',None):
+            lines = nvim.buffers[bufnr][:]
+            lines.append('') # \n at the end of buffer
+            self._cache_src = "\n".join(lines)
+            self._cache_key = key
+
+        scope_offset = ctx.get('scope_offset',0)
+        scope_len = ctx.get('scope_len',len(self._cache_src))
+
+        return self._cache_src[scope_offset:scope_offset+scope_len]
 

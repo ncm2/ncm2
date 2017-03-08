@@ -8,7 +8,7 @@
 # Please register source before executing any other code, this allow cm_core to
 # read basic information about the source without loading the whole module, and
 # modules required by this module
-from cm import get_src, register_source, get_pos, getLogger, get_matcher
+from cm import register_source, getLogger, Base
 
 # A completion source with CTRL-X CTRL-N like feature
 #
@@ -27,12 +27,10 @@ import copy
 
 logger = getLogger(__name__)
 
-
-class Source:
+class Source(Base):
 
     def __init__(self,nvim):
-
-        self._nvim = nvim
+        super().__init__(nvim)
 
     def cm_refresh(self,info,ctx,*args):
 
@@ -47,7 +45,7 @@ class Source:
             return
         try:
             # fetch the previous line for better sorting
-            last_line = self._nvim.current.buffer[ctx['lnum']-2]
+            last_line = self.nvim.current.buffer[ctx['lnum']-2]
             typed = last_line + '\n' + typed
         except:
             pass
@@ -101,9 +99,9 @@ class Source:
             return rest_of_line[0:end]
 
         lnum = ctx['lnum']
-        bufnr = self._nvim.current.buffer.number
+        bufnr = self.nvim.current.buffer.number
 
-        for buffer in self._nvim.buffers:
+        for buffer in self.nvim.buffers:
 
             this_bufnr = buffer.number
             def word_generator():
@@ -159,7 +157,7 @@ class Source:
 
         # filter the result here, so that the result of line completion will be
         # displayed properly
-        matches = get_matcher(self._nvim).process(info, ctx, ctx['startcol'], matches)
+        matches = self.matcher.process(info, ctx, ctx['startcol'], matches)
 
         if matches:
             # add rest_of_line completion for the highest rank
@@ -177,5 +175,5 @@ class Source:
         #     return
 
         logger.info('matches %s', matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
+        ret = self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
 

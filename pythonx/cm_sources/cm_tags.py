@@ -4,7 +4,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import register_source, getLogger
+from cm import register_source, getLogger, Base
 register_source(name='cm-tags',
                    priority=6,
                    abbreviation='Tag',
@@ -17,16 +17,15 @@ import sys
 
 logger = getLogger(__name__)
 
-class Source:
+class Source(Base):
 
     def __init__(self,nvim):
-
-        self._nvim = nvim
-        self._files = self._nvim.call('tagfiles')
+        super().__init__(nvim)
+        self._files = self.nvim.call('tagfiles')
 
     def cm_event(self,event,ctx,*args):
         if event=="WinEnter":
-            self._files = self._nvim.call('tagfiles')
+            self._files = self.nvim.call('tagfiles')
 
     def cm_refresh(self,info,ctx):
 
@@ -55,7 +54,7 @@ class Source:
         logger.info('matches len %s', len(matches))
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, refresh, async=True)
+        self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, refresh, async=True)
 
 
 def binary_search_lines_by_prefix(prefix,filename):

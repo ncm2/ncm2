@@ -3,7 +3,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import get_src, register_source, getLogger
+from cm import register_source, getLogger, Base
 register_source(name='cm-jedi',
                 priority=9,
                 abbreviation='Py',
@@ -12,26 +12,23 @@ register_source(name='cm-jedi',
                 # The last two patterns is for displaying function signatures [r'\(\s?(\w*)$',r',(\s?\w*)$']
                 cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$',r'\.\w*$',r'\(\s?(\w*)$',r',\s?(\w*)$'],)
 
-import os
 import re
-import logging
 import jedi
-from neovim import attach, setup_logging
 
 logger = getLogger(__name__)
 
-class Source:
+class Source(Base):
 
     def __init__(self,nvim):
+        super(Source,self).__init__(nvim)
         self._snippet_engine = nvim.vars['cm_completed_snippet_engine']
-        self._nvim = nvim
 
     def cm_refresh(self,info,ctx,*args):
 
         path = ctx['filepath']
         typed = ctx['typed']
 
-        src = get_src(self._nvim,ctx)
+        src = self.get_src(ctx)
         if not src.strip():
             # empty src may possibly block jedi execution, don't know why
             logger.info('ignore empty src [%s]', src)
@@ -49,7 +46,7 @@ class Source:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 # refresh=True
                 # call signature popup doesn't need to be cached by the framework
-                self._nvim.call('cm#complete', info['name'], ctx, ctx['col'], matches, True, async=True)
+                self.nvim.call('cm#complete', info['name'], ctx, ctx['col'], matches, True, async=True)
             return
 
         completions = script.completions()
@@ -67,7 +64,11 @@ class Source:
                         )
 
             if complete.type == 'function':
-                params = complete.params
+                params = []
+                if hasattr(complete,'params'):
+                    params = complete.params
+                if not params:
+                    params = []
                 placeholders = []
                 num = 1
                 for param in params:
@@ -93,7 +94,7 @@ class Source:
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
-        ret = self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
+        ret = self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
         logger.info('matches %s, ret %s', matches, ret)
 
     def _get_signature_text(self,script):

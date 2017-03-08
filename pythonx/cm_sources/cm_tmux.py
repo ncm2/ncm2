@@ -4,7 +4,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import register_source, get_matcher
+from cm import register_source, getLogger, Base
 import os
 register_source(name='cm-tmux',
                 abbreviation='Tmux',
@@ -19,11 +19,10 @@ import subprocess
 
 logger = logging.getLogger(__name__)
 
-class Source:
+class Source(Base):
 
     def __init__(self,nvim):
-
-        self._nvim = nvim
+        super().__init__(nvim)
 
         self._words = set()
 
@@ -80,8 +79,8 @@ class Source:
         startcol = ctx['startcol']
 
         matches = (dict(word=word,icase=1)  for word in self._words)
-        matches = get_matcher(self._nvim).process(info, ctx, startcol, matches)
+        matches = self.matcher.process(info, ctx, startcol, matches)
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
+        self.nvim.call('cm#complete', info['name'], ctx, startcol, matches, async=True)
 

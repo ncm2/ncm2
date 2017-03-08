@@ -4,22 +4,21 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-from cm import register_source, getLogger, get_matcher
+from cm import register_source, getLogger, Base
 register_source(name='cm-bufkeyword',
                    priority=5,
                    abbreviation='Key',
                    events=['InsertEnter', 'BufEnter'],)
 
-import os
 import re
 import cm_default
 
 logger = getLogger(__name__)
 
-class Source:
+class Source(Base):
 
     def __init__(self,nvim):
-        self._nvim = nvim
+        super(Source,self).__init__(nvim)
         self._words = set()
         self._last_ctx = None
         self.refresh_keyword(nvim.eval('cm#context()'))
@@ -35,7 +34,7 @@ class Source:
         compiled = re.compile(word_pattern)
         logger.info('refreshing_keyword, word_pattern [%s]', word_pattern)
 
-        buffer = self._nvim.current.buffer
+        buffer = self.nvim.current.buffer
 
         if all:
             self._words = set()
@@ -77,8 +76,8 @@ class Source:
 
         matches = (dict(word=word,icase=1)  for word in self._words)
 
-        matches = get_matcher(self._nvim).process(info, ctx, ctx['startcol'], matches)
+        matches = self.matcher.process(info, ctx, ctx['startcol'], matches)
 
         # cm#complete(src, context, startcol, matches)
-        self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
+        self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
 

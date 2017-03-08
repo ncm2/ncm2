@@ -3,18 +3,10 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
-import sys
 import os
 import re
-import logging
 import copy
 import importlib
-import threading
-from threading import Thread, RLock
-import urllib
-import json
-from neovim import attach
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import cm
 import subprocess
 import time
@@ -27,11 +19,11 @@ logger = cm.getLogger(__name__)
 class CmSkipLoading(Exception):
     pass
 
-class CoreHandler:
+class CoreHandler(cm.Base):
 
     def __init__(self,nvim):
 
-        self._nvim = nvim
+        super().__init__(nvim)
 
         # process control information on channels
         self._channel_processes = {}
@@ -51,7 +43,7 @@ class CoreHandler:
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
         self._completed_snippet_enable = nvim.vars['cm_completed_snippet_enable']
 
-        scoper_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
+        scoper_paths = self.nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
         # auto find scopers
         for path in scoper_paths:
@@ -74,7 +66,7 @@ class CoreHandler:
                 logger.exception('importing scoper <%s> failed: %s', modulename, ex)
 
         # auto find sources
-        sources_paths = self._nvim.eval("globpath(&rtp,'pythonx/cm_sources/*.py',1)").split("\n")
+        sources_paths = self.nvim.eval("globpath(&rtp,'pythonx/cm_sources/*.py',1)").split("\n")
         for path in sources_paths:
 
             modulename = os.path.splitext(os.path.basename(path))[0]
@@ -208,7 +200,7 @@ class CoreHandler:
             logger.info("update popup for [%s]",name)
             # the ctx in parameter maybe a subctx for completion source, use
             # nvim.call to get the root context
-            self._refresh_completions(self._nvim.call('cm#context'))
+            self._refresh_completions(self.nvim.call('cm#context'))
         else:
             logger.debug("delay popup for [%s]",name)
 
@@ -317,7 +309,7 @@ class CoreHandler:
         else:
             logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
             logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
-            self._nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
+            self.nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
 
 
     def _get_ctx_list(self,root_ctx):
@@ -331,7 +323,7 @@ class CoreHandler:
             if scope in self._subscope_detectors:
                 for detector in self._subscope_detectors[scope]:
                     try:
-                        sub_ctx = detector.sub_context(ctx, cm.get_src(self._nvim,ctx))
+                        sub_ctx = detector.sub_context(ctx, self.get_src(ctx))
                         if sub_ctx:
                             # adjust offset to global based and add the new
                             # context
@@ -511,7 +503,7 @@ class CoreHandler:
             formalized.append(e)
 
         # filtering and sorting
-        result = cm.get_matcher(self._nvim).process(info,ctx,startcol,formalized)
+        result = self.matcher.process(info,ctx,startcol,formalized)
 
         # fix some text
         for e in result:
@@ -567,7 +559,7 @@ class CoreHandler:
                         # expandable
                         m['menu'] = '[+] ' + m['menu']
 
-        self._nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
+        self.nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
         self._last_matches = matches
         self._last_startcol = startcol
 
