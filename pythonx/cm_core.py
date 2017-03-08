@@ -197,16 +197,11 @@ class CoreHandler:
                 del self._matches[name]
             else:
                 complete_info = self._matches[name]
-                if 'startcol' in complete_info and startcol==complete_info['startcol'] and complete_info['enable']:
-                    # don't disable if it's already enabled with the same startcol
-                    enable = True
-                else:
-                    enable = not ctx.get('early_cache',False)
                 complete_info['startcol'] = startcol
                 complete_info['refresh']  = refresh
                 complete_info['matches']  = matches
                 complete_info['context']  = ctx
-                complete_info['enable']   = enable
+                complete_info['enable']   = not ctx.get('early_cache',False)
 
         # wait for cm_complete_timeout, reduce flashes
         if self._has_popped_up:
