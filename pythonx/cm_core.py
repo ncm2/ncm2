@@ -55,7 +55,7 @@ class CoreHandler(cm.Base):
                 modulename = "cm_scopers.%s" % modulename
                 m = importlib.import_module(modulename)
 
-                scoper = m.Scoper()
+                scoper = m.Scoper(self.nvim)
                 for scope in scoper.scopes:
                     if scope not in self._subscope_detectors:
                         self._subscope_detectors[scope] = []

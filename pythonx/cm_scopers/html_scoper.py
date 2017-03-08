@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 import logging
-import urllib
-import http.client
 import copy
-import cm
+from cm import Base, getLogger
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger = getLogger(__name__)
 
-
-class Scoper:
+class Scoper(Base):
 
     scopes = ['html','xhtml','php','blade','jinja','jinja2','vue.html.javascript.css','vue']
 
@@ -79,7 +75,7 @@ class Scoper:
                             # style
                             self.scope_info['scope']='css'
 
-                        self.scope_info['scope_offset']= cm.get_pos(startpos[0],startpos[1]+1,src)
+                        self.scope_info['scope_offset']= self.get_pos(startpos[0],startpos[1]+1,src)
                         self.scope_info['scope_len']=len(self.last_data)
 
                         # offset as lnum, col format
@@ -109,7 +105,7 @@ class Scoper:
             return new_ctx
 
 
-        pos = cm.get_pos(lnum,col,src)
+        pos = self.get_pos(lnum,col,src)
         # css completions for style='|'
         for match in re.finditer(r'style\s*=\s*("|\')(.*?)\1',src):
             if match.start(2)>pos:
@@ -124,12 +120,12 @@ class Scoper:
 
             new_ctx['scope_offset'] = match.start(2)
             new_ctx['scope_len'] = len(new_src)
-            scope_lnum_col = cm.get_lnum_col(match.start(2),src)
+            scope_lnum_col = self.get_lnum_col(match.start(2),src)
             new_ctx['scope_lnum'] = scope_lnum_col[0]
             new_ctx['scope_col'] = scope_lnum_col[1]
 
             sub_pos = pos - match.start(2)
-            sub_lnum_col = cm.get_lnum_col(sub_pos,new_src)
+            sub_lnum_col = self.get_lnum_col(sub_pos,new_src)
             new_ctx['lnum'] = sub_lnum_col[0]
             new_ctx['col'] = sub_lnum_col[1]
             return new_ctx
