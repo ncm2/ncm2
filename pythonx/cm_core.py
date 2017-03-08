@@ -359,40 +359,40 @@ class CoreHandler:
 
         word_pattern = info.get('word_pattern',None) or cm_default.word_pattern(ctx)
 
-        # check source specific patterns
-        if patterns:
-            for pattern in patterns:
-                matched = re.search(pattern,typed)
-                if matched:
-                    # calculate startcol
-                    m = re.search(word_pattern + "$",typed)
-                    if m:
-                        ctx['base'] = m.group()
-                        ctx['startcol'] = ctx['col'] - len(ctx['base'].encode('utf-8'))
-                    else:
-                        # this is a source specific match, keep going with empty base
-                        ctx['base'] = ''
-                        ctx['startcol'] = ctx['col']
-                    return True
+        # remove the last word, check whether the special pattern matches
+        # last_word_removed
+        end_word_matched = re.search(word_pattern + "$",typed)
+        if end_word_matched:
+            ctx['base']       = end_word_matched.group()
+            ctx['startcol']   = ctx['col'] - len(ctx['base'].encode('utf-8'))
+            last_word_removed = typed[:end_word_matched.start()]
+            word_len          = len(ctx['base'])
+        else:
+            ctx['base']       = ''
+            ctx['startcol']   = ctx['col']
+            last_word_removed = typed
+            word_len          = 0
 
         minimum_length = info['cm_refresh_min_word_len']
-        m = re.search(word_pattern + "$",typed)
 
-        if not m:
-            if minimum_length==0:
-                # always trigger
-                ctx['base'] = ''
-                ctx['startcol'] = ctx['col']
-                return True
-            return False
-
-        ctx['base'] = m.group()
-        ctx['startcol'] = ctx['col'] - len(ctx['base'].encode('utf-8'))
-
-        if len(ctx['base']) < minimum_length and not force:
-            return False
-        else:
+        # always match
+        if minimum_length==0:
             return True
+
+        if force and word_len>0:
+            return True
+
+        if word_len >= minimum_length:
+            return True
+
+        # check source extra patterns
+        if patterns:
+            for pattern in patterns:
+                matched = re.search(pattern, last_word_removed)
+                if matched:
+                    return True
+
+        return False
 
     # almost the same as `s:check_scope` in `autoload/cm.vim`
     def _check_scope(self,ctx,info):
