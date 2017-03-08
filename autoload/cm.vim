@@ -467,17 +467,38 @@ func! s:check_changes(...)
 endfunc
 
 func! s:check_and_inject_snippet()
+
 	if empty(v:completed_item) || !has_key(v:completed_item,'info') || empty(v:completed_item.info) || has_key(v:completed_item,'snippet')
 		return
 	endif
+
 	let l:last_line = split(v:completed_item.info,'\n')[-1]
 	if l:last_line[0:len('snippet@')-1]!='snippet@'
 		return
 	endif
+
 	let l:snippet_id = str2nr(l:last_line[len('snippet@'):])
-	if l:snippet_id<len(s:snippets) && l:snippet_id>=0
-		let v:completed_item.snippet = s:snippets[l:snippet_id]
+	if l:snippet_id>=len(s:snippets) || l:snippet_id<0
+		return
 	endif
+
+	" neosnippet recognize the snippet field of v:completed_item. Also useful
+	" for checking. Kind of a hack.
+	let v:completed_item.snippet = s:snippets[l:snippet_id]
+
+	if g:cm_completed_snippet_engine == 'ultisnips'
+		if get(b:,'_cm_us_setup',0)==0
+			" UltiSnips_Manager.add_buffer_filetypes('%s.snips.ncm' % vim.eval('&filetype'))
+			let b:_cm_us_setup = 1
+			let b:_cm_us_filetype = 'ncm'
+			call UltiSnips#AddFiletypes(b:_cm_us_filetype)
+			autocmd InsertLeave <buffer> exec g:_uspy 'UltiSnips_Manager._added_snippets_source._snippets["ncm"]._snippets = []'
+		endif
+		exec g:_uspy 'UltiSnips_Manager._added_snippets_source._snippets["ncm"]._snippets = []'
+		" TODO cleanup when InsertLeave
+		call UltiSnips#AddSnippetWithPriority(v:completed_item.word, v:completed_item.snippet, '', 'i', b:_cm_us_filetype, 1)
+	endif
+
 endfunc
 
 " on completion context changed

@@ -23,7 +23,7 @@ logger = getLogger(__name__)
 class Source:
 
     def __init__(self,nvim):
-
+        self._snippet_engine = nvim.vars['cm_completed_snippet_engine']
         self._nvim = nvim
 
     def cm_refresh(self,info,ctx,*args):
@@ -78,7 +78,13 @@ class Source:
                     else:
                         break
                     num += 1
-                snippet = '(%s)${0}' % ', '.join(placeholders)
+
+                if self._snippet_engine=='neosnippet':
+                    snippet = '(%s)${0}' % ', '.join(placeholders)
+                else:
+                    # ultisnips
+                    snippet = '%s(%s)${0}' % (item['word'],', '.join(placeholders))
+
                 item['snippet'] = snippet
                 logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
             # Fix the user typed case

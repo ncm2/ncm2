@@ -62,11 +62,26 @@ let g:cm_sources_override = get(g:,'cm_sources_override',{})
 " format: [ (minimal priority, min length), ()]
 let g:cm_refresh_default_min_word_len = get(g:,'cm_refresh_default_min_word_len',[[1,4],[7,3]])
 
-let g:cm_completed_snippet_enable = get(g:,'cm_completed_snippet_enable',get(g:,'neosnippet#enable_completed_snippet',0))
+func! s:lazy_init()
+	if !exists('g:cm_completed_snippet_enable')
+		if get(g:,'neosnippet#enable_completed_snippet',0)
+			let g:cm_completed_snippet_enable = 1
+			let g:cm_completed_snippet_engine = 'neosnippet'
+		elseif exists('g:did_plugin_ultisnips')
+			let g:cm_completed_snippet_enable = 1
+			let g:cm_completed_snippet_engine = 'ultisnips'
+		else
+			let g:cm_completed_snippet_enable = 0
+			let g:cm_completed_snippet_engine = ''
+		endif
+	endif
+endfunc
+
+au User CmSetup call s:lazy_init()
 
 " use did_plugin_ultisnips to detect the installation of ultisnips
 " https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
-au User CmSetup if exists('did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
+au User CmSetup if exists('g:did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
 		\ 'priority': 7, 
 		\ 'abbreviation': 'Snip',
 		\ 'word_pattern': '\S+',

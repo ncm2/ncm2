@@ -181,7 +181,14 @@ g:cm_completed_snippet_enable
 			Snippet support for completed item (:help
 			|v:completed_item|). This is useful for function
 			parameter expension.
-			Default: as |g:neosnippet#enable_completed_snippet|
+
+			Enable by default if any one of the conditions is
+			satisfied:
+
+			- you have installed neosnippet with
+			  |g:neosnippet#enable_completed_snippet| set to 1
+
+			- you have installed ultisnips
 
 						*g:cm_completekeys*
 g:cm_completekeys
