@@ -80,11 +80,8 @@ class Source(Base):
                         break
                     num += 1
 
-                if self._snippet_engine=='neosnippet':
-                    snippet = '(%s)${0}' % ', '.join(placeholders)
-                else:
-                    # ultisnips
-                    snippet = '%s(%s)${0}' % (item['word'],', '.join(placeholders))
+                # ultisnips
+                snippet = '%s(%s)${0}' % (item['word'],', '.join(placeholders))
 
                 item['snippet'] = snippet
                 logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)

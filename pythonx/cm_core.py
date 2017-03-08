@@ -42,6 +42,7 @@ class CoreHandler(cm.Base):
         self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
         self._completed_snippet_enable = nvim.vars['cm_completed_snippet_enable']
+        self._completed_snippet_engine = nvim.vars['cm_completed_snippet_engine']
 
         scoper_paths = self.nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
 
@@ -540,12 +541,20 @@ class CoreHandler(cm.Base):
         snippets = []
         if self._completed_snippet_enable:
             for m in matches:
+
                 if 'snippet' not in m or not m['snippet']:
                     continue
                 if 'info' not in m or not m['info']:
                     m['info'] = 'snippet@%s' % len(snippets)
                 else:
                     m['info'] += '\nsnippet@%s' % len(snippets)
+
+                if self._completed_snippet_engine=='neosnippet':
+                    # neosnippet does not remove the completed word
+                    # make them compatible if possible
+                    if m['snippet'][0:len(m['word'])] == m['word']:
+                        m['snippet'] = m['snippet'][len(m['word']):]
+
                 snippets.append(m['snippet'])
 
             if snippets:
