@@ -77,5 +77,5 @@ class Source(Base):
             matches = matches[0:1024]
 
         self.logger.debug('startcol: %s, matches: %s', startcol, matches)
-        self.nvim.call('cm#complete', info['name'], ctx, startcol, matches, refresh, async=True)
+        self.complete(info, ctx, ctx['startcol'], matches, refresh)
 

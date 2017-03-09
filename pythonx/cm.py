@@ -38,7 +38,7 @@ def register_source(name,abbreviation,priority,enable=True,events=[],python='pyt
     return
 
 
-# base class for source handler
+# Base class for cm_core, sources, and scopers
 class Base:
 
     def __init__(self,nvim):
@@ -134,4 +134,9 @@ class Base:
         scope_len = ctx.get('scope_len',len(self._cache_src))
 
         return self._cache_src[scope_offset:scope_offset+scope_len]
+
+    def complete(self, name, ctx, startcol, matches, refresh=False):
+        if isinstance(name,dict):
+            name = name['name']
+        self.nvim.call('cm#complete', name, ctx, startcol, matches, refresh, async=True)
 

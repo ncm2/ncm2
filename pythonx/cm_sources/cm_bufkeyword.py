@@ -75,9 +75,7 @@ class Source(Base):
         self.refresh_keyword(ctx,False)
 
         matches = (dict(word=word,icase=1)  for word in self._words)
-
         matches = self.matcher.process(info, ctx, ctx['startcol'], matches)
 
-        # cm#complete(src, context, startcol, matches)
-        self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
+        self.complete(info, ctx, ctx['startcol'], matches)
 

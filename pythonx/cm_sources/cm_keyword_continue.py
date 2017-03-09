@@ -175,5 +175,5 @@ class Source(Base):
         #     return
 
         logger.info('matches %s', matches)
-        ret = self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
+        self.complete(info, ctx, ctx['startcol'], matches)
 

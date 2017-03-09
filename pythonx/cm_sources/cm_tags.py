@@ -53,8 +53,7 @@ class Source(Base):
 
         logger.info('matches len %s', len(matches))
 
-        # cm#complete(src, context, startcol, matches)
-        self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, refresh, async=True)
+        self.complete(info, ctx, ctx['startcol'], matches, refresh)
 
 
 def binary_search_lines_by_prefix(prefix,filename):

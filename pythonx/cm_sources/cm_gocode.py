@@ -68,7 +68,6 @@ class Source(Base):
                         )
             matches.append(item)
 
-        # cm#complete(src, context, startcol, matches)
-        ret = self.nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches)
-        logger.info('matches %s, ret %s', matches, ret)
+        logger.info('matches %s', matches)
+        self.complete(info, ctx, ctx['startcol'], matches)
 
