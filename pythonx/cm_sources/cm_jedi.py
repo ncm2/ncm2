@@ -84,8 +84,13 @@ class Source(Base):
                         break
                     num += 1
 
+                snip_args = ', '.join(placeholders)
+                if not placeholders and params:
+                    # don's jump out of parentheses if function has parameters
+                    snip_args='${1}'
+
                 # ultisnips
-                snippet = '%s(%s)${0}' % (item['word'],', '.join(placeholders))
+                snippet = '%s(%s)${0}' % (item['word'], snip_args)
 
                 item['snippet'] = snippet
                 logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
