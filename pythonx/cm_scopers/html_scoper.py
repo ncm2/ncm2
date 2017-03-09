@@ -16,6 +16,8 @@ class Scoper(Base):
         col = ctx['col']
         from html.parser import HTMLParser
 
+        scoper = self
+
         class MyHTMLParser(HTMLParser):
 
             last_data_start = None
@@ -75,7 +77,7 @@ class Scoper(Base):
                             # style
                             self.scope_info['scope']='css'
 
-                        self.scope_info['scope_offset']= self.get_pos(startpos[0],startpos[1]+1,src)
+                        self.scope_info['scope_offset']= scoper.get_pos(startpos[0],startpos[1]+1,src)
                         self.scope_info['scope_len']=len(self.last_data)
 
                         # offset as lnum, col format
