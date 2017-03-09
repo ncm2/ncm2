@@ -63,7 +63,11 @@ class Source(Base):
                         info=complete.docstring()
                         )
 
-            if complete.type == 'function':
+            # Fix the user typed case
+            if item['word'].lower()==complete.name.lower():
+                item['word'] = complete.name
+
+            if complete.type == 'function' or complete.type == 'class':
                 params = []
                 if hasattr(complete,'params'):
                     params = complete.params
@@ -85,9 +89,7 @@ class Source(Base):
 
                 item['snippet'] = snippet
                 logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
-            # Fix the user typed case
-            if item['word'].lower()==complete.name.lower():
-                item['word'] = complete.name
+
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
