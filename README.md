@@ -12,9 +12,11 @@ Subscribe it if you are interested.**
 
 ![All in one screenshot](https://cloud.githubusercontent.com/assets/4538941/22727187/78f35172-ee12-11e6-95e5-e9c160151f3b.gif)
 
+
 ## Table of Contents
 
 <!-- vim-markdown-toc GFM -->
+* [Features](#features)
 * [Available Completion Sources](#available-completion-sources)
 * [Requirements](#requirements)
 * [Installation](#installation)
@@ -30,6 +32,17 @@ Subscribe it if you are interested.**
 
 <!-- vim-markdown-toc -->
 
+
+## Features
+
+1. Asynchronous completion support like |deoplete|.
+2. Faster, all completions should run in parallel.
+3. Smarter on files with different languages, for example, css/javascript
+completion in html style/script tag.
+4. Extensible async vimscript API and python3 API.
+5. Function parameter expansion via ultisnips/neosnippet engine.
+
+
 ## Available Completion Sources
 
 plugin builtin sources:
@@ -37,8 +50,7 @@ plugin builtin sources:
 - Keyword from current buffer
 - Tag completion. (`:help 'tags'`, `:help tagfiles()`)
 - Keyword from tmux session
-- Ultisnips hint, if you have installed ultisnips
-- Neosnippets hint, if you have installed neosnippets
+- Ultisnips or neosnippet hint, which requires ultisnips or neosnippet.
 - File path completion
 - Python completion via [jedi](https://github.com/davidhalter/jedi)
 - Css completion via vim's builtin
