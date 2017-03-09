@@ -17,6 +17,7 @@ register_source(name='cm-gocode',
                 scopes=['go'],
                 cm_refresh_patterns=[r'\.(\w*)$'],)
 
+import re
 import subprocess
 import json
 
@@ -59,14 +60,50 @@ class Source(Base):
         matches = []
 
         for complete in completions:
- 
+
+            # {
+            #     "class": "func",
+            #     "name": "Fprintln",
+            #     "type": "func(w !io!io.Writer, a ...interface{}) (n int, err error)"
+            # },
+
             item = dict(word=complete['name'],
                         icase=1,
                         dup=1,
                         menu=complete.get('type',''),
                         # info=complete.get('doc',''),
                         )
+
             matches.append(item)
+
+            # snippet support
+            if 'class' in complete and complete['class']=='func' and 'type' in complete:
+                m = re.search(r'func\((.*?)\)',complete['type'])
+                if not m:
+                    continue
+                params = m.group(1)
+                params = params.split(',')
+                logger.info('snippet params: %s',params)
+                snip_params = []
+                num = 1
+                optional = ''
+                for param in params:
+                    param = param.strip()
+                    if not param:
+                        logger.error("failed to process snippet for item: %s, param: %s", item, param)
+                        break
+                    name = param.split(' ')[0]
+                    if param.find('...')>=0:
+                        # optional args
+                        if num>1:
+                            optional += '${%s:, %s...}' % (num, name)
+                        else:
+                            optional += '${%s:%s...}' % (num, name)
+                        break
+                    snip_params.append("${%s:%s}" % (num,name))
+                    num += 1
+
+                item['snippet'] = item['word'] + '(' + ", ".join(snip_params) + optional + ')${0}'
 
         logger.info('matches %s', matches)
         self.complete(info, ctx, ctx['startcol'], matches)
