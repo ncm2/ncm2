@@ -91,7 +91,7 @@ class CoreHandler(cm.Base):
                     source[k] = kwargs[k]
 
                 logger.info('registering source: %s',source)
-                nvim.call('cm#register_source',source)
+                nvim.call('cm#register_source', source, async=True)
 
                 # use a trick to only register the source withou loading the entire
                 # module
@@ -313,7 +313,7 @@ class CoreHandler(cm.Base):
         else:
             logger.info('notify_sources_to_refresh calls cnt [%s], channels cnt [%s]',len(refreshes_calls),len(refreshes_channels))
             logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
-            self.nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx)
+            self.nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx, async=True)
 
 
     def _get_ctx_list(self,root_ctx):
@@ -571,7 +571,7 @@ class CoreHandler(cm.Base):
                         # expandable
                         m['menu'] = '[+] ' + m['menu']
 
-        self.nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
+        self.nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets, async=True)
         self._last_matches = matches
         self._last_startcol = startcol
 
