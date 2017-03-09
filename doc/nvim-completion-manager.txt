@@ -142,7 +142,7 @@ g:cm_complete_delay
 			flickering when multiple sources are updating the
 			popup menu in a short interval. Use an interval long
 			enough for computer and short enough for human.  
-			Default: 50
+			Default: 80
 
 						*g:cm_matcher*
 g:cm_matcher 
