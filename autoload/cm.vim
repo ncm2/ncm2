@@ -269,8 +269,6 @@ let s:channel_jobid = -1
 let g:_cm_channel_id = -1
 let s:channel_started = 0
 let g:_cm_start_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
-" let s:complete_timer
-let s:complete_timer_ctx = {}
 let s:snippets = []
 
 augroup cm
@@ -513,11 +511,6 @@ func! s:on_changed()
 		return
 	endif
 
-	if exists('s:complete_timer')
-		call timer_stop(s:complete_timer)
-		unlet s:complete_timer
-	endif
-
 	let l:ctx = cm#context()
 
 	call s:notify_core_channel('cm_refresh',g:_cm_sources,l:ctx,0)
@@ -528,13 +521,6 @@ func! s:on_changed()
 endfunc
 
 func! cm#_notify_sources_to_refresh(calls, channels, ctx)
-
-	if exists('s:complete_timer')
-		call timer_stop(s:complete_timer)
-		unlet s:complete_timer
-	endif
-	let s:complete_timer = timer_start(g:cm_complete_delay,function('s:complete_timeout'))
-	let s:complete_timer_ctx = a:ctx
 
 	for l:channel in a:channels
 		try
@@ -564,7 +550,6 @@ func! cm#_notify_sources_to_refresh(calls, channels, ctx)
 	endfor
 endfunc
 
-
 " omni completion wrapper for cm_refresh
 func! s:cm_refresh_omni(opt,ctx)
 	" omni function's startcol is zero based, convert it to one based
@@ -579,15 +564,6 @@ func! s:cm_refresh_omni(opt,ctx)
 	" there's no scoping context in omnifunc, use cm#context to get the root
 	" context
 	call cm#complete(a:opt, cm#context(), l:startcol, l:matches)
-endfunc
-
-func! s:complete_timeout(timer)
-	" finished, clean variable
-	unlet s:complete_timer
-	if cm#context_changed(s:complete_timer_ctx)
-		return
-	endif
-	call s:notify_core_channel('cm_complete_timeout',g:_cm_sources,s:complete_timer_ctx)
 endfunc
 
 func! cm#menu_selected()

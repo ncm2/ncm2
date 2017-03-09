@@ -123,13 +123,6 @@ def run_event_loop(type,logger,nvim,handler):
     handler.cm_running_ = False
     handler.cm_msgs_ = []
 
-    def on_setup():
-        # use at_exit to ensure the calling of cm_shutdown
-        setup = getattr(handler,'cm_setup',None)
-        if setup:
-            setup()
-        logger.info('on_setup')
-
     def on_request(method, args):
         logger.error('method: %s not implemented, ignore this request', method)
 
@@ -139,6 +132,7 @@ def run_event_loop(type,logger,nvim,handler):
         # next_message API.
         handler.cm_msgs_.append( (method,args) )
         if handler.cm_running_:
+            logger.info("delay notification handling, method[%s]", method)
             return
 
         handler.cm_running_ = True
@@ -170,6 +164,9 @@ def run_event_loop(type,logger,nvim,handler):
                 logger.exception("Failed processing method: %s, args: %s", method, args)
 
         handler.cm_running_ = False
+
+    def on_setup():
+        on_notification('cm_setup',[])
 
     # use at_exit to ensure the calling of cm_shutdown
     func = getattr(handler,'cm_shutdown',None)

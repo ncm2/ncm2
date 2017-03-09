@@ -91,8 +91,8 @@ class Source(Base):
             matches.append(item)
 
         # cm#complete(src, context, startcol, matches)
+        logger.info('matches %s', matches)
         self.complete(info, ctx, ctx['startcol'], matches)
-        logger.info('matches %s, ret %s', matches, ret)
 
     def _get_signature_text(self,script):
         signature_text = ''

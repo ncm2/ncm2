@@ -49,7 +49,7 @@ let g:cm_auto_popup = get(g:,'cm_auto_popup',1)
 " the popup menu flickering when multiple sources are updating the popup menu
 " in a short interval, use an interval long enough for computer and short
 " enough for human
-let g:cm_complete_delay = get(g:,'cm_complete_delay',50)
+let g:cm_complete_delay = get(g:,'cm_complete_delay',80)
 
 " Automatically enable all registered sources by default. Set it to 0 if you
 " want to manually enable the registered sources you want by

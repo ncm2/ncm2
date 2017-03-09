@@ -11,6 +11,7 @@ import cm
 import subprocess
 import time
 import cm_default
+import threading
 
 logger = cm.getLogger(__name__)
 
@@ -31,11 +32,13 @@ class CoreHandler(cm.Base):
         # { '{source_name}': {'startcol': , 'matches'}
         self._matches = {}
         self._sources = {}
-        self._last_startcol = 0
-        self._last_matches = []
-        # should be True for supporting display menu directly without cm_refresh
-        self._has_popped_up = True
         self._subscope_detectors = {}
+        self._last_startcol = 0
+        self._last_matches  = []
+        # should be True for supporting display menu directly without cm_refresh
+        self._has_popped_up  = True
+        self._complete_timer = None
+        self._last_ctx       = None
 
     def cm_setup(self):
 
@@ -50,6 +53,7 @@ class CoreHandler(cm.Base):
         self._start_py   = self.nvim.vars['_cm_start_py_path']
         self._py3        = self.nvim.eval("get(g:,'python3_host_prog','python3')")
         self._py2        = self.nvim.eval("get(g:,'python_host_prog','python2')")
+        self._complete_delay = self.nvim.vars['cm_complete_delay']
         self._completed_snippet_enable = self.nvim.vars['cm_completed_snippet_enable']
         self._completed_snippet_engine = self.nvim.vars['cm_completed_snippet_engine']
 
@@ -73,7 +77,6 @@ class CoreHandler(cm.Base):
                         self._subscope_detectors[scope] = []
                     self._subscope_detectors[scope].append(scoper)
                     logger.info('scoper <%s> imported for %s', modulename, scope)
-
 
             except Exception as ex:
                 logger.exception('importing scoper <%s> failed: %s', modulename, ex)
@@ -128,8 +131,6 @@ class CoreHandler(cm.Base):
                 cm.register_source = old_handler
 
     def _is_kw_futher_typing(self,info,oldctx,curctx):
-
-        # is_matched = self._check_refresh_patterns(info,ctx,force)
 
         old_typed = oldctx['typed']
         cur_typed = curctx['typed']
@@ -210,7 +211,7 @@ class CoreHandler(cm.Base):
                 complete_info['context']  = ctx
                 complete_info['enable']   = not ctx.get('early_cache',False)
 
-        # wait for cm_complete_timeout, reduce flashes
+        # wait for _complete_timeout, reduce flashes
         if self._has_popped_up:
             logger.info("update popup for [%s]",name)
             # the ctx in parameter maybe a subctx for completion source, use
@@ -224,15 +225,33 @@ class CoreHandler(cm.Base):
         self._last_matches = []
         self._last_startcol = 0
 
-    def cm_complete_timeout(self,srcs,ctx,*args):
+        # complete timer
+        self._last_ctx = None
+        if self._complete_timer:
+            self._complete_timer.cancel()
+            self._complete_timer = None
+
+    def _on_complete_timeout(self,srcs,ctx,*args):
+        if self._last_ctx!=ctx:
+            logger.warn("_on_complete_timeout triggered, but last_ctx is %s, param ctx is %s", self._last_ctx, ctx)
+            return
         if not self._has_popped_up:
             self._refresh_completions(ctx)
             self._has_popped_up = True
+        else:
+            logger.debug("ignore _on_complete_timeout for self._has_popped_up")
 
     def cm_refresh(self,srcs,root_ctx,force=0,*args):
 
         root_ctx['scope'] = root_ctx['filetype']
         root_ctx['force'] = force
+
+        # complete delay timer
+        self._last_ctx = root_ctx
+        self._has_popped_up = False
+        if self._complete_timer:
+            self._complete_timer.cancel()
+            self._complete_timer = None
 
         # Note: get_src function asks neovim for data, during which another
         # greenlet coroutine could start or run, calculate this as soon as
@@ -316,7 +335,6 @@ class CoreHandler(cm.Base):
                     logger.exception('cm_refresh exception: %s', ex)
                     continue
 
-        self._has_popped_up = False
         if not refreshes_calls and not refreshes_channels:
             logger.info('not notifying any channels, _refresh_completions now')
             self._refresh_completions(root_ctx)
@@ -326,6 +344,11 @@ class CoreHandler(cm.Base):
             logger.debug('cm#_notify_sources_to_refresh [%s] [%s] [%s]', [e['name'] for e in refreshes_calls], [e['name'] for e in refreshes_channels], root_ctx)
             self.nvim.call('cm#_notify_sources_to_refresh', refreshes_calls, refreshes_channels, root_ctx, async=True)
 
+            # complete delay timer
+            def on_timeout():
+                self.nvim.async_call(self._on_complete_timeout, srcs, root_ctx)
+            self._complete_timer = threading.Timer(float(self._complete_delay)/1000, on_timeout )
+            self._complete_timer.start()
 
     def _get_ctx_list(self,root_ctx):
         ctx_list = [root_ctx,]
@@ -424,6 +447,10 @@ class CoreHandler(cm.Base):
         return False
 
     def _refresh_completions(self,ctx):
+        """
+        Note: This function is called via greenlet coroutine. Be careful, avoid
+        using blocking requirest.
+        """
 
         matches = []
 
