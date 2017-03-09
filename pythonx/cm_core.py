@@ -580,11 +580,17 @@ class CoreHandler(cm.Base):
         # Note: The snippet field will not be kept in v:completed_item.  Use
         # this trick to to hack
         snippets = []
+        has_snippets = False
         if self._completed_snippet_enable:
             for m in matches:
 
                 if 'snippet' not in m or not m['snippet']:
                     continue
+
+                has_snippets = True
+                if not isinstance(m['snippet'],str):
+                    continue
+
                 if 'info' not in m or not m['info']:
                     m['info'] = 'snippet@%s' % len(snippets)
                 else:
@@ -598,7 +604,7 @@ class CoreHandler(cm.Base):
 
                 snippets.append(m['snippet'])
 
-            if snippets:
+            if has_snippets:
                 for m in matches:
                     if 'menu' not in m:
                         m['menu'] = ''

@@ -29,7 +29,7 @@ func! cm#sources#ultisnips#cm_refresh(opt,ctx)
 	" The available snippet list is fairly small, simply dump the whole list
 	" here, leave the filtering work to NCM's standard filter.  This would
 	" reduce the work done by vimscript.
-	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1,"info": l:snips[v:val]}')
+	let l:matches = map(keys(l:snips),'{"word":v:val, "dup":1, "icase":1, "info": l:snips[v:val], "snippet": 1}')
 
 	" call cm#complete to notify the completion framework for update.
 	"
@@ -64,7 +64,7 @@ func! cm#sources#ultisnips#trigger_or_popup(trigger_key)
 	endif
 
 	let l:snips = UltiSnips#SnippetsInCurrentScope()
-	let l:matches = map(keys(l:snips),'{"word":v:val,"dup":1,"icase":1,"info": l:snips[v:val]}')
+	let l:matches = map(keys(l:snips),'{"word":v:val, "dup":1, "icase":1, "info": l:snips[v:val], "snippet": 1}')
 	let l:startcol = l:ctx['col']
 
 	" notify the completion framework

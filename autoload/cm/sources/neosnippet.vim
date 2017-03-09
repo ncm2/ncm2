@@ -1,7 +1,7 @@
 
 function! cm#sources#neosnippet#cm_refresh(info, ctx)
 	let l:snips = values(neosnippet#helpers#get_completion_snippets())
-	let l:matches = map(l:snips,'{"word":v:val["word"],"dup":1,"icase":1,"menu": "Snip: " . v:val["menu_abbr"]}')
+	let l:matches = map(l:snips, '{"word":v:val["word"], "dup":1, "icase":1, "menu": "Snip: " . v:val["menu_abbr"], "snippet": 1}')
 	call cm#complete(a:info['name'], a:ctx, a:ctx['startcol'], l:matches)
 endfunction
 
@@ -18,7 +18,7 @@ func! cm#sources#neosnippet#trigger_or_popup(trigger_key)
 	endif
 
 	let l:snips = values(neosnippet#helpers#get_completion_snippets())
-	let l:matches = map(l:snips,'{"word":v:val["word"],"dup":1,"icase":1,"menu": "Snip: " . v:val["menu_abbr"]}')
+	let l:matches = map(l:snips, '{"word":v:val["word"], "dup":1, "icase":1, "menu": "Snip: " . v:val["menu_abbr"], "snippet": 1}')
 	let l:startcol = l:ctx['col']
 
 	" notify the completion framework
