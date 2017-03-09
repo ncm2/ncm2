@@ -520,6 +520,19 @@ func! s:on_changed()
 
 endfunc
 
+func! cm#_auto_enable_check()
+	if exists('b:cm_enable') && b:cm_enable!=2
+		return
+	endif
+	if (&buftype=='' &&  line2byte(line("$") + 1)<g:cm_buffer_size_limit) 
+		" 2 for auto enable
+		call cm#enable_for_buffer(2)
+	else
+		call cm#disable_for_buffer()
+	endif
+endfunc
+
+
 func! cm#_notify_sources_to_refresh(calls, channels, ctx)
 
 	for l:channel in a:channels

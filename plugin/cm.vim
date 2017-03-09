@@ -4,22 +4,10 @@ let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
 
 if get(g:,'cm_smart_enable',1)
 
-	func! s:auto_enable_check()
-		if exists('b:cm_enable') && b:cm_enable!=2
-			return
-		endif
-		if (&buftype=='' &&  line2byte(line("$") + 1)<g:cm_buffer_size_limit) 
-			" 2 for auto enable
-			call cm#enable_for_buffer(2)
-		else
-			call cm#disable_for_buffer()
-		endif
-	endfunc
-
-	au BufWinEnter * call s:auto_enable_check()
+	au BufWinEnter * call cm#_auto_enable_check()
 	" Unite's `buftype` is not set when BufWinEnter is triggered, use this as
 	" workaround
-	au OptionSet buftype call s:auto_enable_check()
+	au OptionSet buftype call cm#_auto_enable_check()
 
 	" disable clang default mapping by default,
 	" https://github.com/Rip-Rip/clang_complete/pull/515
