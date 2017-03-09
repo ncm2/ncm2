@@ -10,7 +10,7 @@ Future updates, announcements, screenshots will be posted
 **[here](https://github.com/roxma/nvim-completion-manager/issues/12).
 Subscribe it if you are interested.**
 
-![All in one screenshot](https://cloud.githubusercontent.com/assets/4538941/22727187/78f35172-ee12-11e6-95e5-e9c160151f3b.gif)
+![All in one screenshot](https://cloud.githubusercontent.com/assets/4538941/23752974/8fffbdda-0512-11e7-8466-8a30f480de21.gif)
 
 
 ## Table of Contents
