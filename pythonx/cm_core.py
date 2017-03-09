@@ -651,7 +651,8 @@ class CoreHandler(cm.Base):
 
     def cm_start_channels(self,srcs,ctx):
 
-        for name in srcs:
+        names = sorted(srcs.keys(),key=lambda n: srcs[n]['priority'], reverse=True)
+        for name in names:
 
             info = srcs[name]
 
