@@ -68,14 +68,11 @@ def start_channel(source_name,modulename,serveraddr,start_type='channel'):
         if start_type == 'core':
 
             import cm_core
-            nvim.vars['_cm_channel_id'] = nvim.channel_id
             handler = cm_core.CoreHandler(nvim)
             logger.info('starting core, enter event loop')
             run_event_loop('core',logger,nvim,handler)
 
         elif start_type == 'channel':
-
-            nvim.call('cm#_channel_started',source_name, nvim.channel_id)
 
             if sys.version_info.major==2:
                 # python2 doesn't support namespace package
@@ -90,6 +87,7 @@ def start_channel(source_name,modulename,serveraddr,start_type='channel'):
                 m = importlib.import_module(modulename)
 
             handler = m.Source(nvim)
+            nvim.call('cm#_channel_started',source_name, nvim.channel_id, async=True)
             logger.info('handler created, entering event loop')
             run_event_loop('channel',logger,nvim,handler)
 
@@ -126,6 +124,10 @@ def run_event_loop(type,logger,nvim,handler):
     handler.cm_msgs_ = []
 
     def on_setup():
+        # use at_exit to ensure the calling of cm_shutdown
+        setup = getattr(handler,'cm_setup',None)
+        if setup:
+            setup()
         logger.info('on_setup')
 
     def on_request(method, args):

@@ -294,6 +294,11 @@ func! s:check_scope(info)
 	return 0
 endfunc
 
+func! cm#_core_channel_started(id)
+	let g:_cm_channel_id = a:id
+	" start channels as soon as possible
+	call s:notify_core_channel('cm_start_channels',g:_cm_sources,cm#context())
+endfunc
 
 func! cm#_channel_started(name,id)
 

@@ -113,6 +113,9 @@ class CoreHandler(cm.Base):
 
         logger.info('_subscope_detectors: %s', self._subscope_detectors)
 
+    def cm_setup(self):
+        self.nvim.call('cm#_core_channel_started', self.nvim.channel_id, async=True)
+
     def _is_kw_futher_typing(self,info,oldctx,curctx):
 
         # is_matched = self._check_refresh_patterns(info,ctx,force)
