@@ -37,15 +37,27 @@ class CoreHandler(cm.Base):
         self._has_popped_up = True
         self._subscope_detectors = {}
 
-        self._servername = nvim.vars['_cm_servername']
-        self._start_py   = nvim.vars['_cm_start_py_path']
-        self._py3        = nvim.eval("get(g:,'python3_host_prog','python3')")
-        self._py2        = nvim.eval("get(g:,'python_host_prog','python2')")
-        self._completed_snippet_enable = nvim.vars['cm_completed_snippet_enable']
-        self._completed_snippet_engine = nvim.vars['cm_completed_snippet_engine']
+    def cm_setup(self):
+
+        self._detect_sources()
+
+        # after all sources are registered, so that all channels will be
+        # started the first time cm_start_channels is called
+        self.nvim.call('cm#_core_channel_started', self.nvim.channel_id, async=True)
+
+        # load configurations
+        self._servername = self.nvim.vars['_cm_servername']
+        self._start_py   = self.nvim.vars['_cm_start_py_path']
+        self._py3        = self.nvim.eval("get(g:,'python3_host_prog','python3')")
+        self._py2        = self.nvim.eval("get(g:,'python_host_prog','python2')")
+        self._completed_snippet_enable = self.nvim.vars['cm_completed_snippet_enable']
+        self._completed_snippet_engine = self.nvim.vars['cm_completed_snippet_engine']
+
+        self._load_scopers()
+
+    def _load_scopers(self):
 
         scoper_paths = self.nvim.eval("globpath(&rtp,'pythonx/cm_scopers/*.py',1)").split("\n")
-
         # auto find scopers
         for path in scoper_paths:
             if not path:
@@ -65,6 +77,10 @@ class CoreHandler(cm.Base):
 
             except Exception as ex:
                 logger.exception('importing scoper <%s> failed: %s', modulename, ex)
+
+        logger.info('_subscope_detectors: %s', self._subscope_detectors)
+
+    def _detect_sources(self):
 
         # auto find sources
         sources_paths = self.nvim.eval("globpath(&rtp,'pythonx/cm_sources/*.py',1)").split("\n")
@@ -91,7 +107,7 @@ class CoreHandler(cm.Base):
                     source[k] = kwargs[k]
 
                 logger.info('registering source: %s',source)
-                nvim.call('cm#register_source', source, async=True)
+                self.nvim.call('cm#register_source', source, async=True)
 
                 # use a trick to only register the source withou loading the entire
                 # module
@@ -110,11 +126,6 @@ class CoreHandler(cm.Base):
             finally:
                 # restore
                 cm.register_source = old_handler
-
-        logger.info('_subscope_detectors: %s', self._subscope_detectors)
-
-    def cm_setup(self):
-        self.nvim.call('cm#_core_channel_started', self.nvim.channel_id, async=True)
 
     def _is_kw_futher_typing(self,info,oldctx,curctx):
 
