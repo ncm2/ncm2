@@ -157,12 +157,18 @@ autocmd FileType php LanguageClientStart
 set shortmess+=c
 ```
 
+- When the  `<Enter` key is pressed while the popup menu is visible, it only
+  hides the menu. Use this mapping to hide the menu and also start a new line.
+
+```vim
+inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+```
+
 - Use tab to select the popup menu:
 
 ```vim
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 ```
 
 - If you're using ultisnips too, and you also want to use `<Tab>` to trigger

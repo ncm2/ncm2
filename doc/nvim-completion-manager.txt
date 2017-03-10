@@ -62,12 +62,16 @@ Supress the annoying completion messages:
 	" don't give |ins-completion-menu| messages.  For example,
 	" '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
 	set shortmess+=c
-
+<
+- When the <Enter> key is pressed while the popup menu is visible, it only
+  hides the menu. Use this mapping to hide the menu and also start a new line.
+>
+	inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+< 
 Use tab to select the popup menu:
 >
 	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-	inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 <
 If you have only 'omnifunc' available, you may register it as a source to the
 framework.
