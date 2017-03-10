@@ -2,7 +2,7 @@
 
 # A Completion Framework for Neovim
 
-This is a **Fast! Extensible! Async! completion framework** for
+This is a **fast, extensible, async completion framework** for
 [neovim](https://github.com/neovim/neovim).  For more information about plugin
 implementation, please read the **[Why](#why) section**.
 
