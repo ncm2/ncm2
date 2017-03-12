@@ -88,33 +88,36 @@ class Source(Base):
             if item['word'].lower()==complete.name.lower():
                 item['word'] = complete.name
 
-            if complete.type == 'function' or complete.type == 'class':
-                params = []
-                if hasattr(complete,'params'):
-                    params = complete.params
-                if not params:
+            # snippet support
+            try:
+                if complete.type == 'function' or complete.type == 'class':
                     params = []
-                placeholders = []
-                num = 1
-                for param in params:
-                    logger.info('name: %s, description: %s', param.name, param.description)
-                    if re.match(r'^[\w\s]+$', param.description):
-                        # param without default value
-                        placeholders.append('${%s:%s}' % (num,param.name) )
-                    else:
-                        break
-                    num += 1
+                    if hasattr(complete,'params'):
+                        params = complete.params
+                    if not params:
+                        params = []
+                    placeholders = []
+                    num = 1
+                    for param in params:
+                        logger.info('name: %s, description: %s', param.name, param.description)
+                        if re.match(r'^[\w\s]+$', param.description):
+                            # param without default value
+                            placeholders.append('${%s:%s}' % (num,param.name) )
+                        else:
+                            break
+                        num += 1
 
-                snip_args = ', '.join(placeholders)
-                if not placeholders and params:
-                    # don's jump out of parentheses if function has parameters
-                    snip_args='${1}'
+                    snip_args = ', '.join(placeholders)
+                    if not placeholders and params:
+                        # don's jump out of parentheses if function has parameters
+                        snip_args='${1}'
 
-                # ultisnips
-                snippet = '%s(%s)${0}' % (item['word'], snip_args)
+                    snippet = '%s(%s)${0}' % (item['word'], snip_args)
 
-                item['snippet'] = snippet
-                logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
+                    item['snippet'] = snippet
+                    logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
+            except Exception as ex:
+                logger.exception("exception parsing snippet for item: %s, complete: %s", item, complete)
 
             matches.append(item)
 
