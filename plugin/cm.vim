@@ -79,14 +79,18 @@ au User CmSetup if exists('g:did_plugin_ultisnips') | call cm#register_source({'
 		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
 		\ }) | endif
 
-
-" use did_plugin_ultisnips to detect the installation of ultisnips
-" https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
 au User CmSetup if exists('g:loaded_neosnippet') | call cm#register_source({'name' : 'cm-neosnippet',
 		\ 'priority': 7, 
 		\ 'abbreviation': 'Snip',
 		\ 'word_pattern': '\S+',
 		\ 'cm_refresh': 'cm#sources#neosnippet#cm_refresh',
+		\ }) | endif
+
+au User CmSetup if exists('g:snipMateSources') | call cm#register_source({'name' : 'cm-snipmate',
+		\ 'priority': 7,
+		\ 'abbreviation': 'Snip',
+		\ 'word_pattern': '\S+',
+		\ 'cm_refresh': 'cm#sources#snipmate#cm_refresh',
 		\ }) | endif
 
 " css

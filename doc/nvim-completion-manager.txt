@@ -126,7 +126,11 @@ If you have |Ultisnips|:
 Or if you have |SnipMate|:
 >
 	let g:snips_no_mappings = 1
-	imap <expr> <c-u> pumvisible() ? "\<c-y>\<Plug>snipMateTrigger" : "\<Plug>snipMateTrigger"
+	" imap <expr> <c-u> pumvisible() ? "\<c-y>\<Plug>snipMateTrigger" : "\<Plug>snipMateTrigger"
+	" wrap the mapping
+	imap <expr> <Plug>(snipmate_force_trigger) pumvisible() ? "\<c-y>\<Plug>snipMateTrigger" : "\<Plug>snipMateTrigger"
+	" show a list of snippets when no the user has typed nothing
+	inoremap <silent> <c-u> <c-r>=cm#sources#snipmate#trigger_or_popup("\<Plug>(snipmate_force_trigger)")<cr>
 	vmap <c-u> <Plug>snipMateTrigger
 	imap <expr> <c-j> pumvisible() ? "\<c-y>\<Plug>snipMateNextOrTrigger" : "\<Plug>snipMateNextOrTrigger"
 	vmap <c-j> <Plug>snipMateNextOrTrigger
