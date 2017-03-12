@@ -40,7 +40,10 @@ Subscribe it if you are interested.**
 3. Smarter on files with different languages, for example, css/javascript
 completion in html style/script tag.
 4. Extensible async vimscript API and python3 API.
-5. Function parameter expansion via ultisnips,neosnippet or snipmate.
+5. Function parameter expansion via
+   [Ultisnips](https://github.com/SirVer/ultisnips),
+   [neosnippet.vim](https://github.com/Shougo/neosnippet.vim) or
+   [vim-snipmate](https://github.com/garbas/vim-snipmate).
 
 
 ## Available Completion Sources
@@ -50,7 +53,8 @@ plugin builtin sources:
 - Keyword from current buffer
 - Tag completion. (`:help 'tags'`, `:help tagfiles()`)
 - Keyword from tmux session
-- Ultisnips, neosnippet or snipmate hint, when you've installed one of them.
+- Ultisnips, neosnippet or snipmate hint, if you have installed any one of
+  them.
 - File path completion
 - Python completion via [jedi](https://github.com/davidhalter/jedi)
 - Css completion via vim's builtin

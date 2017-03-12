@@ -28,7 +28,7 @@ Main features:
 3. Smarter on files with different languages, for example, css/javascript
 completion in html style/script tag.
 4. Extensible async vimscript API and python3 API.
-5. Function parameter expansion via ultisnips/neosnippet.
+5. Function parameter expansion via |Ultisnips|, |neosnippet| or |SnipMate|.
 
 
 ==============================================================================
