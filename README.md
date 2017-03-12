@@ -161,7 +161,7 @@ autocmd FileType php LanguageClientStart
 set shortmess+=c
 ```
 
-- When the  `<Enter` key is pressed while the popup menu is visible, it only
+- When the  `<Enter>` key is pressed while the popup menu is visible, it only
   hides the menu. Use this mapping to hide the menu and also start a new line.
 
 ```vim
