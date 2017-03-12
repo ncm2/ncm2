@@ -447,7 +447,7 @@ func! s:change_tick_start()
 	let s:lasttick = s:changetick()
 	" check changes every 30ms, which is 0.03s, it should be fast enough
 	let s:change_timer = timer_start(30,function('s:check_changes'),{'repeat':-1})
-	call s:on_changed()
+	call s:notify_core_channel('cm_refresh',g:_cm_sources,cm#context(),0)
 endfunc
 
 func! s:change_tick_stop()
@@ -511,9 +511,7 @@ func! s:on_changed()
 		return
 	endif
 
-	let l:ctx = cm#context()
-
-	call s:notify_core_channel('cm_refresh',g:_cm_sources,l:ctx,0)
+	call s:notify_core_channel('cm_refresh',g:_cm_sources,cm#context(),0)
 
 	" TODO
 	" detect popup item selected event then notify sources
