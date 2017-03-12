@@ -39,9 +39,20 @@ class Source(Base):
         # logger.info('jedi.Script lnum[%s] curcol[%s] path[%s] [%s]', lnum,len(typed),path,src)
         script = jedi.Script(src, ctx['lnum'], len(ctx['typed']), path)
 
+        signature_text = ''
+        signature = None
+        try:
+            signatures = script.call_signatures()
+            logger.info('signatures: %s', signatures)
+            if len(signatures)>0:
+                signature = signatures[-1]
+                params=[param.description for param in signature.params]
+                signature_text = signature.name + '(' + ', '.join(params) + ')'
+                logger.info("signature: %s, name: %s", signature, signature.name)
+        except Exception as ex:
+            logger.exception("get signature text failed %s", signature_text)
+
         if re.search(r'^(?!from|import).*?[\(\,]\s*$', typed):
-            # try show the call signature
-            signature_text = self._get_signature_text(script)
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 # refresh=True
@@ -56,7 +67,17 @@ class Source(Base):
 
         for complete in completions:
 
-            item = dict(word=ctx['base']+complete.complete,
+            insert = complete.complete
+
+            try:
+                # simply workaround jedi's bug:
+                # https://github.com/roxma/nvim-completion-manager/issues/43
+                if signature and complete.type=='param' and complete.parent().name!=signature.name:
+                    insert = insert.rstrip('=')
+            except Exception as ex:
+                logger.exception("error processing complete item: %s", complete)
+
+            item = dict(word=ctx['base']+insert,
                         icase=1,
                         dup=1,
                         menu=complete.description,
@@ -100,16 +121,4 @@ class Source(Base):
         # cm#complete(src, context, startcol, matches)
         logger.info('matches %s', matches)
         self.complete(info, ctx, ctx['startcol'], matches)
-
-    def _get_signature_text(self,script):
-        signature_text = ''
-        # TODO: optimize
-        # currently simply use the last signature
-        signatures = script.call_signatures()
-        logger.info('signatures: %s', signatures)
-        if len(signatures)>0:
-            signature = signatures[-1]
-            params=[param.description for param in signature.params]
-            signature_text = signature.name + '(' + ', '.join(params) + ')'
-        return signature_text
 
