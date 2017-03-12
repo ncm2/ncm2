@@ -67,7 +67,7 @@ Supress the annoying completion messages:
   hides the menu. Use this mapping to hide the menu and also start a new line.
 >
 	inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-< 
+<
 Use tab to select the popup menu:
 >
 	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
@@ -88,7 +88,7 @@ framework.
 			\ 'cm_refresh_patterns':[':\s+\w*$'],
 			\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 			\ })
->
+<
 Note: 'omnifunc' is implemented in a synchronouse style, and vim-vimscript is
 single threaded, it would potentially block the ui with the introduction of a
 heavy weight 'omnifunc', for example the builtin phpcomplete. If you get some
@@ -107,6 +107,43 @@ completion source.
 	\ 'cm-tags': {'enable':0}
 	\ }
 <
+						*NCM-parameter-expansion*
+						*NCM-snippet*
+Config <c-u>, <c-j> and <c-k> for parameter expansion and jumping around
+placeholders.
+
+						*NCM-Ultisnips*
+If you have |Ultisnips|:
+>
+	let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
+	let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
+	let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
+    let g:UltiSnipsRemoveSelectModeMappings = 0
+	" optional
+	inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+<
+						*NCM-SnipMate*
+Or if you have |SnipMate|:
+>
+	let g:snips_no_mappings = 1
+	imap <expr> <c-u> pumvisible() ? "\<c-y>\<Plug>snipMateTrigger" : "\<Plug>snipMateTrigger"
+	vmap <c-u> <Plug>snipMateTrigger
+	imap <expr> <c-j> pumvisible() ? "\<c-y>\<Plug>snipMateNextOrTrigger" : "\<Plug>snipMateNextOrTrigger"
+	vmap <c-j> <Plug>snipMateNextOrTrigger
+	imap <expr> <c-k> pumvisible() ? "\<c-y>\<Plug>snipMateBack" : "\<Plug>snipMateBack"
+	vmap <c-k> <Plug>snipMateBack
+<
+						*NCM-neosnippet*
+Or if you have |neosnippet|:
+>
+	imap <c-j>     <Plug>(neosnippet_expand_or_jump)
+	vmap <c-j>     <Plug>(neosnippet_expand_or_jump)
+	inoremap <silent> <c-u> <c-r>=cm#sources#neosnippet#trigger_or_popup("\<Plug>(neosnippet_expand_or_jump)")<cr>
+	vmap <c-u>     <Plug>(neosnippet_expand_target)
+	" expand parameters
+	let g:neosnippet#enable_completed_snippet=1
+<
+
 ==============================================================================
 4. Settings					*NCM-settings*
 
