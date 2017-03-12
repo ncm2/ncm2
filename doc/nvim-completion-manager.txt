@@ -14,6 +14,7 @@ nvim-completion-manager			    *nvim-completion-manager* *NCM*
 5. API						|NCM-API|
 6. Why						|NCM-why|
 7. Minimal Source Exampels			|NCM-source-exampels|
+8. Known issues					|NCM-known-issues|
 
 ==============================================================================
 1. Introduction					*NCM-introduction*
@@ -625,6 +626,23 @@ directory.
 		matches = ['foo_bar','foo_baz']
 		self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
 <
+
+==============================================================================
+8. Known issues					*NCM-known-issues*
+
+8.1 Significant delay when exiting from vim8	*issue#52*
+
+There are two main causes:
+
+- The vim-hug-neovim-rpc uses multithread implementation. Vim has to wait for
+  all threads exit before shutdown, even though those are python daemon
+  thread.
+
+- The current version of NCM is using the classic multi-process architecture,
+  NCM runs outside of vim process and it is started via the |job_start|
+  function.  However, the |job_start| method provided by vim8, unlike the
+  |jobstart| in neovim, has no detach option available, which means that vim8
+  has to wait for NCM process exit before shutdown.
 
 ==============================================================================
 vim: tw=78:ts=8:softtabstop=8:sw=8:ft=help:norl:noexpandtab:fen:noet:
