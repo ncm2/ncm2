@@ -85,18 +85,14 @@ func! cm#enable_for_buffer(...)
 		autocmd! * <buffer>
 		autocmd InsertEnter <buffer> call s:notify_core_channel('cm_insert_enter')
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave')
-		if g:cm_auto_popup
-			autocmd InsertEnter <buffer>  call s:change_tick_start()
-		endif
+		autocmd InsertEnter <buffer>  call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
 		autocmd BufEnter    <buffer> set completeopt=menu,menuone,noinsert,noselect
 		" working together with timer, the timer is for detecting changes
 		" popup menu is visible. TextChangedI will not be triggered when popup
 		" menu is visible, but TextChangedI is more efficient and faster than
 		" timer when popup menu is not visible.
-		if g:cm_auto_popup
-			autocmd TextChangedI <buffer> call s:check_changes()
-		endif
+		autocmd TextChangedI <buffer> call s:check_changes()
 	augroup END
 
 	call s:start_core_channel()
@@ -109,6 +105,7 @@ func! cm#disable_for_buffer()
 	augroup cm
 		autocmd! * <buffer>
 	augroup END
+	call s:change_tick_stop()
 endfunc
 
 
@@ -212,11 +209,6 @@ func! cm#register_source(info)
 	let a:info['early_cache'] = get(a:info,'early_cache', !has_key(a:info,'cm_refresh'))
 
 	let g:_cm_sources[l:name] = a:info
-
-	" check and start channels
-	if get(b:,'cm_enable',0) == 0
-		return
-	endif
 
 	call s:notify_core_channel('cm_start_channels',g:_cm_sources,cm#context())
 
@@ -346,7 +338,7 @@ endfunc
 
 func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
-	if ! get(b:,'cm_enable',0)
+	if !get(b:,'cm_enable',0)  || &paste!=0
 		return
 	endif
 
@@ -447,7 +439,7 @@ func! s:change_tick_start()
 	let s:lasttick = s:changetick()
 	" check changes every 30ms, which is 0.03s, it should be fast enough
 	let s:change_timer = timer_start(30,function('s:check_changes'),{'repeat':-1})
-	call s:notify_core_channel('cm_refresh',g:_cm_sources,cm#context(),0)
+	call s:on_changed()
 endfunc
 
 func! s:change_tick_stop()
@@ -507,15 +499,11 @@ endfunc
 " on completion context changed
 func! s:on_changed()
 
-	if get(b:,'cm_enable',0)==0 || mode()!='i' || &paste!=0
+	if &paste!=0 || g:cm_auto_popup==0
 		return
 	endif
 
 	call s:notify_core_channel('cm_refresh',g:_cm_sources,cm#context(),0)
-
-	" TODO
-	" detect popup item selected event then notify sources
-
 endfunc
 
 func! cm#_auto_enable_check()
