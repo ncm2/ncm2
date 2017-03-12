@@ -492,8 +492,23 @@ func! s:check_and_inject_snippet()
 		exec g:_uspy 'UltiSnips_Manager._added_snippets_source._snippets["ncm"]._snippets = []'
 		" TODO cleanup when InsertLeave
 		call UltiSnips#AddSnippetWithPriority(v:completed_item.word, v:completed_item.snippet, '', 'i', b:_cm_us_filetype, 1)
+	elseif g:cm_completed_snippet_engine == 'snipmate'
+		if !exists('s:completed_item')
+			let s:completed_item = {}
+			autocmd InsertLeave * let s:completed_item = {}
+			" inject ncm's handler into snipmate
+			let g:snipMateSources['ncm'] = funcref#Function('cm#_snipmate_snippets')
+		endif
+		let s:completed_item = v:completed_item
 	endif
 
+endfunc
+
+func! cm#_snipmate_snippets(scopes, trigger, result)
+	if empty(s:completed_item)
+		return
+	endif
+	let a:result[s:completed_item['word']] = {'default': [s:completed_item.snippet,0] }
 endfunc
 
 " on completion context changed

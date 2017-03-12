@@ -58,6 +58,9 @@ func! s:lazy_init()
 		elseif exists('g:did_plugin_ultisnips')
 			let g:cm_completed_snippet_enable = 1
 			let g:cm_completed_snippet_engine = 'ultisnips'
+		elseif exists('g:snipMateSources')
+			let g:cm_completed_snippet_enable = 1
+			let g:cm_completed_snippet_engine = 'snipmate'
 		else
 			let g:cm_completed_snippet_enable = 0
 			let g:cm_completed_snippet_engine = ''
