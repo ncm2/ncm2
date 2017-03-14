@@ -675,12 +675,26 @@ class CoreHandler(cm.Base):
 
     def cm_shutdown(self):
 
+        # wait for channel-threads' exit
+        for name in self._channel_threads:
+            tinfo = self._channel_threads[name]
+            if 'thread' not in tinfo:
+                continue
+            try:
+                logger.info("join <%s> thread", name)
+                tinfo['thread'].join(2)
+                logger.info("success join <%s> thread", name)
+            except Exception as ex:
+                logger.exception("timeout join <%s> thread", name)
+
         # wait for normal exit
         time.sleep(1)
 
         procs = []
         for name in self._channel_processes:
             pinfo = self._channel_processes[name]
+            if 'proc' not in pinfo:
+                continue
             proc = pinfo['proc']
             try:
                 if proc.poll() is not None:
