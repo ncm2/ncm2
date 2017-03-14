@@ -241,12 +241,12 @@ differences between deoplete and this plugin.
 
 ### Async architecture
 
-Each completion source should be a standalone process, the manager notifies
-the completion source for any text changing, even when popup menu is visible.
-The completion source notifies the manager if there's any complete matches
-available. After some basic priority sorting between completion sources, and
-some simple filtering, the completion popup menu will be triggered with the
-`complete()` function by the completion manager.
+Each completion source should be a thread or a standalone process, the manager
+notifies the completion source for any text changing, even when popup menu is
+visible.  The completion source notifies the manager if there's any complete
+matches available. After some basic priority sorting between completion
+sources, and some simple filtering, the completion popup menu will be
+triggered with the `complete()` function by the completion manager.
 
 If some of the completion source is calculating matches for a long long time,
 the popup menu will still be shown quickly if other completion sources work
@@ -258,7 +258,8 @@ deoplete are gathered with `gather_candidates()` of the `Source` object,
 inside a for loop, in deoplete's process. A slow completion source may defer
 the display of popup menu. Of course it will not block the ui.
 
-IMHO, NCM is potentially faster because all completion sources run in
+The good news is that deoplete has supported async `gather_candidates` now.
+But still, NCM is potentially faster because all completion sources run in
 parallel.
 
 ### Scoping
