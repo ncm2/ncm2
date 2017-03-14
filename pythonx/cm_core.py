@@ -116,7 +116,7 @@ class CoreHandler(cm.Base):
                 # module
                 raise CmSkipLoading()
 
-            old_handler = register_source
+            old_handler = cm.register_source
             cm.register_source = register_source
             try:
                 # register_source
