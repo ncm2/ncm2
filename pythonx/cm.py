@@ -182,14 +182,20 @@ def start_and_run_channel(channel_type, serveraddr, source_name, modulename):
             file = modulename.replace('.','/')
             exp = 'globpath(&rtp,"pythonx/%s.py",1)' % file
             path = nvim.eval(exp).strip()
-            logger.info('python2 file path: %s, exp: %s',path, exp)
+            logger.info('<%s> python2 file path: %s, exp: %s', source_name, path, exp)
             m = imp.load_source(modulename,path)
+            # the previous module load may be hacked before, by register_source
+            if not hasattr(m, 'Source'):
+                m = imp.reload(m)
         else:
             m = importlib.import_module(modulename)
+            # the previous module load may be hacked before, by register_source
+            if not hasattr(m, 'Source'):
+                m = importlib.reload(m)
 
         handler = m.Source(nvim)
         nvim.call('cm#_channel_started',source_name, nvim.channel_id, async=True)
-        logger.info('handler created, entering event loop')
+        logger.info('<%s> handler created, entering event loop', source_name)
 
 
     handler.cm_running_ = False
@@ -241,6 +247,7 @@ def start_and_run_channel(channel_type, serveraddr, source_name, modulename):
         on_notification('cm_setup',[])
 
     try:
+        logger.info("<%s> entering event loop", source_name)
         # Use next_message is simpler, as a handler doesn't need to deal with
         # concurrent issue, but it has serious issue,
         # https://github.com/roxma/nvim-completion-manager/issues/35#issuecomment-284049103

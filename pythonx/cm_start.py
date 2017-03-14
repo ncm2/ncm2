@@ -33,7 +33,7 @@ def main():
         pass
 
     if channel_type == 'core':
-        source_name = ''
+        source_name = 'cm_core'
         modulename = 'cm_core'
         serveraddr = sys.argv[2]
     else:

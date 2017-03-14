@@ -3,6 +3,7 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+import sys
 import os
 import re
 import copy
@@ -28,6 +29,7 @@ class CoreHandler(cm.Base):
 
         # process control information on channels
         self._channel_processes = {}
+        self._channel_threads = {}
 
         # { '{source_name}': {'startcol': , 'matches'}
         self._matches = {}
@@ -622,19 +624,12 @@ class CoreHandler(cm.Base):
 
     def _start_channel(self,info):
 
-        name = info['name']
-
-        if name not in self._channel_processes:
-            self._channel_processes[name] = {}
-        process_info = self._channel_processes[name]
-
-        # channel process already started
-        if 'pid' in process_info:
-            return
         if 'channel' not in info:
+            logger.error("this source does not use channel: %s", info)
             return
 
-        channel = info['channel']
+        name         = info['name']
+        channel      = info['channel']
         channel_type = channel.get('type','')
 
         py = ''
@@ -645,16 +640,38 @@ class CoreHandler(cm.Base):
         else:
             logger.info("Unsupported channel_type [%s]",channel_type)
 
+        if name not in self._channel_processes:
+            self._channel_processes[name] = {}
+        if name not in self._channel_threads:
+            self._channel_threads[name] = {}
+
+        process_info = self._channel_processes[name]
+        thread_info = self._channel_threads[name]
+
+        # channel process already started
+        if 'proc' in process_info or 'thread' in thread_info:
+            return
+
+        if channel_type=='python3' and sys.version_info.major>=3:
+            logger.info("starting <%s> thread channel", name)
+            thread_info['thread'] = threading.Thread(
+                    target=cm.start_and_run_channel,
+                    name=name,
+                    args=('channel', self._servername, name, channel['module'])
+                    )
+            thread_info['thread'].start()
+            return
+
         cmd = [py, self._start_py, 'channel', name, channel['module'], self._servername]
 
         # has not been started yet, start it now
         logger.info('starting channels for %s: %s',name, cmd)
 
         proc = subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-        self._channel_processes[name]['pid'] = proc.pid
-        self._channel_processes[name]['proc'] = proc
+        process_info['pid'] = proc.pid
+        process_info['proc'] = proc
 
-        logger.info('pid: %s', proc.pid)
+        logger.info('source <%s> channel pid: %s', name, proc.pid)
 
     def cm_shutdown(self):
 
@@ -703,6 +720,7 @@ class CoreHandler(cm.Base):
             if not info['enable']:
                 continue
 
+            # this source is not using channel
             if 'channel' not in info:
                 continue
 
