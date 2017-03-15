@@ -313,12 +313,11 @@ vim
 ```
 
 After you reproduce the error, check the contents of the log files generated
-by NCM on current working directory. Especially the one with `cm_core` in the
-name.
+by NCM on current working directory, especially `nvim.log_py3_cm_core`.
 
 If there's no log file, and you get the message `nvim-completion-manager core
-channel terminated`, then you have to try start NCM manually, and see what's
-happaning. Follow these steps:
+channel terminated`, then you have to try starting NCM manually, and see
+what's happaning. Follow these steps:
 
 1. If you are using
    [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc) on vim8,
@@ -329,6 +328,20 @@ happaning. Follow these steps:
 3. Find the `pythonx/cm_start.py` inside NCM's installation directory.  Use
    `python3 pythonx/cm_start.py core 127.0.0.1:37744` to start NCM manually.
 
+If NCM is working well, but a completion source is broken. For example, python
+completion is not working, you need to check the contents of the file
+`nvim.log_py3_cm_sources.cm_jedi`. If this log file is not created, the python
+completion source may have failed to start somehow. You need to start it
+manually. Follow these steps:
+
+1. Find the rpc server address.
+2. Find the python completion source name via `:echo g:_cm_sources`. For
+   python completion, It is `cm-jedi`, then use `:echo
+   g:_cm_sources['cm-jedi']['channel']['module']` to get the module name,
+   which would be `cm_sources.cm_jedi`.
+3. Use the source name and the module name to start the source manually,
+   `python3 pythonx/cm_start.py channel cm-jedi cm_sources.cm_jedi
+   /tmp/nvim5UoeSg/0`
 
 ## Related Projects
 
