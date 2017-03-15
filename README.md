@@ -29,8 +29,6 @@ Subscribe it if you are interested.**
 * [FAQ](#faq)
     * [Why Python?](#why-python)
 * [Trouble-shooting](#trouble-shooting)
-    * [The whole NCM is not working](#the-whole-ncm-is-not-working)
-    * [Some completion source is not working](#some-completion-source-is-not-working)
 * [Related Projects](#related-projects)
 
 <!-- vim-markdown-toc -->
@@ -298,13 +296,11 @@ explanation](https://github.com/Valloric/YouCompleteMe#why-isnt-ycm-just-written
 
 ## Trouble-shooting
 
-### The whole NCM is not working
-
 If something is broken when you play with NCM. Use this  command to set
 environment variables and start your nvim/vim8.
 
 ```sh
-NVIM_PYTHON_LOG_FILE=nvim.log NVIM_NCM_LOG_LEVEL=DEBUG NVIM_NCM_MULTI_THREAD=0 vim
+NVIM_PYTHON_LOG_FILE=nvim.log NVIM_NCM_LOG_LEVEL=DEBUG NVIM_NCM_MULTI_THREAD=0 nvim
 ```
 
 Use this if you're using Windows system.
@@ -313,7 +309,7 @@ Use this if you're using Windows system.
 set NVIM_PYTHON_LOG_FILE=nvim.log
 set NVIM_NCM_LOG_LEVEL=DEBUG
 set NVIM_NCM_MULTI_THREAD=0
-vim
+nvim
 ```
 
 After you reproduce the error, check the contents of the log files generated
@@ -332,8 +328,6 @@ what's happaning. Follow these steps:
 3. Find the `pythonx/cm_start.py` inside NCM's installation directory.  Use
    `python3 pythonx/cm_start.py core 127.0.0.1:37744` to start NCM manually.
 
-
-### Some completion source is not working
 
 If NCM is working well, but some completion source is broken. For example,
 python completion is not working, you need to check the contents of the file
