@@ -58,6 +58,7 @@ class CoreHandler(cm.Base):
         self._complete_delay = self.nvim.vars['cm_complete_delay']
         self._completed_snippet_enable = self.nvim.vars['cm_completed_snippet_enable']
         self._completed_snippet_engine = self.nvim.vars['cm_completed_snippet_engine']
+        self._multi_thread = int(self.nvim.vars['cm_multi_threading'])
 
         self._load_scopers()
 
@@ -657,7 +658,7 @@ class CoreHandler(cm.Base):
         if 'proc' in process_info or 'thread' in thread_info:
             return
 
-        if channel_type=='python3' and sys.version_info.major>=3:
+        if self._multi_thread and channel_type=='python3' and sys.version_info.major>=3:
             logger.info("starting <%s> thread channel", name)
             thread_info['thread'] = threading.Thread(
                     target=cm.start_and_run_channel,

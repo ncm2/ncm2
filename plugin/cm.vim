@@ -2,6 +2,15 @@
 " simply ignore files larger than 1M, for performance
 let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
 
+" multithreadig, saves more memory, enabled by default
+if !exists('g:cm_multi_threading')
+	if $NVIM_NCM_MULTI_THREAD == ''
+		let g:cm_multi_threading = 1
+	else
+		let g:cm_multi_threading = $NVIM_NCM_MULTI_THREAD
+	endif
+endif
+
 if get(g:,'cm_smart_enable',1)
 
 	au BufWinEnter * call cm#_auto_enable_check()

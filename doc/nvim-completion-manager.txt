@@ -280,6 +280,14 @@ g:cm_refresh_default_min_word_len
 			`<Plug>(cm_force_refresh)` key to trigger popup
 			manually with short typing.
 
+						*g:cm_multi_threading*
+g:cm_multi_threading
+			If this options is set to 0. NCM could run in
+			multi-process mode, each source is a standalone
+			process. This is useful for debugging.
+			Default: 1 if environment variable
+			`$NVIM_NCM_MULTI_THREAD` is not set.
+
 ==============================================================================
 5. API						*NCM-API*
 
@@ -641,11 +649,10 @@ There are two main causes:
   all threads exit before shutdown, even though those are python daemon
   thread.
 
-- The current version of NCM is using the classic multi-process architecture,
-  NCM runs outside of vim process and it is started via the |job_start|
-  function.  However, the |job_start| method provided by vim8, unlike the
-  |jobstart| in neovim, has no detach option available, which means that vim8
-  has to wait for NCM process exit before shutdown.
+- The current version of NCM is runs outside of vim process and it is started
+  via the |job_start| function.  However, the |job_start| method provided by
+  vim8, unlike the |jobstart| in neovim, has no detach option available, which
+  means that vim8 has to wait for NCM process exit before shutdown.
 
 ==============================================================================
 vim: tw=78:ts=8:softtabstop=8:sw=8:ft=help:norl:noexpandtab:fen:noet:
