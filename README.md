@@ -300,7 +300,7 @@ If something is broken when you play with NCM. Use this  command to set
 environment variables and start your nvim/vim8.
 
 ```sh
-NVIM_PYTHON_LOG_FILE=nvim.log NVIM_NCM_LOG_LEVEL=DEBUG vim
+NVIM_PYTHON_LOG_FILE=nvim.log NVIM_NCM_LOG_LEVEL=DEBUG NVIM_NCM_MULTI_THREAD=0 vim
 ```
 
 On Windows, use `set` command to set environment variables.
@@ -308,6 +308,7 @@ On Windows, use `set` command to set environment variables.
 ```
 set NVIM_PYTHON_LOG_FILE=nvim.log
 set NVIM_NCM_LOG_LEVEL=DEBUG
+set NVIM_NCM_MULTI_THREAD=0
 vim
 ```
 
