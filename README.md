@@ -29,6 +29,8 @@ Subscribe it if you are interested.**
 * [FAQ](#faq)
     * [Why Python?](#why-python)
 * [Trouble-shooting](#trouble-shooting)
+    * [The whole NCM is not working](#the-whole-ncm-is-not-working)
+    * [Some completion source is not working](#some-completion-source-is-not-working)
 * [Related Projects](#related-projects)
 
 <!-- vim-markdown-toc -->
@@ -296,6 +298,8 @@ explanation](https://github.com/Valloric/YouCompleteMe#why-isnt-ycm-just-written
 
 ## Trouble-shooting
 
+### The whole NCM is not working
+
 If something is broken when you play with NCM. Use this  command to set
 environment variables and start your nvim/vim8.
 
@@ -303,7 +307,7 @@ environment variables and start your nvim/vim8.
 NVIM_PYTHON_LOG_FILE=nvim.log NVIM_NCM_LOG_LEVEL=DEBUG NVIM_NCM_MULTI_THREAD=0 vim
 ```
 
-On Windows, use `set` command to set environment variables.
+Use this if you're using Windows system.
 
 ```
 set NVIM_PYTHON_LOG_FILE=nvim.log
@@ -315,8 +319,8 @@ vim
 After you reproduce the error, check the contents of the log files generated
 by NCM on current working directory, especially `nvim.log_py3_cm_core`.
 
-If there's no log file, and you get the message `nvim-completion-manager core
-channel terminated`, then you have to try starting NCM manually, and see
+If no log file is generated, and you get the message `nvim-completion-manager
+core channel terminated`, then you have to try starting NCM manually, and see
 what's happaning. Follow these steps:
 
 1. If you are using
@@ -328,13 +332,16 @@ what's happaning. Follow these steps:
 3. Find the `pythonx/cm_start.py` inside NCM's installation directory.  Use
    `python3 pythonx/cm_start.py core 127.0.0.1:37744` to start NCM manually.
 
-If NCM is working well, but a completion source is broken. For example, python
-completion is not working, you need to check the contents of the file
+
+### Some completion source is not working
+
+If NCM is working well, but some completion source is broken. For example,
+python completion is not working, you need to check the contents of the file
 `nvim.log_py3_cm_sources.cm_jedi`. If this log file is not created, the python
 completion source may have failed to start somehow. You need to start it
 manually. Follow these steps:
 
-1. Find the rpc server address.
+1. Find the rpc server address as before.
 2. Find the python completion source name via `:echo g:_cm_sources` or simply
    `:echo keys(g:_cm_sources)`. For python completion, It is `cm-jedi`, then
    use `:echo g:_cm_sources['cm-jedi']['channel']['module']` to get the module
