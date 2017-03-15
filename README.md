@@ -28,6 +28,7 @@ Subscribe it if you are interested.**
     * [Experimental hacking](#experimental-hacking)
 * [FAQ](#faq)
     * [Why Python?](#why-python)
+* [Trouble-shooting](#trouble-shooting)
 * [Related Projects](#related-projects)
 
 <!-- vim-markdown-toc -->
@@ -292,6 +293,41 @@ better option rather than a timer or the limited `TextChangedI`.
 
 YouCompleteMe has [good
 explanation](https://github.com/Valloric/YouCompleteMe#why-isnt-ycm-just-written-in-plain-vimscript-ffs).
+
+## Trouble-shooting
+
+If something is broken when you play with NCM. Use this  command to set
+environment variables and start your nvim/vim8.
+
+```sh
+NVIM_PYTHON_LOG_FILE=nvim.log NVIM_NCM_LOG_LEVEL=DEBUG vim
+```
+
+On Windows, use `set` command to set environment variables.
+
+```
+set NVIM_PYTHON_LOG_FILE=nvim.log
+set NVIM_NCM_LOG_LEVEL=DEBUG
+vim
+```
+
+After you reproduce the error, check the contents of the log files generated
+by NCM on current working directory. Especially the one with `cm_core` in the
+name.
+
+If there's no log file, and you get the message `nvim-completion-manager core
+channel terminated`, then you have to try start NCM manually, and see what's
+happaning. Follow these steps:
+
+1. If you are using
+   [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc) on vim8,
+   use `:echo neovim_rpc#serveraddr()` to get the rpc server address. (eg.
+   `127.0.0.1:37744`).
+2. If you're on neovim, use `:echo v:servername` to get the rpc server address.
+   (eg. `/tmp/nvim53UkGK/0`)
+3. Find the `pythonx/cm_start.py` inside NCM's installation directory.  Use
+   `python3 pythonx/cm_start.py core 127.0.0.1:37744` to start NCM manually.
+
 
 ## Related Projects
 
