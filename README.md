@@ -339,7 +339,7 @@ python completion source may have failed to start somehow. Follow these steps
 to start it manually:
 
 1. Find the rpc server address as before.
-2. Find the python completion source name via `:echo g:_cm_sources` or simply
+2. Find the completion source name via `:echo g:_cm_sources` or simply
    `:echo keys(g:_cm_sources)`. For python completion, It is `cm-jedi`, then
    use `:echo g:_cm_sources['cm-jedi']['channel']['module']` to get the module
    name, which would be `cm_sources.cm_jedi`.
