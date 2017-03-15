@@ -177,7 +177,7 @@ class CoreHandler(cm.Base):
             if not self._is_kw_futher_typing(info,ctx,current_ctx):
                 logger.info("[%s] matches is outdated. ignore them.", name)
                 return
-            logger.info("[%s] matches is outdated by keyword futher typing. I'm gonna keep it.", name)
+            logger.info("[%s] matches is outdated by keyword further typing. I'm gonna keep it.", name)
 
         # adjust for subscope
         if ctx['lnum']==1:
@@ -211,7 +211,12 @@ class CoreHandler(cm.Base):
                 complete_info['refresh']  = refresh
                 complete_info['matches']  = matches
                 complete_info['context']  = ctx
-                complete_info['enable']   = not ctx.get('early_cache',False)
+                if outdated and complete_info.get('enable',False):
+                    # outdated, but it is keyword further typing, do not
+                    # override the already enabled matches
+                    complete_info['enable'] = True
+                else:
+                    complete_info['enable']   = not ctx.get('early_cache',False)
 
         # wait for _complete_timeout, reduce flashes
         if self._has_popped_up:
