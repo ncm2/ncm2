@@ -335,13 +335,16 @@ completion source may have failed to start somehow. You need to start it
 manually. Follow these steps:
 
 1. Find the rpc server address.
-2. Find the python completion source name via `:echo g:_cm_sources`. For
-   python completion, It is `cm-jedi`, then use `:echo
-   g:_cm_sources['cm-jedi']['channel']['module']` to get the module name,
-   which would be `cm_sources.cm_jedi`.
+2. Find the python completion source name via `:echo g:_cm_sources` or simply
+   `:echo keys(g:_cm_sources)`. For python completion, It is `cm-jedi`, then
+   use `:echo g:_cm_sources['cm-jedi']['channel']['module']` to get the module
+   name, which would be `cm_sources.cm_jedi`.
 3. Use the source name and the module name to start the source manually,
-   `python3 pythonx/cm_start.py channel cm-jedi cm_sources.cm_jedi
-   /tmp/nvim5UoeSg/0`
+
+```sh
+# python3 pythonx/cm_start.py channel {source_name} {module_name} {addr}
+python3 pythonx/cm_start.py channel cm-jedi cm_sources.cm_jedi /tmp/nvim5UoeSg/0
+```
 
 ## Related Projects
 
