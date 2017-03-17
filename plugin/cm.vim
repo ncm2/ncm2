@@ -1,4 +1,8 @@
 
+if !has('nvim') && v:version<800
+	finish
+endif
+
 " simply ignore files larger than 1M, for performance
 let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
 
