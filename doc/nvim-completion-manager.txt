@@ -373,7 +373,7 @@ cm#register_source({source})
 
 			Default: |g:cm_refresh_default_min_word_len|
 
-	early_cache				NCM-early_cache
+	early_cache				*NCM-early_cache*
 			Cache the completion candidates whenever a word
 			pattern matches, before then amout of characters hit
 			the |cm_refresh_min_word_len| or the typing matches
