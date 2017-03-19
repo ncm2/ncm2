@@ -73,7 +73,7 @@ func! cm#enable_for_buffer(...)
 	endif
 
 	" TODO this override the global options, any way to fix this?
-	set completeopt=menu,menuone,noinsert,noselect
+	let &completeopt=g:cm_completeopt
 	if g:cm_completekeys=="\<Plug>(cm_completefunc)"
 		set completefunc=cm#_completefunc
 	endif
@@ -87,7 +87,7 @@ func! cm#enable_for_buffer(...)
 		autocmd InsertLeave <buffer> call s:notify_core_channel('cm_insert_leave')
 		autocmd InsertEnter <buffer>  call s:change_tick_start()
 		autocmd InsertLeave <buffer> call s:change_tick_stop()
-		autocmd BufEnter    <buffer> set completeopt=menu,menuone,noinsert,noselect
+		autocmd BufEnter    <buffer> let &completeopt=g:cm_completeopt
 		" working together with timer, the timer is for detecting changes
 		" popup menu is visible. TextChangedI will not be triggered when popup
 		" menu is visible, but TextChangedI is more efficient and faster than

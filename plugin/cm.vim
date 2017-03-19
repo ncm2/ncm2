@@ -63,6 +63,8 @@ let g:cm_sources_override = get(g:,'cm_sources_override',{})
 " format: [ (minimal priority, min length), ()]
 let g:cm_refresh_default_min_word_len = get(g:,'cm_refresh_default_min_word_len',[[1,4],[7,3]])
 
+let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
+
 func! s:lazy_init()
 	if !exists('g:cm_completed_snippet_enable')
 		if get(g:,'neosnippet#enable_completed_snippet',0)

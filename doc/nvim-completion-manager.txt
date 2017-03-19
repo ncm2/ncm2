@@ -288,6 +288,11 @@ g:cm_multi_threading
 			Default: 1 if environment variable
 			`$NVIM_NCM_MULTI_THREAD` is not set.
 
+						*g:cm_completeopt*
+g:cm_completeopt
+			The value of 'completeopt' when NCM is active.
+			Default: "menu,menuone,noinsert,noselect"
+
 ==============================================================================
 5. API						*NCM-API*
 
