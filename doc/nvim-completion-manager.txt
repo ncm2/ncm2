@@ -13,7 +13,7 @@ nvim-completion-manager			    *nvim-completion-manager* *NCM*
 4. Settings					|NCM-settings|
 5. API						|NCM-API|
 6. Why						|NCM-why|
-7. Minimal Source Exampels			|NCM-source-exampels|
+7. Minimal Source Exampels			|NCM-source-examples|
 8. Known issues					|NCM-known-issues|
 
 ==============================================================================
