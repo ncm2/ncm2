@@ -69,20 +69,17 @@ scoping features:
 
 extra sources:
 
-- Language server protocol via
-  [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+- Language server protocol via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
     - [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)
-- PHP completion via
-  [nvim-cm-php-language-server](https://github.com/roxma/nvim-cm-php-language-server)
+- PHP completion via [nvim-cm-php-language-server](https://github.com/roxma/nvim-cm-php-language-server)
   (deprecated)
-- C/C++ completion via
-  [clang_complete](https://github.com/roxma/clang_complete). This plugin
-  [requires
-  python2](https://github.com/llvm-mirror/clang/commit/abdad67b94ad4dad2d655d48ff5f81d6ccf3852e)
+- C/C++ completion via [clang_complete](https://github.com/roxma/clang_complete). 
+  This plugin [requires python2](https://github.com/llvm-mirror/clang/commit/abdad67b94ad4dad2d655d48ff5f81d6ccf3852e)
   support for neovim.
-- Javascript completion via
-  [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)
+- Javascript completion via [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)
 - Golang completion via [gocode](https://github.com/nsf/gocode)
+- Clojure completion via [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)
+
 
 ## Requirements
 
