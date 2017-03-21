@@ -11,9 +11,9 @@
 from cm import register_source, getLogger, Base
 register_source(name='cm-filepath',
                 abbreviation='path',
-                word_pattern=r'[^\s,\\\/]+',
-                cm_refresh_patterns=[r'(\.[\/\\]|[a-zA-Z]:\\|~\/)[0-9a-zA-Z_\-\.\\\/~\$]*$'],
-                options=dict(path_pattern=r'''[^\s\'\",]+'''),
+                word_pattern=r'''[^\s'",\\\/]+''',
+                cm_refresh_patterns=[r'''(\.[\/\\]|[a-zA-Z]:\\|~\/)[^\s'",]*$''',r'''[\/\\][^\s'",]+[\/\\]$'''],
+                options=dict(path_pattern=r'''[^\s'",]+'''),
                 priority=6,)
 
 import os
