@@ -97,11 +97,14 @@ class CoreHandler(cm.Base):
 
             # use a trick to only register the source withou loading the entire
             # module
-            def register_source(name,abbreviation,priority,enable=True,events=[],python='python3',**kwargs):
+            def register_source(name,abbreviation,priority,enable=True,events=[],python='python3',multi_thread=None,**kwargs):
 
                 channel = dict(type=python,
                                module=modulename,
                                events=events)
+
+                if not multi_thread is None:
+                    channel['multi_thread'] = multi_thread
 
                 source = {}
                 source['channel']      = channel
@@ -658,7 +661,7 @@ class CoreHandler(cm.Base):
         if 'proc' in process_info or 'thread' in thread_info:
             return
 
-        if self._multi_thread and channel_type=='python3' and sys.version_info.major>=3:
+        if self._multi_thread and channel_type=='python3' and channel.get('multi_thread',1) and sys.version_info.major>=3:
             logger.info("starting <%s> thread channel", name)
             thread_info['thread'] = threading.Thread(
                     target=cm.start_and_run_channel,

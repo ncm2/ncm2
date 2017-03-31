@@ -32,7 +32,7 @@ logger = getLogger(__name__)
 
 # python="python2" is only used for sources that depends on python2 libraries,
 # don't use it if possible
-def register_source(name,abbreviation,priority,enable=True,events=[],python='python3',**kwargs):
+def register_source(name,abbreviation,priority,enable=True,events=[],python='python3',multi_thread=None,**kwargs):
     # implementation is put inside cm_core
     # 
     # cm_core use a trick to only register the source withou loading the entire
