@@ -29,6 +29,10 @@ class Source(Base):
         path = ctx['filepath']
         typed = ctx['typed']
 
+        # Ignore comment, also workaround jedi's bug #62
+        if re.match(r'\s*#', typed):
+            return
+
         src = self.get_src(ctx)
         if not src.strip():
             # empty src may possibly block jedi execution, don't know why
