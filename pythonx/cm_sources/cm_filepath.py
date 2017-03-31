@@ -11,9 +11,9 @@
 from cm import register_source, getLogger, Base
 register_source(name='cm-filepath',
                 abbreviation='path',
-                word_pattern=r'''[^\s'"=,`\\\/]+''',
-                cm_refresh_patterns=[r'''(\.[\/\\]|[a-zA-Z]:\\|~\/)[^\s'"=,`]*$''',r'''[\/\\][^\s'"=,`]+[\/\\]$'''],
-                options=dict(path_pattern=r'''[^\s'"=,`]+'''),
+                word_pattern=r'''([^\W]|[.~%$])+''',
+                cm_refresh_patterns=[r'''(\.[/\\]|[a-zA-Z]:\\|~\/)([^\W]|[.~%$]|[/\\])*$''',r'''[/\\$]([^\W]|[.~%$]|[/\\])+[/\\]$'''],
+                options=dict(path_pattern=r'''(([^\W]|[.~%$]|[/\\])+)'''),
                 priority=6,)
 
 import os
@@ -33,9 +33,9 @@ class Source(Base):
 
         pkw = re.search(info['options']['path_pattern']+r'$',typed).group(0)
 
-        dir = os.path.dirname(pkw)
-        dir = os.path.expandvars(dir)
+        dir = os.path.expandvars(pkw)
         dir = os.path.expanduser(dir)
+        dir = os.path.dirname(dir)
 
         self.logger.debug('dir: %s', dir)
 
