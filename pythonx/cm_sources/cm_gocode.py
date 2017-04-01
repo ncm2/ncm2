@@ -29,6 +29,14 @@ class Source(Base):
     def __init__(self,nvim):
         super(Source,self).__init__(nvim)
 
+    def get_pos(self, lnum , col, src):
+        lines = src.split(b'\n')
+        pos = 0
+        for i in range(lnum-1):
+            pos += len(lines[i])+1
+        pos += col-1
+        return pos
+
     def cm_refresh(self,info,ctx,*args):
 
         # Note:
@@ -37,7 +45,7 @@ class Source(Base):
         # of the file, Please use `cm.get_src()` instead of
         # `"\n".join(self._nvim.current.buffer[:])`
 
-        src = self.get_src(ctx)
+        src = self.get_src(ctx).encode('utf-8')
 
         # convert lnum, col to offset
         offset = self.get_pos(ctx['lnum'],ctx['col'],src)
@@ -48,7 +56,7 @@ class Source(Base):
                                 stdout=subprocess.PIPE, 
                                 stderr=subprocess.DEVNULL)
 
-        result, errs = proc.communicate(src.encode('utf-8'),timeout=30)
+        result, errs = proc.communicate(src,timeout=30)
         # result: [1, [{"class": "func", "name": "Print", "type": "func(a ...interface{}) (n int, err error)"}, ...]]
         result = json.loads(result.decode('utf-8')) 
         logger.info("result %s", result)
