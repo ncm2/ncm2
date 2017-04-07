@@ -13,6 +13,7 @@ from cm import register_source, getLogger, Base
 register_source(name='cm-gocode',
                 priority=9,
                 abbreviation='Go',
+                word_pattern=r'[\w/]+',
                 scoping=True,
                 scopes=['go'],
                 cm_refresh_patterns=[r'\.(\w*)$'],)
