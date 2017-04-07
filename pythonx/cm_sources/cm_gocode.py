@@ -62,6 +62,7 @@ class Source(Base):
         result = json.loads(result.decode('utf-8')) 
         logger.info("result %s", result)
         completions = result[1]
+        startcol = ctx['col'] - result[0]
 
         if not completions:
             return
@@ -114,6 +115,6 @@ class Source(Base):
 
                 item['snippet'] = item['word'] + '(' + ", ".join(snip_params) + optional + ')${0}'
 
-        logger.info('matches %s', matches)
-        self.complete(info, ctx, ctx['startcol'], matches)
+        logger.info('startcol %s, matches %s', startcol, matches)
+        self.complete(info, ctx, startcol, matches)
 
