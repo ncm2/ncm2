@@ -309,10 +309,8 @@ class CoreHandler(cm.Base):
                         logger.debug('<%s> is not auto_popup', name)
                         continue
 
-                    # check if enough to trigger cm_refresh
-                    # if ok, set startcol for it
-                    is_matched = self._check_refresh_patterns(info,ctx,force)
-                    if not is_matched:
+                    # refresh patterns
+                    if not self._check_refresh_patterns(info,ctx,force):
                         if not force and info['early_cache'] and self._check_refresh_patterns(info,ctx,True):
                             # early cache
                             ctx['early_cache'] = True
@@ -320,8 +318,7 @@ class CoreHandler(cm.Base):
                         else:
                             logger.debug('cm_refresh ignore <%s>, force[%s] early_cache[%s]', name, force, info['early_cache'])
                             continue
-
-                    if is_matched:
+                    else:
                         if name in self._matches:
                             # enable previous early_cache, if available
                             self._matches[name]['enable'] = True
@@ -396,7 +393,6 @@ class CoreHandler(cm.Base):
 
         patterns = info.get('cm_refresh_patterns',None)
         typed = ctx['typed']
-        is_matched = False
 
         word_pattern = info.get('word_pattern',None) or cm_default.word_pattern(ctx)
 
