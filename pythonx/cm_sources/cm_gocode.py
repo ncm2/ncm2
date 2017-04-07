@@ -46,12 +46,13 @@ class Source(Base):
         # `"\n".join(self._nvim.current.buffer[:])`
 
         src = self.get_src(ctx).encode('utf-8')
+        filepath = ctx['filepath']
 
         # convert lnum, col to offset
         offset = self.get_pos(ctx['lnum'],ctx['col'],src)
 
         # invoke gocode
-        proc = subprocess.Popen(args=['gocode','-f','json','autocomplete','%s' % offset], 
+        proc = subprocess.Popen(args=['gocode','-f','json','autocomplete', filepath,'%s' % offset], 
                                 stdin=subprocess.PIPE, 
                                 stdout=subprocess.PIPE, 
                                 stderr=subprocess.DEVNULL)
