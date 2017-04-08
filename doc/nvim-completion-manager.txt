@@ -375,9 +375,11 @@ cm#register_source({source})
 
 	early_cache				*NCM-early_cache*
 			Cache the completion candidates whenever a word
-			pattern matches, before then amout of characters hit
-			the |cm_refresh_min_word_len| or the typing matches
-			|cm_refresh_patterns|.
+			pattern matches, the result will not be popped up
+			until the word gets long enough
+			(|cm_refresh_min_word_len|) or matches
+			|cm_refresh_patterns|. It feels faster when candidates
+			are already cached before the popup menu is displayed.
 
 			Default: 0 for ||NCM-vimscript-source| registered.  1
 				for |NCM-python-source| .
