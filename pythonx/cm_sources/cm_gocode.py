@@ -78,7 +78,7 @@ class Source(Base):
         completions = result[1]
         startcol = ctx['col'] - result[0]
 
-        if startcol==ctx['col'] and re.match("\w", ctx['typed'][-1]):
+        if startcol==ctx['col'] and re.match(r'\w', ctx['typed'][-1]):
             # workaround gocode bug when completion is triggered in a golang
             # string
             return
