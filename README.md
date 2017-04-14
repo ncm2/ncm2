@@ -79,6 +79,7 @@ extra sources:
 - Javascript completion via [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)
 - Golang completion via [gocode](https://github.com/nsf/gocode)
 - Clojure completion via [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)
+- Rust completion via [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
 
 
 ## Requirements
