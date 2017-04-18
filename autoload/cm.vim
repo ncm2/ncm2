@@ -354,7 +354,8 @@ func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
 	let s:context = a:context
 	let s:startcol = a:startcol
-	let s:matches = a:matches
+	let l:padcmd = 'extend(v:val,{"abbr":printf("%".strdisplaywidth(v:val["padding"])."s%s","",v:val["abbr"])})'
+	let s:matches = map(a:matches, l:padcmd)
 	let s:snippets = a:snippets
 
 	call feedkeys(g:cm_completekeys)

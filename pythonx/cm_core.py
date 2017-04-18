@@ -517,13 +517,13 @@ class CoreHandler(cm.Base):
                     continue
 
                 prefix = ctx['typed'][startcol-1 : source_startcol-1]
-                padding = (' ' * len(prefix.encode('utf-8')))
 
                 for e in source_matches:
-                    if 'abbr' in e:
-                        e['abbr'] = padding + e['abbr']
-                    else:
-                        e['abbr'] = padding + e['word']
+                    # do the padding in vimscript to avoid the rpc
+                    # overhead of calling strdisplaywidth
+                    e['padding'] = prefix
+                    if 'abbr' not in e:
+                        e['abbr'] = e['word']
                     e['word'] = prefix + e['word']
 
                 matches += source_matches
@@ -625,7 +625,7 @@ class CoreHandler(cm.Base):
                         # expandable
                         m['menu'] = '[+] ' + m['menu']
 
-        self.nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets, async=True)
+        self.nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
         self._last_matches = matches
         self._last_startcol = startcol
 
