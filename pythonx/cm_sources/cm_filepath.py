@@ -42,12 +42,16 @@ class Source(Base):
 
         self.logger.debug('dir: %s', dir)
 
+        bdirs = []
+        if filepath != "":
+            curdir = os.path.dirname(filepath)
+            bdirs.append(('buf',curdir), )
+
         # full path of current file, current working dir
         cwd = self.nvim.call('getcwd')
-        curdir = os.path.dirname(filepath)
+        bdirs.append(('cwd',cwd), )
 
-        bdirs = [('buf',curdir), ('cwd',cwd)]
-        if (pkw!="./") and (pkw!=".\\"):
+        if pkw and pkw[0] != ".":
             bdirs.append(('root',"/"))
 
         seen = set()
