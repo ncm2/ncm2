@@ -517,12 +517,13 @@ class CoreHandler(cm.Base):
                     continue
 
                 prefix = ctx['typed'][startcol-1 : source_startcol-1]
+                padding = (' ' * len(prefix.encode('utf-8')))
 
                 for e in source_matches:
                     if 'abbr' in e:
-                        e['abbr'] = (' '*len(prefix)) + e['abbr']
+                        e['abbr'] = padding + e['abbr']
                     else:
-                        e['abbr'] = (' '*len(prefix)) + e['word']
+                        e['abbr'] = padding + e['word']
                     e['word'] = prefix + e['word']
 
                 matches += source_matches
