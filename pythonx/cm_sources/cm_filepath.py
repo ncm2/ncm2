@@ -69,11 +69,11 @@ class Source(Base):
             menu = file
             matches.append(dict(word=word,icase=1,menu=menu,dup=1))
 
-        # pre filtering
-        matches = self.matcher.process(info, ctx, startcol, matches)
         refresh = 0
         if len(matches)>1024:
             refresh = 1
+            # pre filtering
+            matches = self.matcher.process(info, ctx, startcol, matches)
             matches = matches[0:1024]
 
         self.logger.debug('startcol: %s, matches: %s', startcol, matches)
