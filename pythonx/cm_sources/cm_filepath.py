@@ -35,6 +35,9 @@ class Source(Base):
 
         dir = os.path.expandvars(pkw)
         dir = os.path.expanduser(dir)
+        expanded = False
+        if dir != pkw:
+            expanded = True
         dir = os.path.dirname(dir)
 
         self.logger.debug('dir: %s', dir)
@@ -43,31 +46,31 @@ class Source(Base):
         cwd = self.nvim.call('getcwd')
         curdir = os.path.dirname(filepath)
 
-        bdirs = [curdir, cwd]
+        bdirs = [('buf',curdir), ('cwd',cwd)]
         if (pkw!="./") and (pkw!=".\\"):
-            bdirs.append("/")
+            bdirs.append(('root',"/"))
 
-        files = []
-        for bdir in bdirs:
+        seen = set()
+        matches = []
+        for label,bdir in bdirs:
             joined_dir = os.path.join(bdir,dir.strip('/'))
             self.logger.debug('searching dir: %s', joined_dir)
             try:
                 names = os.listdir(joined_dir)
                 self.logger.debug('search result: %s', names)
                 for name in names:
-                    files.append(os.path.join(joined_dir,name))
+                    p = os.path.join(joined_dir,name)
+                    if p in seen:
+                        continue
+                    seen.add(p)
+                    word = os.path.basename(p)
+                    menu = '~' + label
+                    if expanded:
+                        menu += '~ ' + p
+                    matches.append(dict(word=word,icase=1,menu=menu,dup=1))
             except Exception as ex:
                 self.logger.info('exception on listing joined_dir [%s], %s', joined_dir, ex)
                 continue
-
-        # remove duplicate
-        files = list(set(files))
-
-        matches = []
-        for file in files:
-            word = os.path.basename(file)
-            menu = file
-            matches.append(dict(word=word,icase=1,menu=menu,dup=1))
 
         refresh = 0
         if len(matches)>1024:
