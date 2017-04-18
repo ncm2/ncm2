@@ -519,9 +519,11 @@ class CoreHandler(cm.Base):
                 prefix = ctx['typed'][startcol-1 : source_startcol-1]
 
                 for e in source_matches:
+                    if 'abbr' in e:
+                        e['abbr'] = (' '*len(prefix)) + e['abbr']
+                    else:
+                        e['abbr'] = (' '*len(prefix)) + e['word']
                     e['word'] = prefix + e['word']
-                    # if 'abbr' in e:
-                    #     e['abbr'] = prefix + e['abbr']
 
                 matches += source_matches
 
