@@ -12,7 +12,8 @@ from cm import register_source, getLogger, Base
 register_source(name='cm-filepath',
                 abbreviation='path',
                 word_pattern=r'''([^\W]|[-.~%$])+''',
-                cm_refresh_patterns=[r'''(\.[/\\]|[a-zA-Z]:\\|~\/)([^\W]|[-.~%$]|[/\\])*$''',r'''[/\\$]([^\W]|[-.~%$]|[/\\])+[/\\]$'''],
+                cm_refresh_patterns=[
+                    r'''(\.[/\\]|[a-zA-Z]:\\|~\/)([^\W]|[-.~%$]|[/\\])*$''', r'''[/\\$]([^\W]|[-.~%$]|[/\\])+[/\\]$'''],
                 options=dict(path_pattern=r'''(([^\W]|[-.~%$]|[/\\])+)'''),
                 priority=6,)
 
@@ -20,18 +21,19 @@ import os
 import re
 from neovim.api import Nvim
 
+
 class Source(Base):
 
-    def __init__(self,nvim):
-        super(Source,self).__init__(nvim)
+    def __init__(self, nvim):
+        super(Source, self).__init__(nvim)
 
-    def cm_refresh(self,info,ctx):
+    def cm_refresh(self, info, ctx):
 
         typed = ctx['typed']
         filepath = ctx['filepath']
         startcol = ctx['startcol']
 
-        pkw = re.search(info['options']['path_pattern']+r'$',typed).group(0)
+        pkw = re.search(info['options']['path_pattern'] + r'$', typed).group(0)
 
         dir = os.path.expandvars(pkw)
         dir = os.path.expanduser(dir)
@@ -45,25 +47,25 @@ class Source(Base):
         bdirs = []
         if filepath != "":
             curdir = os.path.dirname(filepath)
-            bdirs.append(('buf',curdir), )
+            bdirs.append(('buf', curdir), )
 
         # full path of current file, current working dir
         cwd = self.nvim.call('getcwd')
-        bdirs.append(('cwd',cwd), )
+        bdirs.append(('cwd', cwd), )
 
         if pkw and pkw[0] != ".":
-            bdirs.append(('root',"/"))
+            bdirs.append(('root', "/"))
 
         seen = set()
         matches = []
-        for label,bdir in bdirs:
-            joined_dir = os.path.join(bdir,dir.strip('/'))
+        for label, bdir in bdirs:
+            joined_dir = os.path.join(bdir, dir.strip('/'))
             self.logger.debug('searching dir: %s', joined_dir)
             try:
                 names = os.listdir(joined_dir)
                 self.logger.debug('search result: %s', names)
                 for name in names:
-                    p = os.path.join(joined_dir,name)
+                    p = os.path.join(joined_dir, name)
                     if p in seen:
                         continue
                     seen.add(p)
@@ -71,13 +73,13 @@ class Source(Base):
                     menu = '~' + label
                     if expanded:
                         menu += '~ ' + p
-                    matches.append(dict(word=word,icase=1,menu=menu,dup=1))
+                    matches.append(dict(word=word, icase=1, menu=menu, dup=1))
             except Exception as ex:
                 self.logger.info('exception on listing joined_dir [%s], %s', joined_dir, ex)
                 continue
 
         refresh = 0
-        if len(matches)>1024:
+        if len(matches) > 1024:
             refresh = 1
             # pre filtering
             matches = self.matcher.process(info, ctx, startcol, matches)
@@ -85,4 +87,3 @@ class Source(Base):
 
         self.logger.debug('startcol: %s, matches: %s', startcol, matches)
         self.complete(info, ctx, ctx['startcol'], matches, refresh)
-
