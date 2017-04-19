@@ -15,6 +15,7 @@ register_source(name='cm-filepath',
                 cm_refresh_patterns=[
                     r'''(\.[/\\]|[a-zA-Z]:\\|~\/)([^\W]|[-.~%$]|[/\\])*$''', r'''[/\\$]([^\W]|[-.~%$]|[/\\])+[/\\]$'''],
                 options=dict(path_pattern=r'''(([^\W]|[-.~%$]|[/\\])+)'''),
+                sort=0,
                 priority=6,)
 
 import os
@@ -63,6 +64,7 @@ class Source(Base):
             self.logger.debug('searching dir: %s', joined_dir)
             try:
                 names = os.listdir(joined_dir)
+                names.sort(key=lambda name: name.lower())
                 self.logger.debug('search result: %s', names)
                 for name in names:
                     p = os.path.join(joined_dir, name)
