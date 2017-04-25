@@ -232,10 +232,12 @@ g:cm_completed_snippet_enable
 			Enable by default if any one of the conditions is
 			satisfied:
 
-			- you have installed neosnippet with
+			- You have installed neosnippet with
 			  |g:neosnippet#enable_completed_snippet| set to 1
 
-			- you have installed ultisnips
+			- You have installed ultisnips
+
+			- You have installed snipMate
 
 						*g:cm_completekeys*
 g:cm_completekeys
@@ -412,7 +414,7 @@ cm#complete({name}, {context}, {startcol}, {matches}[, {refresh}])
 	See |cm#context()| for more information.
 
 	{startcol} and {matches} are used the same way as vim's builtin
-	|complete()|function.
+	|complete()| function.
 
 	{refresh} is 0 by default. Normally |NCM| will cache the result until
 	another word started. And if there's cached result of a source, the
@@ -440,14 +442,13 @@ cm#context()
 	the following fields:
 
 	bufnr		
-			Current buffer number. Same result as `bufnr('%')`.
+			Same as `bufnr('%')`.
 	lnum		
-			Current cursor line number. Same result as
-			`line('.')`.
+			Same as `line('.')`.
 	col		
-			Current cursor column. Same result as `col('.')`.
+			Same as `col('.')`.
 	filetype	
-			Equivalent to the value of 'filetype' of the buffer.
+			Same as 'filetype' of the buffer.
 	typed					*cm#context().typed*
 			The typed text. For example: >
 				^foo bar|baz
@@ -463,7 +464,7 @@ cm#context()
 			matters if you're dealing with non English Unicode
 			characters.
 	filepath	
-			The path of current editting file. Equivalent to
+			The path of current editting file. Same as
 			`expand('%:p')` 
 
 	Note: When the context is passed via |cm_refresh-notification|, it has
@@ -486,8 +487,7 @@ cm#context()
 
 	base
 			Set according to the startcol. The value is the same
-			as the {base} passed to |complete-functions|. In
-			previous example, this field will be "barfoo".
+			as the {base} passed to |complete-functions|.
 
 	force		
 			Non-zero value if this notification is triggered by
