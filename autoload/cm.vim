@@ -258,9 +258,16 @@ let s:channel_started = 0
 let g:_cm_start_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
 let s:snippets = []
 
+" global lock for being compatible with other plugins:
+" 1 - vim-multiple-cursors
+let g:_cm_lock = 0
+
 augroup cm
 	autocmd!
 	autocmd VimLeavePre * let s:leaving=1
+
+    autocmd User MultipleCursorsPre  let g:_cm_lock = or(g:_cm_lock, 0x1)
+    autocmd User MultipleCursorsPost let g:_cm_lock = and(g:_cm_lock, invert(0x1))
 augroup END
 
 func! s:check_scope(info)
@@ -333,7 +340,7 @@ endfunc
 
 func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
-	if !get(b:,'cm_enable',0)  || &paste!=0
+	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock
 		return
 	endif
 
