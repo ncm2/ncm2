@@ -251,7 +251,7 @@ endfunc
 let g:_cm_sources = {}
 let s:leaving = 0
 let s:change_timer = -1
-let s:lasttick = ''
+let s:lasttick = []
 let s:channel_jobid = -1
 let g:_cm_channel_id = -1
 let s:channel_started = 0
@@ -450,7 +450,7 @@ func! s:change_tick_stop()
 		return
 	endif
 	call timer_stop(s:change_timer)
-	let s:lasttick = ''
+	let s:lasttick = []
 	let s:change_timer = -1
 endfunc
 
