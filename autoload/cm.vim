@@ -340,7 +340,7 @@ endfunc
 
 func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
-	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock
+	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
 		return
 	endif
 
