@@ -365,7 +365,7 @@ func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 	let s:matches = map(a:matches, l:padcmd)
 	let s:snippets = a:snippets
 
-	call feedkeys(g:cm_completekeys)
+	call feedkeys(g:cm_completekeys, 'i')
 
 endfunc
 
