@@ -158,6 +158,9 @@ class Matcher(object):
 
     def process(self,info,ctx,startcol,matches):
 
+        # generator to list
+        matches = list(matches)
+
         # fix for chinese characters
         # `你好 abcd|`
         # has  col('.')==11 on vim
