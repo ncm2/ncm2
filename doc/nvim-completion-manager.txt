@@ -210,6 +210,8 @@ g:cm_matcher.module
 				Note: Known issue #8 on github, there may be
 				undesired cursor flickering with fuzzy
 				matcher.
+			`"cm_matchers.abbrev_matcher"`
+				A more intuitive version of fuzzy matching.
 
 						*g:cm_matcher.case*
 g:cm_matcher.case

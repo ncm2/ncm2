@@ -29,9 +29,6 @@ endif
 
 let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})
 
-" use this for fuzzy matching
-" let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm.matchers.fuzzy_matcher', 'case': 'smartcase'})
-
 if !exists('g:cm_completekeys')
 	if g:cm_matcher['module'] == 'cm_matchers.prefix_matcher'
 		" <Plug>(cm_complete) has no flickering issue with prefix_matcher. But
