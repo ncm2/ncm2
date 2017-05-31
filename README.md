@@ -217,9 +217,8 @@ let g:cm_sources_override = {
 - For really simple, light weight completion candidate calculation, or
   avoiding python, refer to
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
-- For really async completion source (strongly encoraged), refer to the gocode
-  completion:
-  [pythonx/cm_sources/cm_gocode.py](pythonx/cm_sources/cm_gocode.py)
+- For really async completion source (strongly encoraged), refer to the rust
+  completion: [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
 
 Please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
