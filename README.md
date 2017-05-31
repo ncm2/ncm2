@@ -71,6 +71,7 @@ completion in html style/script tag.
 | C/C++                    | [clang_complete](https://github.com/roxma/clang_complete)                              |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
 | Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
+| elm                      | [ncm-elm-oracle](https://github.com/roxma/ncm-elm-oracle)                              |
 | Clojure                  | [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                        |
 | Rust                     | [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)                                |
 | Vimscript                | [neco-vim](https://github.com/Shougo/neco-vim)                                         |
