@@ -17,7 +17,8 @@ Subscribe it if you are interested.**
 
 <!-- vim-markdown-toc GFM -->
 * [Features](#features)
-* [Available Completion Sources](#available-completion-sources)
+* [Scoping Sources:](#scoping-sources)
+* [Completion Sources](#completion-sources)
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Configuration Tips](#configuration-tips)
@@ -47,39 +48,34 @@ completion in html style/script tag.
    [vim-snipmate](https://github.com/garbas/vim-snipmate).
 
 
-## Available Completion Sources
-
-plugin builtin sources:
-
-- Keyword from current buffer
-- Tag completion. (`:help 'tags'`, `:help tagfiles()`)
-- Keyword from tmux session
-- Ultisnips, neosnippet or snipmate hint, if you have installed any one of
-  them.
-- File path completion
-- Python completion via [jedi](https://github.com/davidhalter/jedi)
-- Css completion via vim's builtin
-  [csscomplete#CompleteCSS](https://github.com/othree/csscomplete.vim)
-
-scoping features:
+## Scoping Sources:
 
 - Language specific completion for markdown
 - Javascript code completion in html script tag
 - Css code completion in html style tag
 
-extra sources:
+## Completion Sources
 
-| Language   | Repository                                                                      |
-|------------|---------------------------------------------------------------------------------|
-| -          | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)      |
-| PHP        | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim) |
-| C/C++      | [clang_complete](https://github.com/roxma/clang_complete)                       |
-| Javascript | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                           |
-| Javascript | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                               |
-| Golang     | [gocode](https://github.com/nsf/gocode)                                         |
-| Clojure    | [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                 |
-| Rust       | [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)                         |
-| Vimscript  | [neco-vim](https://github.com/Shougo/neco-vim)                                  |
+| Language / Description   | Repository                                                                             |
+|--------------------------|----------------------------------------------------------------------------------------|
+| Word from current buffer | builtin                                                                                |
+| Word from tmux session   | builtin                                                                                |
+| Tag completion           | builtin                                                                                |
+| Snippet hint             | [Ultisnips](https://github.com/SirVer/ultisnips)                                       |
+| Snippet hint             | [vim-snipmate](https://github.com/garbas/vim-snipmate)                                 |
+| Snippet hint             | [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)                             |
+| Filepath completion      | builtin                                                                                |
+| Python                   | builtin, requires [jedi](https://github.com/davidhalter/jedi)                          |
+| Css                      | builtin, requires [csscomplete#CompleteCSS](https://github.com/othree/csscomplete.vim) |
+| -                        | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
+| PHP                      | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)        |
+| C/C++                    | [clang_complete](https://github.com/roxma/clang_complete)                              |
+| Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
+| Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
+| Golang                   | builtin, requires [gocode](https://github.com/nsf/gocode)                              |
+| Clojure                  | [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                        |
+| Rust                     | [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)                                |
+| Vimscript                | [neco-vim](https://github.com/Shougo/neco-vim)                                         |
 
 
 ## Requirements
