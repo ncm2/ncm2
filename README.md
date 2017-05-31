@@ -65,9 +65,9 @@ completion in html style/script tag.
 | Python                   | builtin, requires [jedi](https://github.com/davidhalter/jedi)                          |
 | Css                      | builtin, requires [csscomplete#CompleteCSS](https://github.com/othree/csscomplete.vim) |
 | Golang                   | builtin, requires [gocode](https://github.com/nsf/gocode)                              |
-| Snippet hint             | [Ultisnips](https://github.com/SirVer/ultisnips)                                       |
-| Snippet hint             | [vim-snipmate](https://github.com/garbas/vim-snipmate)                                 |
-| Snippet hint             | [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)                             |
+| Ultisnips hint           | builtin, requires [Ultisnips](https://github.com/SirVer/ultisnips)                     |
+| Snipmate hint            | builtin, requires [vim-snipmate](https://github.com/garbas/vim-snipmate)               |
+| neosnippet hint          | builtin, requires [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)           |
 | C/C++                    | [clang_complete](https://github.com/roxma/clang_complete)                              |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
 | Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
