@@ -33,12 +33,7 @@ if has('nvim')==0
 endif
 
 
-" options
-
-" chech this plugin is enabled
-" get(b:,'cm_enable',0)
-
-" do nothing, place it here only to avoid the message 'No matching autocommands'
+" do nothing. place it here only to avoid the message 'No matching autocommands'
 autocmd User CmSetup silent 
 
 func! cm#enable_for_buffer(...)
@@ -244,6 +239,19 @@ func! cm#complete(src, context, startcol, matches, ...)
 	call s:notify_core_channel('cm_complete',g:_cm_sources,a:src,a:context,a:startcol,a:matches,l:refresh,0,'')
 	return 0
 
+endfunc
+
+" show message to user
+func! cm#message(msgtype, msg)
+    if toupper(a:msgtype) == 'ERROR'
+        if mode() == 'i'
+            " side effect
+            set nosmd
+        endif
+        echoh WarningMsg | echom '[ERROR] ' . a:msg | echoh None 
+        return
+    endif
+    echom '[' . toupper(a:msgtype) . '] ' . a:msg
 endfunc
 
 " internal functions and variables

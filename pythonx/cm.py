@@ -137,6 +137,9 @@ class Base:
 
         return self._cache_src[scope_offset:scope_offset+scope_len]
 
+    def message(self, msgtype, msg):
+        self.nvim.call('cm#message', msgtype, msg)
+
     def complete(self, name, ctx, startcol, matches, refresh=False):
         if isinstance(name,dict):
             name = name['name']

@@ -31,6 +31,14 @@ class Source(Base):
         super(Source,self).__init__(nvim)
         self._checked = False
 
+        try:
+            from distutils.spawn import find_executable
+            # echoe does not work here
+            if not find_executable("gocode"):
+                self.message('error', "Can't find [gocode] binary. Please install gocode http://github.com/nsf/gocode")
+        except:
+            pass
+
     def get_pos(self, lnum , col, src):
         lines = src.split(b'\n')
         pos = 0
@@ -38,16 +46,6 @@ class Source(Base):
             pos += len(lines[i])+1
         pos += col-1
         return pos
-
-    def _check_warn_gocode(self):
-        if self._checked:
-            return
-        self._checked = True
-        from distutils.spawn import find_executable
-        # echoe does not work here
-        cmd = "set nosmd | echoh WarningMsg | echom 'Can not find gocode for completion, you need http://github.com/nsf/gocode' | echoh None "
-        if not find_executable("gocode"):
-            self.nvim.command(cmd)
 
     def cm_refresh(self,info,ctx,*args):
 
@@ -59,8 +57,6 @@ class Source(Base):
 
         src = self.get_src(ctx).encode('utf-8')
         filepath = ctx['filepath']
-
-        self._check_warn_gocode()
 
         # convert lnum, col to offset
         offset = self.get_pos(ctx['lnum'],ctx['col'],src)
@@ -75,6 +71,9 @@ class Source(Base):
         # result: [1, [{"class": "func", "name": "Print", "type": "func(a ...interface{}) (n int, err error)"}, ...]]
         result = json.loads(result.decode('utf-8')) 
         logger.info("result %s", result)
+        if not result:
+            return
+
         completions = result[1]
         startcol = ctx['col'] - result[0]
 
