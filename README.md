@@ -68,6 +68,7 @@ completion in html style/script tag.
 | Ultisnips hint           | builtin, requires [Ultisnips](https://github.com/SirVer/ultisnips)                     |
 | Snipmate hint            | builtin, requires [vim-snipmate](https://github.com/garbas/vim-snipmate)               |
 | neosnippet hint          | builtin, requires [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)           |
+| **LanguageServer**       | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
 | C/C++                    | [clang_complete](https://github.com/roxma/clang_complete)                              |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
 | Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
@@ -75,7 +76,7 @@ completion in html style/script tag.
 | Clojure                  | [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                        |
 | Rust                     | [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)                                |
 | Vimscript                | [neco-vim](https://github.com/Shougo/neco-vim)                                         |
-| **LanguageServer**       | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
+| Ruby                     | [ncm-rct-complete](https://github.com/roxma/ncm-rct-complete)                          |
 | PHP                      | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)        |
 
 
