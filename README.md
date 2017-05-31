@@ -69,18 +69,18 @@ scoping features:
 
 extra sources:
 
-- Language server protocol via [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
-    - [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)
-- PHP completion via [nvim-cm-php-language-server](https://github.com/roxma/nvim-cm-php-language-server)
-  (deprecated)
-- C/C++ completion via [clang_complete](https://github.com/roxma/clang_complete). 
-  This plugin [requires python2](https://github.com/llvm-mirror/clang/commit/abdad67b94ad4dad2d655d48ff5f81d6ccf3852e)
-  support for neovim.
-- Javascript completion via [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)
-- Golang completion via [gocode](https://github.com/nsf/gocode)
-- Clojure completion via [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)
-- Rust completion via [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
-- Vimscript completion via [neco-vim](https://github.com/Shougo/neco-vim)
+| Language   | Repository                                                                      |
+|------------|---------------------------------------------------------------------------------|
+| -          | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)      |
+| PHP        | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim) |
+| C/C++      | [clang_complete](https://github.com/roxma/clang_complete)                       |
+| Javascript | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                           |
+| Javascript | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                               |
+| Golang     | [gocode](https://github.com/nsf/gocode)                                         |
+| Clojure    | [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                 |
+| Rust       | [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)                         |
+| Vimscript  | [neco-vim](https://github.com/Shougo/neco-vim)                                  |
+
 
 ## Requirements
 
