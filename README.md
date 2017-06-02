@@ -78,6 +78,7 @@ completion in html style/script tag.
 | Vimscript                | [neco-vim](https://github.com/Shougo/neco-vim)                                         |
 | Ruby                     | [ncm-rct-complete](https://github.com/roxma/ncm-rct-complete)                          |
 | PHP                      | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)        |
+| Swift                    | [nvim-cm-swift-completer](https://github.com/dafufer/nvim-cm-swift-completer)          |
 
 
 ## Requirements
