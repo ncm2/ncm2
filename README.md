@@ -60,7 +60,7 @@ completion in html style/script tag.
 |--------------------------|----------------------------------------------------------------------------------------|
 | Word from current buffer | builtin                                                                                |
 | Word from tmux session   | builtin                                                                                |
-| Tag completion           | builtin                                                                                |
+| ctags completion         | builtin                                                                                |
 | Filepath completion      | builtin                                                                                |
 | Python                   | builtin, requires [jedi](https://github.com/davidhalter/jedi)                          |
 | Css                      | builtin, requires [csscomplete#CompleteCSS](https://github.com/othree/csscomplete.vim) |
@@ -68,7 +68,7 @@ completion in html style/script tag.
 | Ultisnips hint           | builtin, requires [Ultisnips](https://github.com/SirVer/ultisnips)                     |
 | Snipmate hint            | builtin, requires [vim-snipmate](https://github.com/garbas/vim-snipmate)               |
 | neosnippet hint          | builtin, requires [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)           |
-| **LanguageServer**       | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
+| Language Server Protocal | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
 | C/C++                    | [clang_complete](https://github.com/roxma/clang_complete)                              |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
 | Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
@@ -79,6 +79,7 @@ completion in html style/script tag.
 | Ruby                     | [ncm-rct-complete](https://github.com/roxma/ncm-rct-complete)                          |
 | PHP                      | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)        |
 | Swift                    | [nvim-cm-swift-completer](https://github.com/dafufer/nvim-cm-swift-completer)          |
+| gtags completion         | [gen_tags.vim](https://github.com/jsfaint/gen_tags.vim)                                |
 
 
 ## Requirements
