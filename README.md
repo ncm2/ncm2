@@ -91,7 +91,7 @@ completion in html style/script tag.
 
 ## Installation
 
-- Assumming you're using [vim-plug](https://github.com/junegunn/vim-plug)
+- Assuming you're using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 " the framework
