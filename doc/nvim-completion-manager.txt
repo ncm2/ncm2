@@ -64,10 +64,15 @@ Supress the annoying completion messages:
 	" '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
 	set shortmess+=c
 <
-- When the <Enter> key is pressed while the popup menu is visible, it only
-  hides the menu. Use this mapping to hide the menu and also start a new line.
+When the <Enter> key is pressed while the popup menu is visible, it only hides
+the menu. Use this mapping to hide the menu and also start a new line.
 >
 	inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+<
+When use CTRL-C key to leave insert mode, it does not trigger the autocmd
+|InsertLeave|. You should use CTRL-] key, or map the CTRL-C to <ESC>.
+>
+	inoremap <c-c> <ESC>
 <
 Use tab to select the popup menu:
 >

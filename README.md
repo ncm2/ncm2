@@ -167,6 +167,13 @@ set shortmess+=c
 inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 ```
 
+- When use `ctrl-c` key to leave insert mode, it does not trigger the autocmd
+  `InsertLeave`. You should use `<c-]>` key, or map the `<c-c>` to `<ESC>`.
+
+```vim
+inoremap <c-c> <ESC>
+```
+
 - Use tab to select the popup menu:
 
 ```vim
