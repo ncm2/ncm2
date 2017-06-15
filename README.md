@@ -80,6 +80,8 @@ completion in html style/script tag.
 | PHP                      | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)        |
 | Swift                    | [nvim-cm-swift-completer](https://github.com/dafufer/nvim-cm-swift-completer)          |
 | gtags completion         | [gen_tags.vim](https://github.com/jsfaint/gen_tags.vim)                                |
+| syntax completion        | [neco-syntax](https://github.com/Shougo/neco-syntax)                                   |
+| include completion       | [neoinclude](https://github.com/Shougo/neoinclude.vim)                                 |
 
 
 ## Requirements
