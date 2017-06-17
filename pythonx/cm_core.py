@@ -594,36 +594,36 @@ class CoreHandler(cm.Base):
         if self._completed_snippet_enable:
             for m in matches:
 
-                if 'snippet' not in m or not m['snippet']:
+                if not m.get('snippet', None) and not m.get('is_snippet', None):
                     continue
 
                 has_snippets = True
-                if not isinstance(m['snippet'],str):
-                    continue
+
+                snippet = m.get('snippet', '')
 
                 if 'info' not in m or not m['info']:
                     m['info'] = 'snippet@%s' % len(snippets)
                 else:
                     m['info'] += '\nsnippet@%s' % len(snippets)
 
-                if self._completed_snippet_engine=='neosnippet':
+                if snippet and self._completed_snippet_engine=='neosnippet':
                     # neosnippet does not remove the completed word
                     # make them compatible if possible
-                    if m['snippet'][0:len(m['word'])] == m['word']:
-                        m['snippet'] = m['snippet'][len(m['word']):]
+                    if snippet[0:len(m['word'])] == m['word']:
+                        snippet = snippet[len(m['word']):]
 
-                snippets.append(m['snippet'])
+                snippets.append(snippet)
 
             if has_snippets:
                 for m in matches:
                     if 'menu' not in m:
                         m['menu'] = ''
-                    if 'snippet' not in m or not m['snippet']:
-                        m['menu'] = '[ ] ' + m['menu']
-                    else:
+                    if m.get('snippet', None) or m.get('is_snippet', None):
                         # [+] sign indicates that this completion item is
                         # expandable
                         m['menu'] = '[+] ' + m['menu']
+                    else:
+                        m['menu'] = '[ ] ' + m['menu']
 
         self.nvim.call('cm#_core_complete', ctx, startcol, matches, not_changed, snippets)
         self._last_matches = matches

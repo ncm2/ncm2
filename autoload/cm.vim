@@ -494,6 +494,10 @@ func! s:check_and_inject_snippet()
 	" for checking. Kind of a hack.
 	let v:completed_item.snippet = s:snippets[l:snippet_id]
 
+    if v:completed_item.snippet == ''
+        return ''
+    endif
+
 	if g:cm_completed_snippet_engine == 'ultisnips'
 		if get(b:,'_cm_us_setup',0)==0
 			" UltiSnips_Manager.add_buffer_filetypes('%s.snips.ncm' % vim.eval('&filetype'))
