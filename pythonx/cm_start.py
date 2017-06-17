@@ -53,7 +53,7 @@ def main():
     except:
         pass
 
-    # hack for windows platform
+    # Stop Popen from openning console window on Windows system
     if platform.system() == 'Windows':
         try:
             import subprocess
