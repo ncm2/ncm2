@@ -10,6 +10,7 @@ register_source(name='cm-jedi',
                 scoping=True,
                 scopes=['python'],
                 multi_thread=0,
+                early_cache=1,
                 # The last two patterns is for displaying function signatures [r'\(\s?(\w*)$',r',(\s?\w*)$']
                 cm_refresh_patterns=[r'^(import|from).*?\s(\w*)$',r'\.\w*$',r'\(\s?(\w*)$',r',\s?(\w*)$'],)
 
@@ -57,7 +58,7 @@ class Source(Base):
         except Exception as ex:
             logger.exception("get signature text failed %s", signature_text)
 
-        if re.search(r'^(?!from|import).*?[\(\,]\s*$', typed):
+        if re.search(r'^\s*(?!from|import).*?[(,]\s*$', typed):
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 # refresh=True
@@ -95,7 +96,7 @@ class Source(Base):
 
             # snippet support
             try:
-                if complete.type == 'function' or complete.type == 'class':
+                if (complete.type == 'function' or complete.type == 'class') and not re.search(r'^\s*(from|import)', typed):
                     params = []
                     if hasattr(complete,'params'):
                         params = complete.params

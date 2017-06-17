@@ -197,8 +197,7 @@ func! cm#register_source(info)
 	" similar to g:cm_auto_popup
 	let a:info['auto_popup'] = get(a:info,'auto_popup',1)
 
-	" disable early_cache by default for vimscript source
-	let a:info['early_cache'] = get(a:info,'early_cache', !has_key(a:info,'cm_refresh'))
+	let a:info['early_cache'] = get(a:info,'early_cache', 0)
 
 	let g:_cm_sources[l:name] = a:info
 

@@ -390,8 +390,7 @@ cm#register_source({source})
 			|cm_refresh_patterns|. It feels faster when candidates
 			are already cached before the popup menu is displayed.
 
-			Default: 0 for ||NCM-vimscript-source| registered.  1
-				for |NCM-python-source| .
+			Default: 0.
 
 	auto_popup
 			If 0, only the |<Plug>(cm_force_refresh)| key can
