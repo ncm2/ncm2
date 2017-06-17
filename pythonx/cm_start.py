@@ -10,6 +10,7 @@ from neovim import attach, setup_logging
 from cm import getLogger, start_and_run_channel
 import atexit
 import threading
+import platform
 
 logger = getLogger(__name__)
 
@@ -51,6 +52,20 @@ def main():
         setproctitle.setproctitle('%s nvim-completion-manager' % modulename)
     except:
         pass
+
+    # hack for windows platform
+    if platform.system() == 'Windows':
+        try:
+            import subprocess
+            cls = subprocess.Popen
+            class NewPopen(cls):
+                def __init__(self, *args, **keys):
+                    if 'shell' not in keys:
+                        keys['shell'] = True
+                    cls.__init__(self, *args, **keys)
+            subprocess.Popen = NewPopen
+        except Exception as ex:
+            logger.exception('Failed hacking subprocess.Popen for windows platform: %s', ex)
 
     try:
         start_and_run_channel(channel_type, serveraddr, source_name, modulename)
