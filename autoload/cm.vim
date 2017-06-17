@@ -8,6 +8,8 @@ endif
 let s:init = 1
 let s:already_setup = 0
 
+inoremap <silent> <expr> <Plug>(cm_inject_snippet) <SID>check_and_inject_snippet()
+
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
@@ -475,17 +477,17 @@ endfunc
 func! s:check_and_inject_snippet()
 
 	if empty(v:completed_item) || !has_key(v:completed_item,'info') || empty(v:completed_item.info) || has_key(v:completed_item,'snippet')
-		return
+		return ''
 	endif
 
 	let l:last_line = split(v:completed_item.info,'\n')[-1]
 	if l:last_line[0:len('snippet@')-1]!='snippet@'
-		return
+		return ''
 	endif
 
 	let l:snippet_id = str2nr(l:last_line[len('snippet@'):])
 	if l:snippet_id>=len(s:snippets) || l:snippet_id<0
-		return
+		return ''
 	endif
 
 	" neosnippet recognize the snippet field of v:completed_item. Also useful
@@ -513,6 +515,7 @@ func! s:check_and_inject_snippet()
 		let s:completed_item = v:completed_item
 	endif
 
+    return ''
 endfunc
 
 func! cm#_snipmate_snippets(scopes, trigger, result)

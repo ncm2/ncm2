@@ -527,6 +527,14 @@ cm#disable_for_buffer()
 			Disable |g:cm_auto_popup| to display popup only with
 			this key.
 
+<Plug>(cm_inject_snippet)
+			Here is an example for accepting the item and
+			expanding the snippet with <CR> key. Suppose you use
+			the <C-U> key for expanding snippet.
+>
+    imap <expr> <Plug>(expand_or_nl) (has_key(v:completed_item,'snippet')?"\<C-U>":"\<CR>")
+    imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(cm_inject_snippet)\<Plug>(expand_or_nl)" : "\<CR>")
+
 ==============================================================================
 6. Why						*NCM-why*
 
