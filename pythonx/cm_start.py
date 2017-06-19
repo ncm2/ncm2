@@ -60,8 +60,10 @@ def main():
             cls = subprocess.Popen
             class NewPopen(cls):
                 def __init__(self, *args, **keys):
-                    if 'shell' not in keys:
-                        keys['shell'] = True
+                    if 'startupinfo' not in keys:
+                        si = subprocess.STARTUPINFO()
+                        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                        keys['startupinfo'] = si
                     cls.__init__(self, *args, **keys)
             subprocess.Popen = NewPopen
         except Exception as ex:
