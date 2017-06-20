@@ -87,8 +87,7 @@ func! cm#enable_for_buffer(...)
 		autocmd TextChangedI <buffer> call s:check_changes()
 	augroup END
 
-	call s:start_core_channel()
-	call s:notify_core_channel('cm_start_channels',g:_cm_sources,cm#context())
+    call s:start_core_channel()
 
 endfunc
 
@@ -404,18 +403,28 @@ function! s:on_core_channel_error(job_id, data, event)
 	echoe join(a:data,"\n")
 endfunction
 
-func! s:start_core_channel()
+func! s:start_core_channel(...)
 	if s:channel_started
 		return
 	endif
-	let l:py3 = get(g:,'python3_host_prog','python3')
-	let s:channel_jobid = call(s:jobstart,[[l:py3,g:_cm_start_py_path,'core',g:_cm_servername],{
+	let s:channel_started = 1
+
+	let g:_cm_py3 = get(g:,'python3_host_prog','')
+    if g:_cm_py3 == '' && has('python3')
+        " heavy weight
+        " but better support for python detection
+        python3 import sys
+        let g:_cm_py3 = py3eval('sys.executable')
+    endif
+    if g:_cm_py3 == ''
+        let g:_cm_py3 = 'python3'
+    endif
+
+	let s:channel_jobid = call(s:jobstart,[[g:_cm_py3, g:_cm_start_py_path, 'core', g:_cm_servername], {
 			\ 'on_exit' : function('s:on_core_channel_exit'),
 			\ 'on_stderr' : function('s:on_core_channel_error'),
 			\ 'detach'  : 1,
 			\ }])
-
-	let s:channel_started = 1
 endfunc
 
 fun s:on_core_channel_exit(job_id, data, event)
