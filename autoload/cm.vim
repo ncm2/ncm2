@@ -547,7 +547,7 @@ func! s:on_changed()
 	call s:notify_core_channel('cm_refresh',g:_cm_sources,cm#context(),0)
 endfunc
 
-func! cm#_auto_enable_check()
+func! cm#_auto_enable_check(...)
 	if exists('b:cm_enable') && b:cm_enable!=2
 		return
 	endif

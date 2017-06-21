@@ -15,16 +15,25 @@ if !exists('g:cm_multi_threading')
 	endif
 endif
 
+func! s:smart_enable(...)
+    au BufWinEnter * call cm#_auto_enable_check()
+    " Unite's `buftype` is not set when BufWinEnter is triggered, use this as
+    " workaround
+    au OptionSet buftype call cm#_auto_enable_check()
+endfunc
+
+func! s:smart_enable_timer(...)
+    call cm#_auto_enable_check()
+endfunc
+
+let g:cm_startup_delay = get(g:, 'cm_startup_delay', 500)
+
 if get(g:,'cm_smart_enable',1)
-
-	au BufWinEnter * call cm#_auto_enable_check()
-	" Unite's `buftype` is not set when BufWinEnter is triggered, use this as
-	" workaround
-	au OptionSet buftype call cm#_auto_enable_check()
-
-	" disable clang default mapping by default,
-	" https://github.com/Rip-Rip/clang_complete/pull/515
-	let g:clang_make_default_keymappings = get(g:,'clang_make_default_keymappings',0)
+    if g:cm_startup_delay
+        call timer_start(g:cm_startup_delay, function('s:smart_enable_timer'))
+    else
+        call s:smart_enable()
+    endif
 endif
 
 let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})
@@ -62,7 +71,7 @@ let g:cm_refresh_default_min_word_len = get(g:,'cm_refresh_default_min_word_len'
 
 let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
 
-func! s:lazy_init()
+func! s:snippet_init()
 	if !exists('g:cm_completed_snippet_enable')
 		if get(g:,'neosnippet#enable_completed_snippet',0)
 			let g:cm_completed_snippet_enable = 1
@@ -80,7 +89,7 @@ func! s:lazy_init()
 	endif
 endfunc
 
-au User CmSetup call s:lazy_init()
+au User CmSetup call s:snippet_init()
 
 " use did_plugin_ultisnips to detect the installation of ultisnips
 " https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
@@ -116,17 +125,4 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 
-
-" " keyword
-" call cm#register_source({
-" 		\ 'name' : 'cm-bufkeyword',
-" 		\ 'priority': 5, 
-" 		\ 'abbreviation': 'Key',
-" 		\ 'channel': {
-" 		\		'type': 'python3',
-" 		\		'path': 'autoload/cm/sources/cm_bufkeyword.py',
-" 		\		'events':['CursorHold','CursorHoldI','BufEnter','BufWritePost','TextChangedI'],
-" 		\		'detach':1,
-" 		\ },
-" 		\ })
 
