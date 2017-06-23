@@ -15,27 +15,6 @@ if !exists('g:cm_multi_threading')
 	endif
 endif
 
-func! s:smart_enable(...)
-    au BufWinEnter * call cm#_auto_enable_check()
-    " Unite's `buftype` is not set when BufWinEnter is triggered, use this as
-    " workaround
-    au OptionSet buftype call cm#_auto_enable_check()
-endfunc
-
-func! s:smart_enable_timer(...)
-    call cm#_auto_enable_check()
-endfunc
-
-let g:cm_startup_delay = get(g:, 'cm_startup_delay', 500)
-
-if get(g:,'cm_smart_enable',1)
-    if g:cm_startup_delay
-        call timer_start(g:cm_startup_delay, function('s:smart_enable_timer'))
-    else
-        call s:smart_enable()
-    endif
-endif
-
 let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})
 
 if !exists('g:cm_completekeys')
@@ -71,6 +50,7 @@ let g:cm_refresh_default_min_word_len = get(g:,'cm_refresh_default_min_word_len'
 
 let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
 
+" runs after snippet plugin is loaded
 func! s:snippet_init()
 	if !exists('g:cm_completed_snippet_enable')
 		if get(g:,'neosnippet#enable_completed_snippet',0)
@@ -125,4 +105,15 @@ au User CmSetup call cm#register_source({'name' : 'cm-css',
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 
+func! s:startup(...)
+    if get(g:,'cm_smart_enable',1)
+        call cm#_auto_enable_check()
+        augroup cm_smart_enable
+            au!
+            au BufEnter * call cm#_auto_enable_check()
+            au OptionSet buftype call cm#_auto_enable_check()
+        augroup end
+    endif
+endfunc
 
+call timer_start(get(g:, 'cm_startup_delay', 100), function('s:startup'))
