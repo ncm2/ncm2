@@ -17,7 +17,7 @@ register_source(name='cm-gocode',
                 early_cache=1,
                 scoping=True,
                 scopes=['go'],
-                cm_refresh_patterns=[r'\.(\w*)$'],)
+                cm_refresh_patterns=[r'\.'],)
 
 import re
 import subprocess

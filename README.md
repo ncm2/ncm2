@@ -228,6 +228,7 @@ let g:cm_sources_override = {
   [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
 - For really async completion source (strongly encoraged), refer to the rust
   completion: [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
+- `:help ncm-source-examples` for minimal examples
 
 Please upload your screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you

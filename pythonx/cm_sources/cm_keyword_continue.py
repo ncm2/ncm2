@@ -18,7 +18,7 @@ register_source(name='cm-keyword-continue',
                 priority=5,
                 abbreviation='',
                 word_pattern=r'\w+',
-                cm_refresh_min_word_len=0,
+                cm_refresh_length=0,
                 auto_popup=0,
                 sort=0,)
 
