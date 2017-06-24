@@ -267,9 +267,9 @@ g:cm_auto_popup
 			trigger the popup menu.
 			Default: 1
 
-						*g:cm_refresh_default_min_word_len*
-g:cm_refresh_default_min_word_len
-			The default value for |cm_refresh_min_word_len|.
+						*g:cm_refresh_length*
+g:cm_refresh_length
+			The default value for |cm_refresh_length|.
 
 			Default: `[[1,4],[7,3]]`
 			Format: a |List| as [[ min priority, min len ],...],
@@ -353,7 +353,7 @@ cm#register_source({source})
 						*cm_refresh_patterns*
 	cm_refresh_patterns			*NCM-cm_refresh_patterns*
 			An extra |List| of PCRE patterns (python regex),
-			besides |cm_refresh_min_word_len|, for auto triggering
+			besides |cm_refresh_length|, for auto triggering
 			popup menu. 
 
 						*cm_refresh*
@@ -371,22 +371,26 @@ cm#register_source({source})
 
 				`{'omnifunc': 'csscomplete#CompleteCSS'}`
 
-						*NCM-cm_refresh_min_word_len*
-	cm_refresh_min_word_len			*cm_refresh_min_word_len*
+						*NCM-cm_refresh_length*
+	cm_refresh_length			*cm_refresh_length*
 			The minimum length of the matching word for auto
 			triggering popup menu.
 
-			If len(matching word) >= cm_refresh_min_word_len, a
-			|cm_refresh-notification| will be triggered for this
-			source.
+			If it contains a negative value,
+			|cm_refresh-notification| will only get triggered by
+			|cm_refresh_patterns|.
 
-			Default: |g:cm_refresh_default_min_word_len|
+			Otherwise, if len(matching word) >= cm_refresh_length,
+			a |cm_refresh-notification| will be triggered for the
+			source. 
+
+			Default: |g:cm_refresh_length|
 
 	early_cache				*NCM-early_cache*
 			Cache the completion candidates whenever a word
 			pattern matches, the result will not be popped up
 			until the word gets long enough
-			(|cm_refresh_min_word_len|) or matches
+			(|cm_refresh_length|) or matches
 			|cm_refresh_patterns|. It feels faster when candidates
 			are already cached before the popup menu is displayed.
 

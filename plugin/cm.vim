@@ -58,7 +58,9 @@ let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 let g:cm_sources_override = get(g:,'cm_sources_override',{})
 
 " format: [ (minimal priority, min length), ()]
-let g:cm_refresh_default_min_word_len = get(g:,'cm_refresh_default_min_word_len',[[1,4],[7,3]])
+" the name cm_refresh_default_min_word_len is deprecated, it will be removed
+" in the future
+let g:cm_refresh_length = get(g:, 'cm_refresh_length', get(g:, 'cm_refresh_default_min_word_len', [[1, 4], [7, 3]]))
 
 let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
 

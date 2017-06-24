@@ -325,8 +325,13 @@ class CoreHandler(cm.Base):
                         if name in self._matches:
                             self._matches[name]['enable'] = True
 
-                    if (name in self._matches) and not self._matches[name]['refresh'] and not force and self._matches[name]['startcol']==ctx['startcol']:
-                        logger.debug('cached <%s>, ignore cm_refresh', name)
+                    if (
+                            (name in self._matches) and 
+                            not self._matches[name]['refresh'] and 
+                            not force and 
+                            self._matches[name]['startcol']==ctx['startcol']
+                        ):
+                        logger.debug('<%s> has been cached, <%s> candidates', name, len(self._matches[name]['matches']))
                         continue
 
                     if 'cm_refresh' in info:
@@ -412,7 +417,7 @@ class CoreHandler(cm.Base):
             last_word_removed = typed
             word_len          = 0
 
-        minimum_length = info['cm_refresh_min_word_len']
+        minimum_length = info['cm_refresh_length']
 
         # always match
         if minimum_length==0:
@@ -421,7 +426,7 @@ class CoreHandler(cm.Base):
         if force and word_len>0:
             return True
 
-        if word_len >= minimum_length:
+        if minimum_length > 0 and word_len >= minimum_length:
             return True
 
         # check source extra patterns

@@ -172,19 +172,24 @@ func! cm#register_source(info)
 
 	let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
 
-	" calculating cm_refresh_min_word_len
-	if !has_key(a:info,'cm_refresh_min_word_len')
-		if type(g:cm_refresh_default_min_word_len)==type(1)
-			let a:info['cm_refresh_min_word_len'] = g:cm_refresh_default_min_word_len
+    " the name cm_refresh_min_word_len is deprecated, it will be removed
+    " in the future
+    if has_key(a:info, 'cm_refresh_min_word_len')
+        let a:info['cm_refresh_length'] = a:info['cm_refresh_min_word_len']
+    endif
+
+	if !has_key(a:info,'cm_refresh_length')
+		if type(g:cm_refresh_length)==type(1)
+			let a:info['cm_refresh_length'] = g:cm_refresh_length
 		else
 			" format: [ [ minimal priority, min length ], []]
 			"
 			" Configure by min priority level. Use the max priority setting
 			" available
 			let l:max = -1
-			for l:e in g:cm_refresh_default_min_word_len
+			for l:e in g:cm_refresh_length
 				if (a:info['priority'] >= l:e[0]) && (l:e[0] > l:max)
-					let a:info['cm_refresh_min_word_len'] = l:e[1]
+					let a:info['cm_refresh_length'] = l:e[1]
 					let l:max = l:e[0]
 				endif
 			endfor
