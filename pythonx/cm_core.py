@@ -675,11 +675,7 @@ class CoreHandler(cm.Base):
         # has not been started yet, start it now
         logger.info('starting channels for %s: %s',name, cmd)
 
-        debug_env_var = 'NVIM_NCM_SHARE_SOURCE_PROC_OUTPUT'
-        if debug_env_var in os.environ and int(os.environ[debug_env_var]) > 0:
-            proc = subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=sys.stdout,stderr=sys.stderr)
-        else:
-            proc = subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        proc = subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=sys.stdout,stderr=sys.stderr)
         process_info['pid'] = proc.pid
         process_info['proc'] = proc
 
