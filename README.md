@@ -86,10 +86,8 @@ completion in html style/script tag.
 
 ## Requirements
 
-- Neovim.
-- Or vim8 with `has("python")` or `has("python3")`
-- `python3` found in your `$PATH` env variable or setting
-  `g:python3_host_prog` to the full path of your python3 executable.
+- `has("python3")`.
+- If you're on vim8, [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc).
 
 ## Installation
 
