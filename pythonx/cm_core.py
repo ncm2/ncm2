@@ -330,7 +330,7 @@ class CoreHandler(cm.Base):
                             not self._matches[name]['refresh'] and 
                             not force and 
                             self._matches[name]['startcol']==ctx['startcol'] and
-                            ctx.get('group', '') == self._matches[name]['ctx'].get('group', '')
+                            ctx.get('group', '') == self._matches[name]['context'].get('group', '')
                         ):
                         logger.debug('<%s> has been cached, <%s> candidates', name, len(self._matches[name]['matches']))
                         continue
@@ -437,11 +437,11 @@ class CoreHandler(cm.Base):
                 # `$` is not necessary to be specified in cm_refresh_patterns
                 # anymore
                 pattern = pattern.rstrip('$')
-                pattern += '(' + word_pattern + ')?$'
+                pattern += '(?P<word>(' + word_pattern + ')?)$'
 
                 matched = re.search(pattern, typed)
                 if matched:
-                    ctx['group'] = typed[ : matched.start(len(matched.groups())-1)]
+                    ctx['group'] = typed[ : matched.start('word')]
                     return True
 
         min_len = info['cm_refresh_length']
