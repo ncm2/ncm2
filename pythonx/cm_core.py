@@ -329,7 +329,8 @@ class CoreHandler(cm.Base):
                             (name in self._matches) and 
                             not self._matches[name]['refresh'] and 
                             not force and 
-                            self._matches[name]['startcol']==ctx['startcol']
+                            self._matches[name]['startcol']==ctx['startcol'] and
+                            ctx.get('group', '') == self._matches[name]['ctx'].get('group', '')
                         ):
                         logger.debug('<%s> has been cached, <%s> candidates', name, len(self._matches[name]['matches']))
                         continue
@@ -398,43 +399,62 @@ class CoreHandler(cm.Base):
 
     def _check_refresh_patterns(self,info,ctx,force=False):
 
+        # Concept of ctx['group']:
+        #   for cm_refresh_pattern `\/`, and word pattern `[a-z/]`
+        #   foo/bar gets `foo/`
+        #   foo/bar/baz gets `foo/bar/`
+        # It is useful for trigerring cm_refresh in the middle of a word
+
         patterns = info.get('cm_refresh_patterns',None)
         typed = ctx['typed']
 
-        word_pattern = info.get('word_pattern',None) or cm_default.word_pattern(ctx)
+        word_pattern = info.get('word_pattern', None) or cm_default.word_pattern(ctx)
 
         # remove the last word, check whether the special pattern matches
-        # last_word_removed
+        # word_removed
         end_word_matched = re.search(word_pattern + "$",typed)
         if end_word_matched:
             ctx['base']       = end_word_matched.group()
             ctx['startcol']   = ctx['col'] - len(ctx['base'].encode('utf-8'))
-            last_word_removed = typed[:end_word_matched.start()]
+            word_removed      = typed[:end_word_matched.start()]
             word_len          = len(ctx['base'])
         else:
             ctx['base']       = ''
             ctx['startcol']   = ctx['col']
-            last_word_removed = typed
+            word_removed      = typed
             word_len          = 0
 
-        minimum_length = info['cm_refresh_length']
+        ctx['group'] = word_removed
+
+        # check source extra patterns
+        if patterns:
+            for pattern in patterns:
+                # use '.*' as greedy match, to push it to the last matched
+                # pattern
+                if not pattern.startswith("^"):
+                    pattern = '.*' + pattern
+
+                # `$` is not necessary to be specified in cm_refresh_patterns
+                # anymore
+                pattern = pattern.rstrip('$')
+                pattern += '(' + word_pattern + ')?$'
+
+                matched = re.search(pattern, typed)
+                if matched:
+                    ctx['group'] = typed[ : matched.start(len(matched.groups())-1)]
+                    return True
+
+        min_len = info['cm_refresh_length']
 
         # always match
-        if minimum_length==0:
+        if min_len==0:
             return True
 
         if force and word_len>0:
             return True
 
-        if minimum_length > 0 and word_len >= minimum_length:
+        if min_len > 0 and word_len >= min_len:
             return True
-
-        # check source extra patterns
-        if patterns:
-            for pattern in patterns:
-                matched = re.search(pattern, last_word_removed)
-                if matched:
-                    return True
 
         return False
 

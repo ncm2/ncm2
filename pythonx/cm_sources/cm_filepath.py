@@ -13,7 +13,7 @@ register_source(name='cm-filepath',
                 abbreviation='path',
                 word_pattern=r'''([^\W]|[-.~%$])+''',
                 cm_refresh_patterns=[
-                    r'''(\.[/\\]|[a-zA-Z]:\\|~\/)([^\W]|[-.~%$]|[/\\])*$''', r'''[/\\$]([^\W]|[-.~%$]|[/\\])+[/\\]$'''],
+                    r'''(\.[/\\]+|[a-zA-Z]:\\+|~\/+)''', r'''([^\W]|[-.~%$]|[/\\])+[/\\]+'''],
                 options=dict(path_pattern=r'''(([^\W]|[-.~%$]|[/\\])+)'''),
                 sort=0,
                 priority=6,)
