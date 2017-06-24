@@ -317,10 +317,12 @@ class CoreHandler(cm.Base):
                             logger.debug('<%s> early_caching', name)
                         else:
                             logger.debug('cm_refresh ignore <%s>, force[%s] early_cache[%s]', name, force, info['early_cache'])
+                            if name in self._matches:
+                                self._matches[name]['enable'] = False
                             continue
                     else:
+                        # enable cached
                         if name in self._matches:
-                            # enable previous early_cache, if available
                             self._matches[name]['enable'] = True
 
                     if (name in self._matches) and not self._matches[name]['refresh'] and not force and self._matches[name]['startcol']==ctx['startcol']:
