@@ -429,7 +429,7 @@ class CoreHandler(cm.Base):
         # check source extra patterns
         if patterns:
             for pattern in patterns:
-                # use '.*' as greedy match, to push it to the last matched
+                # use greedy match '.*', to push the match to the last occurance
                 # pattern
                 if not pattern.startswith("^"):
                     pattern = '.*' + pattern
@@ -437,11 +437,10 @@ class CoreHandler(cm.Base):
                 # `$` is not necessary to be specified in cm_refresh_patterns
                 # anymore
                 pattern = pattern.rstrip('$')
-                pattern += '(?P<word>(' + word_pattern + ')?)$'
 
                 matched = re.search(pattern, typed)
-                if matched:
-                    ctx['group'] = typed[ : matched.start('word')]
+                if matched and matched.end() >= len(typed)-word_len:
+                    ctx['group'] = matched.end()
                     return True
 
         min_len = info['cm_refresh_length']
