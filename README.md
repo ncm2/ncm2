@@ -19,10 +19,10 @@ Subscribe it if you are interested.**
 * [Features](#features)
 * [Scoping Sources:](#scoping-sources)
 * [Completion Sources](#completion-sources)
+* [How to extend this framework?](#how-to-extend-this-framework)
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Configuration Tips](#configuration-tips)
-* [How to extend this framework?](#how-to-extend-this-framework)
 * [Why?](#why)
     * [Async architecture](#async-architecture)
     * [Scoping](#scoping)
@@ -82,6 +82,20 @@ completion in html style/script tag.
 | gtags completion         | [gen_tags.vim](https://github.com/jsfaint/gen_tags.vim)                                |
 | syntax completion        | [neco-syntax](https://github.com/Shougo/neco-syntax)                                   |
 | include completion       | [neoinclude](https://github.com/Shougo/neoinclude.vim)                                 |
+
+
+## How to extend this framework?
+
+- For really simple, light weight completion candidate calculation, or
+  avoiding python, refer to
+  [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
+- For really async completion source (strongly encoraged), refer to the rust
+  completion: [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
+- `:help ncm-source-examples` for minimal examples
+
+Please upload your screenshot
+[here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
+created the extension.
 
 
 ## Requirements
@@ -220,20 +234,6 @@ let g:cm_sources_override = {
     \ 'cm-tags': {'enable':0}
     \ }
 ```
-
-## How to extend this framework?
-
-- For really simple, light weight completion candidate calculation, or
-  avoiding python, refer to
-  [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
-- For really async completion source (strongly encoraged), refer to the rust
-  completion: [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
-- `:help ncm-source-examples` for minimal examples
-
-Please upload your screenshot
-[here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
-created the extension.
-
 
 ## Why?
 
