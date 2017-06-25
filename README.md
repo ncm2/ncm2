@@ -82,6 +82,7 @@ completion in html style/script tag.
 | gtags completion         | [gen_tags.vim](https://github.com/jsfaint/gen_tags.vim)                                |
 | syntax completion        | [neco-syntax](https://github.com/Shougo/neco-syntax)                                   |
 | include completion       | [neoinclude](https://github.com/Shougo/neoinclude.vim)                                 |
+| github completion        | [ncm-github](https://github.com/roxma/ncm-github)                                      |
 
 
 ## How to extend this framework?
