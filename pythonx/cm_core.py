@@ -330,7 +330,7 @@ class CoreHandler(cm.Base):
                             not self._matches[name]['refresh'] and 
                             not force and 
                             self._matches[name]['startcol']==ctx['startcol'] and
-                            ctx.get('group', '') == self._matches[name]['context'].get('group', '')
+                            ctx.get('match_end', '') == self._matches[name]['context'].get('match_end', '')
                         ):
                         logger.debug('<%s> has been cached, <%s> candidates', name, len(self._matches[name]['matches']))
                         continue
@@ -399,7 +399,7 @@ class CoreHandler(cm.Base):
 
     def _check_refresh_patterns(self,info,ctx,force=False):
 
-        # Concept of ctx['group']:
+        # Concept of ctx['match_end']:
         #   for cm_refresh_pattern `\/`, and word pattern `[a-z/]`
         #   foo/bar gets `foo/`
         #   foo/bar/baz gets `foo/bar/`
@@ -424,7 +424,7 @@ class CoreHandler(cm.Base):
             word_removed      = typed
             word_len          = 0
 
-        ctx['group'] = word_removed
+        ctx['match_end'] = len(word_removed)
 
         # check source extra patterns
         if patterns:
@@ -440,7 +440,7 @@ class CoreHandler(cm.Base):
 
                 matched = re.search(pattern, typed)
                 if matched and matched.end() >= len(typed)-word_len:
-                    ctx['group'] = matched.end()
+                    ctx['match_end'] = matched.end()
                     return True
 
         min_len = info['cm_refresh_length']
