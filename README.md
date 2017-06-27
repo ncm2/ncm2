@@ -83,6 +83,7 @@ completion in html style/script tag.
 | syntax completion        | [neco-syntax](https://github.com/Shougo/neco-syntax)                                   |
 | include completion       | [neoinclude](https://github.com/Shougo/neoinclude.vim)                                 |
 | github completion        | [ncm-github](https://github.com/roxma/ncm-github)                                      |
+| mutt mails               | [#97 mutt-aliases.vim](https://github.com/roxma/nvim-completion-manager/issues/97)     |
 
 
 ## How to extend this framework?
