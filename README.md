@@ -84,6 +84,7 @@ completion in html style/script tag.
 | include completion       | [neoinclude](https://github.com/Shougo/neoinclude.vim)                                 |
 | github completion        | [ncm-github](https://github.com/roxma/ncm-github)                                      |
 | mutt mails               | [#97 mutt-aliases.vim](https://github.com/roxma/nvim-completion-manager/issues/97)     |
+| deoplete                 | [#50 deoplete](https://github.com/roxma/nvim-completion-manager/issues/50)             |
 
 
 ## How to extend this framework?
