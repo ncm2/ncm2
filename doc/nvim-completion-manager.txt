@@ -49,7 +49,7 @@ Install the required pip modules for your python3:
 	# mistune for language specific completion on markdown
 	# psutil and setproctitle are optional utilities
 	pip3 install --user neovim jedi mistune psutil setproctitle
-
+<
 Note: If you're using vim8, you also need to install the `neovim` pip module
 for the python, depending which on of `has("python")` has `has("python3")` you
 are using. You also need to install |vim-hug-neovim-rpc| Plugin:
@@ -69,18 +69,18 @@ the menu. Use this mapping to hide the menu and also start a new line.
 >
 	inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 <
-When use CTRL-C key to leave insert mode, it does not trigger the autocmd
-|InsertLeave|. You should use CTRL-] key, or map the CTRL-C to <ESC>.
+When using CTRL-C to leave insert mode, it does not trigger the autocmd
+|InsertLeave|. You should use CTRL-[, or map the CTRL-C to <ESC>.
 >
 	inoremap <c-c> <ESC>
 <
-Use tab to select the popup menu:
+Use <TAB> to select the popup menu:
 >
 	inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 	inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 <
-If you have only 'omnifunc' available, you may register it as a source to the
-framework.
+If 'omnifunc' is the only available option, you may register it as a source
+for NCM.
 >
 	" css completion via `csscomplete#CompleteCSS`
 	" The `'cm_refresh_patterns'` is PCRE.
@@ -124,7 +124,7 @@ If you have |Ultisnips|:
 	let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
 	let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
 	let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
-    let g:UltiSnipsRemoveSelectModeMappings = 0
+	let g:UltiSnipsRemoveSelectModeMappings = 0
 	" optional
 	inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 <
@@ -530,6 +530,7 @@ cm#disable_for_buffer()
 			Disable |g:cm_auto_popup| to display popup only with
 			this key.
 
+						*<Plug>(cm_inject_snippet)*
 <Plug>(cm_inject_snippet)
 			Here is an example for accepting the item and
 			expanding the snippet with <CR> key. Suppose you use

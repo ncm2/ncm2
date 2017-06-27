@@ -37,7 +37,7 @@ Subscribe it if you are interested.**
 
 ## Features
 
-1. Asynchronous completion support like |deoplete|.
+1. Asynchronous completion support like deoplete.
 2. Faster, all completions should run in parallel.
 3. Smarter on files with different languages, for example, css/javascript
 completion in html style/script tag.
@@ -184,22 +184,23 @@ set shortmess+=c
 inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 ```
 
-- When use `ctrl-c` key to leave insert mode, it does not trigger the autocmd
-  `InsertLeave`. You should use `<c-]>` key, or map the `<c-c>` to `<ESC>`.
+- When using `CTRL-C` key to leave insert mode, it does not trigger the
+  autocmd `InsertLeave`. You should use `CTRL-[`, or map the `<c-c>` to
+  `<ESC>`.
 
 ```vim
 inoremap <c-c> <ESC>
 ```
 
-- Use tab to select the popup menu:
+- Use `<TAB>` to select the popup menu:
 
 ```vim
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 ```
 
-- If you have only `omnifunc` available, you may register it as a source to
-  the framework.
+- If 'omnifunc' is the only available option, you may register it as a source
+  for NCM.
  
  
 ```vim
