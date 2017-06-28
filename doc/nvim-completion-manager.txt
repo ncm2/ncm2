@@ -9,7 +9,7 @@ nvim-completion-manager			    *nvim-completion-manager* *NCM*
 
 1. Introduction					|NCM-introduction|
 2. Install					|NCM-install|
-3. Configuration Tips				|NCM-tips|
+3. Optional Configuration Tips			|NCM-tips|
 4. Settings					|NCM-settings|
 5. API						|NCM-API|
 6. Why						|NCM-why|
@@ -56,7 +56,7 @@ are using. You also need to install |vim-hug-neovim-rpc| Plugin:
 https://github.com/roxma/vim-hug-neovim-rpc
 
 ==============================================================================
-3. Configuration Tips				*NCM-tips*
+3. Optional Configuration Tips			*NCM-tips*
 
 Supress the annoying completion messages:
 >

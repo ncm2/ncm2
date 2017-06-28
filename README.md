@@ -22,7 +22,7 @@ Subscribe it if you are interested.**
 * [How to extend this framework?](#how-to-extend-this-framework)
 * [Requirements](#requirements)
 * [Installation](#installation)
-* [Configuration Tips](#configuration-tips)
+* [Optional Configuration Tips](#optional-configuration-tips)
 * [Why?](#why)
     * [Async architecture](#async-architecture)
     * [Scoping](#scoping)
@@ -167,7 +167,7 @@ Plug 'roxma/LanguageServer-php-neovim',  {'do': 'composer install && composer ru
 autocmd FileType php LanguageClientStart
 ```
 
-## Configuration Tips
+## Optional Configuration Tips
 
 - Supress the annoying completion messages:
 
