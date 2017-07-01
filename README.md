@@ -89,14 +89,12 @@ completion in html style/script tag.
 
 ## How to extend this framework?
 
-- For really simple, light weight completion candidate calculation, or
-  avoiding python, refer to
-  [autoload/cm/sources/ultisnips.vim](autoload/cm/sources/ultisnips.vim)
-- For really async completion source (strongly encoraged), refer to the rust
-  completion: [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
 - `:help ncm-source-examples` for minimal examples
+- Some real, small examples:
+  [github-emoji](https://github.com/roxma/ncm-github/blob/master/pythonx/cm_sources/github_emoji.py),
+  [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
 
-Please upload your screenshot
+Please upload your new plugin, or possibly screenshot
 [here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
 created the extension.
 
