@@ -25,6 +25,16 @@ class Source(Base):
         super(Source,self).__init__(nvim)
         self._snippet_engine = nvim.vars['cm_completed_snippet_engine']
 
+        # workaround for #62
+        try:
+            import resource
+            import psutil
+            mem = psutil.virtual_memory()
+            resource.setrlimit(resource.RLIMIT_DATA, (mem.total/3, resource.RLIM_INFINITY))
+        except Exception as ex:
+            logger.exception("set RLIMIT_DATA failed. %s", ex)
+            pass
+
     def cm_refresh(self,info,ctx,*args):
 
         path = ctx['filepath']
