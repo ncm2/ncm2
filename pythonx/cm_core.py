@@ -434,10 +434,6 @@ class CoreHandler(cm.Base):
                 if not pattern.startswith("^"):
                     pattern = '.*' + pattern
 
-                # `$` is not necessary to be specified in cm_refresh_patterns
-                # anymore
-                pattern = pattern.rstrip('$')
-
                 matched = re.search(pattern, typed)
                 if matched and matched.end() >= len(typed)-word_len:
                     ctx['match_end'] = matched.end()
