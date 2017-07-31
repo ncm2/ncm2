@@ -70,7 +70,7 @@ class Base:
 
             case = matcher_opt.get('case','')
             if case not in ['case','icase','smartcase']:
-                ignorecase,sartcase = nvim.eval('[&ignorecase,&smartcase]')
+                ignorecase,smartcase = nvim.eval('[&ignorecase,&smartcase]')
                 if smartcase:
                     chcmp = chcmp_smartcase
                 elif ignorecase:
