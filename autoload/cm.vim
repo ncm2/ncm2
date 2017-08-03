@@ -353,9 +353,9 @@ endfunc
 
 func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
-	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
-		return
-	endif
+    if s:should_skip()
+        return
+    endif
 
 	" ignore the request if context has changed
 	if  cm#context_changed(a:context)
@@ -458,6 +458,10 @@ func! s:changetick()
 	return getcurpos()
 endfunc
 
+func! s:should_skip()
+    return !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
+endfunc
+
 func! s:change_tick_start()
 	if s:change_timer!=-1
 		return
@@ -465,6 +469,7 @@ func! s:change_tick_start()
 	let s:lasttick = s:changetick()
 	" check changes every 30ms, which is 0.03s, it should be fast enough
 	let s:change_timer = timer_start(30,function('s:check_changes'),{'repeat':-1})
+
 	call s:on_changed()
 endfunc
 
@@ -479,6 +484,11 @@ endfunc
 
 
 func! s:check_changes(...)
+
+    if s:should_skip()
+        return
+    endif
+
 	let l:tick = s:changetick()
 	if l:tick!=s:lasttick
 		let s:lasttick = l:tick
@@ -545,7 +555,11 @@ endfunc
 " on completion context changed
 func! s:on_changed()
 
-	if &paste!=0 || g:cm_auto_popup==0
+    if s:should_skip()
+        return
+    endif
+
+	if g:cm_auto_popup==0
 		return
 	endif
 
