@@ -353,9 +353,9 @@ endfunc
 
 func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 
-	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
-		return
-	endif
+    if s:should_skip()
+        return
+    endif
 
 	" ignore the request if context has changed
 	if  cm#context_changed(a:context)
@@ -458,6 +458,10 @@ func! s:changetick()
 	return getcurpos()
 endfunc
 
+func! s:should_skip()
+    return !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
+endfunc
+
 func! s:change_tick_start()
 	if s:change_timer!=-1
 		return
@@ -481,9 +485,9 @@ endfunc
 
 func! s:check_changes(...)
 
-	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
-		return
-	endif
+    if s:should_skip()
+        return
+    endif
 
 	let l:tick = s:changetick()
 	if l:tick!=s:lasttick
@@ -551,9 +555,9 @@ endfunc
 " on completion context changed
 func! s:on_changed()
 
-	if !get(b:,'cm_enable',0)  || &paste!=0 || g:_cm_lock || mode() != 'i'
-		return
-	endif
+    if s:should_skip()
+        return
+    endif
 
 	if g:cm_auto_popup==0
 		return
