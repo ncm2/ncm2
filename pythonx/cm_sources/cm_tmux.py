@@ -62,7 +62,6 @@ class Source(Base):
             outs, errs = proc.communicate(timeout=15)
             pane_ids = outs.decode('utf-8')
 
-
             for pane_id in pane_ids.strip().split('\n'):
                 proc = subprocess.Popen(args=['tmux', 'capture-pane', '-p', '-t', '{}.{}'.format(win_index,pane_id)],
                                         stdin=subprocess.PIPE,
