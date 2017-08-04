@@ -17,7 +17,7 @@ import re
 import logging
 import subprocess
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__).
 
 class Source(Base):
 
@@ -41,25 +41,34 @@ class Source(Base):
         pat = re.compile(self._split_pattern)
         self._words = set()
 
-        # tmux list-window -F '#{window_index},#{window_panes}'
+        # tmux list-window -F '#{window_index}'
         # tmux capture-pane -p -t "$window_index.$pane_index"
-        proc = subprocess.Popen(args=['tmux','list-window','-F','#{window_index},#{window_panes}'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        outs,errs = proc.communicate(timeout=15)
-        outs = outs.decode('utf-8')
-        logger.info('list-window: %s', outs)
+        proc = subprocess.Popen(args=['tmux', 'list-window', '-F', '#{window_index}'],
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+
+        outs, errs = proc.communicate(timeout=15)
+        window_indices = outs.decode('utf-8')
+        logger.info('list-window: %s', window_indices)
 
         # parse windows
         panes = []
-        for line in outs.split("\n"):
-            fields = line.split(',')
-            if len(fields)!=2:
-                continue
-            # windows.append(fields)
-            win_index = fields[0]
-            pane_cnt = int(fields[1])
-            for pane_id in range(pane_cnt):
-                proc = subprocess.Popen(args=['tmux','capture-pane','-p','-t','%s.%s' % (win_index,pane_id)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-                outs,errs = proc.communicate(timeout=15)
+        for win_index in window_indices.strip().split('\n'):
+            proc = subprocess.Popen(args=['tmux', 'list-panes', '-t', win_index, '-F', '#{pane_index}'],
+                                    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            outs, errs = proc.communicate(timeout=15)
+            pane_ids = outs.decode('utf-8')
+
+
+            for pane_id in pane_ids.strip().split('\n'):
+                proc = subprocess.Popen(args=['tmux', 'capture-pane', '-p', '-t', '{}.{}'.format(win_index,pane_id)],
+                                        stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+                outs, errs = proc.communicate(timeout=15)
                 try:
                     outs = outs.decode('utf-8')
                     panes.append(outs)
