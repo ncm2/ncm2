@@ -17,7 +17,7 @@ import re
 import logging
 import subprocess
 
-logger = logging.getLogger(__name__).
+logger = getLogger(__name__)
 
 class Source(Base):
 
