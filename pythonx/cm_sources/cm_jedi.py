@@ -3,6 +3,17 @@
 # For debugging
 # NVIM_PYTHON_LOG_FILE=nvim.log NVIM_PYTHON_LOG_LEVEL=INFO nvim
 
+from __future__ import absolute_import
+import os
+
+py = None
+
+# detect python2
+if 'VIRTUAL_ENV' in os.environ:
+    py2 = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'python2')
+    if os.path.isfile(py2):
+        py = 'python2'
+
 from cm import register_source, getLogger, Base
 register_source(name='cm-jedi',
                 priority=9,
@@ -12,7 +23,8 @@ register_source(name='cm-jedi',
                 multi_thread=0,
                 early_cache=1,
                 # The last two patterns is for displaying function signatures r'\(\s?', r',\s?'
-                cm_refresh_patterns=[r'^(import|from).*\s', r'\.', r'\(\s?', r',\s?'],)
+                cm_refresh_patterns=[r'^(import|from).*\s', r'\.', r'\(\s?', r',\s?'],
+                python=py,)
 
 import re
 import jedi
@@ -22,7 +34,7 @@ logger = getLogger(__name__)
 class Source(Base):
 
     def __init__(self,nvim):
-        super(Source,self).__init__(nvim)
+        Base.__init__(self, nvim)
         self._snippet_engine = nvim.vars['cm_completed_snippet_engine']
 
         # workaround for #62
