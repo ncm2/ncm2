@@ -6,7 +6,7 @@
 from __future__ import absolute_import
 import os
 
-py = None
+py = 'python3'
 
 # detect python2
 if 'VIRTUAL_ENV' in os.environ:
