@@ -515,7 +515,8 @@ func! s:check_and_inject_snippet()
 
 	" neosnippet recognize the snippet field of v:completed_item. Also useful
 	" for checking. Kind of a hack.
-	let v:completed_item.snippet = s:snippets[l:snippet_id]
+	let v:completed_item.snippet = s:snippets[l:snippet_id]['snippet']
+    let v:completed_item.snippet_word = s:snippets[l:snippet_id]['word']
 
     if v:completed_item.snippet == ''
         return ''
@@ -531,7 +532,7 @@ func! s:check_and_inject_snippet()
 		endif
 		exec g:_uspy 'UltiSnips_Manager._added_snippets_source._snippets["ncm"]._snippets = []'
 		" TODO cleanup when InsertLeave
-		call UltiSnips#AddSnippetWithPriority(v:completed_item.word, v:completed_item.snippet, '', 'i', b:_cm_us_filetype, 1)
+		call UltiSnips#AddSnippetWithPriority(v:completed_item.snippet_word, v:completed_item.snippet, '', 'i', b:_cm_us_filetype, 1)
 	elseif g:cm_completed_snippet_engine == 'snipmate'
 		if !exists('s:completed_item')
 			let s:completed_item = {}
@@ -549,7 +550,7 @@ func! cm#_snipmate_snippets(scopes, trigger, result)
 	if empty(s:completed_item)
 		return
 	endif
-	let a:result[s:completed_item['word']] = {'default': [s:completed_item.snippet,0] }
+	let a:result[s:completed_item['snippet_word']] = {'default': [s:completed_item.snippet,0] }
 endfunc
 
 " on completion context changed

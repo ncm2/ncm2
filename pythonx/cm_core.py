@@ -13,6 +13,7 @@ import subprocess
 import time
 import cm_default
 import threading
+import json
 
 logger = cm.getLogger(__name__)
 
@@ -546,6 +547,7 @@ class CoreHandler(cm.Base):
                     e['padding'] = prefix
                     if 'abbr' not in e:
                         e['abbr'] = e['word']
+                    e['snippet_word'] = e['word']
                     e['word'] = prefix + e['word']
 
                 matches += source_matches
@@ -631,10 +633,10 @@ class CoreHandler(cm.Base):
                 if snippet and self._completed_snippet_engine=='neosnippet':
                     # neosnippet does not remove the completed word
                     # make them compatible if possible
-                    if snippet[0:len(m['word'])] == m['word']:
-                        snippet = snippet[len(m['word']):]
+                    if snippet[0:len(m['snippet_word'])] == m['snippet_word']:
+                        snippet = snippet[len(m['snippet_word']):]
 
-                snippets.append(snippet)
+                snippets.append(dict(snippet=snippet, word=m['snippet_word']))
 
             if has_snippets:
                 for m in matches:
