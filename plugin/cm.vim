@@ -69,6 +69,9 @@ func! s:snippet_init()
 			let g:cm_completed_snippet_engine = ''
 		endif
 	endif
+	if !exists('g:cm_completed_snippet_engine')
+        let g:cm_completed_snippet_engine = ''
+    endif
 endfunc
 
 au User CmSetup call s:snippet_init()
