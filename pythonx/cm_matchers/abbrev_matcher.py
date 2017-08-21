@@ -68,7 +68,7 @@ def _match_generator(pattern, string, offset=0):
         i = _find_ignorecase(string, abbrev_0, i + 1)
 
 
-def make_regex(pattern, greedy=True, escape=False):
+def make_regex(pattern, escape=False):
     """Build regular expression corresponding to `pattern`."""
 
     def re_group(r):
@@ -80,7 +80,7 @@ def make_regex(pattern, greedy=True, escape=False):
     def re_opt(r):
         return re_group(r) + '?'
 
-    asterisk = '*' if greedy or not vim else '{-}'
+    asterisk = '*'
     res = ''
     res += '^'
     for i, ch in enumerate(pattern):
