@@ -32,8 +32,8 @@ endif
 let g:cm_auto_popup = get(g:,'cm_auto_popup',1)
 
 " Wait for an interval before candidate calculation, to improve editor
-" performance for fast typing
-let g:cm_complete_start_delay = get(g:,'cm_complete_start_delay', 50)
+" performance for fast typing.
+let g:cm_complete_start_delay = get(g:,'cm_complete_start_delay', 0)
 
 " Wait for an interval before popping up, in milliseconds, this would reduce
 " the popup menu flickering when multiple sources are updating the popup menu
