@@ -31,11 +31,16 @@ endif
 
 let g:cm_auto_popup = get(g:,'cm_auto_popup',1)
 
+" Wait for an interval before candidate calculation, to improve editor
+" performance for fast typing.
+let g:cm_complete_start_delay = get(g:,'cm_complete_start_delay', 0)
+
 " Wait for an interval before popping up, in milliseconds, this would reduce
 " the popup menu flickering when multiple sources are updating the popup menu
 " in a short interval, use an interval long enough for computer and short
 " enough for human
-let g:cm_complete_delay = get(g:,'cm_complete_delay',80)
+" The name cm_complete_delay is deprecated
+let g:cm_complete_popup_delay = get(g:, 'cm_complete_popup_delay', get(g:, 'cm_complete_delay', 50))
 
 " Automatically enable all registered sources by default. Set it to 0 if you
 " want to manually enable the registered sources you want by

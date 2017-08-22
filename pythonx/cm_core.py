@@ -56,7 +56,7 @@ class CoreHandler(cm.Base):
         self._start_py   = self.nvim.vars['_cm_start_py_path']
         self._py3        = self.nvim.vars['_cm_py3']
         self._py2        = self.nvim.eval("get(g:,'python_host_prog','python2')")
-        self._complete_delay = self.nvim.vars['cm_complete_delay']
+        self._complete_delay = self.nvim.vars['cm_complete_popup_delay']
         self._completed_snippet_enable = self.nvim.vars['cm_completed_snippet_enable']
         self._completed_snippet_engine = self.nvim.vars['cm_completed_snippet_engine']
         self._multi_thread = int(self.nvim.vars['cm_multi_threading'])
