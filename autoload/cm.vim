@@ -270,7 +270,7 @@ let g:_cm_channel_id = -1
 let s:channel_started = 0
 let g:_cm_start_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
 let s:snippets = []
-let s:complete_begin_timer = 0
+let s:complete_start_timer = 0
 
 " global lock for being compatible with other plugins:
 " 1 - vim-multiple-cursors
@@ -498,18 +498,18 @@ func! s:check_changes(...)
         if g:cm_complete_start_delay == 0
             call s:on_changed()
         else
-            if s:complete_begin_timer
-                call timer_stop(s:complete_begin_timer)
+            if s:complete_start_timer
+                call timer_stop(s:complete_start_timer)
             endif
-            let s:complete_begin_timer = timer_start(g:cm_complete_start_delay, function('s:on_changed'), {'repeat': 1})
+            let s:complete_start_timer = timer_start(g:cm_complete_start_delay, function('s:complete_start_timer_handler'), {'repeat': 1})
         endif
 	endif
 
 	call s:check_and_inject_snippet()
 endfunc
 
-func! s:complete_begin_timer_handler(...)
-    let s:complete_begin_timer = 0
+func! s:complete_start_timer_handler(...)
+    let s:complete_start_timer = 0
     call s:on_changed()
 endfunc
 
