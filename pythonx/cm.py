@@ -156,6 +156,13 @@ def setup_neovim(serveraddr):
     else:
         nvim = attach('socket',path=serveraddr)
 
+    sync_rtp(nvim)
+    return nvim
+
+def sync_rtp(nvim):
+    """
+    sync sys.path with vim's rtp option
+    """
     # setup pythonx
     pythonxs = nvim.eval('globpath(&rtp,"pythonx",1)')
     for path in pythonxs.split("\n"):

@@ -43,9 +43,9 @@ class CoreHandler(cm.Base):
         self._complete_timer = None
         self._last_ctx       = None
 
-    def cm_setup(self):
+        self._loaded_modules = {}
 
-        self._detect_sources()
+    def cm_setup(self):
 
         # after all sources are registered, so that all channels will be
         # started the first time cm_start_channels is called
@@ -61,6 +61,14 @@ class CoreHandler(cm.Base):
         self._completed_snippet_engine = self.nvim.vars['cm_completed_snippet_engine']
         self._multi_thread = int(self.nvim.vars['cm_multi_threading'])
 
+        self.cm_detect_modules()
+
+    def cm_detect_modules(self):
+
+        cm.sync_rtp(self.nvim)
+
+        self._detect_sources()
+
         self._load_scopers()
 
     def _load_scopers(self):
@@ -73,6 +81,11 @@ class CoreHandler(cm.Base):
             try:
                 modulename = os.path.splitext(os.path.basename(path))[0]
                 modulename = "cm_scopers.%s" % modulename
+                if modulename  in self._loaded_modules:
+                    continue
+
+                self._loaded_modules[modulename] = True
+
                 m = importlib.import_module(modulename)
 
                 scoper = m.Scoper(self.nvim)
@@ -95,6 +108,9 @@ class CoreHandler(cm.Base):
 
             modulename = os.path.splitext(os.path.basename(path))[0]
             modulename = "cm_sources.%s" % modulename
+
+            if modulename  in self._loaded_modules:
+                continue
 
             # use a trick to only register the source withou loading the entire
             # module
