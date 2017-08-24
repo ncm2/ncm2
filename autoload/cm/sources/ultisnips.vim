@@ -26,6 +26,7 @@ func! cm#sources#ultisnips#trigger_or_popup(trigger_key)
 		return ''
 	endif
 
+    let l:ctx['startcol'] = 1
     call cm#sources#ultisnips#cm_refresh('cm-ultisnips', l:ctx)
     return ''
 endfunc
