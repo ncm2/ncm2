@@ -654,24 +654,21 @@ Note: This file foo.py should be placed into 'rtp'/pythonx/cm_sources/
 directory.
 >
 	# -*- coding: utf-8 -*-
-
-	from cm import register_source
+	
+	from cm import register_source, Base
 	register_source(name='foo_bar',
-			   abbreviation='foo',
-			   cm_refresh_patterns=[r'fo$'],
-			   priority=8)
-
+	                   abbreviation='foo',
+	                   # cm_refresh_patterns=[r'/'],
+	                   priority=8)
+	
 	import re
-
-	class Source:
-
-	    def __init__(self,nvim):
-
-		self._nvim = nvim
-
-	    def cm_refresh(self,info,ctx):
-		matches = ['foo_bar','foo_baz']
-		self._nvim.call('cm#complete', info['name'], ctx, ctx['startcol'], matches, async=True)
+	
+	class Source(Base):
+	
+	    def cm_refresh(self, info, ctx):
+	        matches = ['foo_bar','foo_baz']
+	        startcol = ctx['startcol']
+	        self.complete(info, ctx, startcol, matches)
 <
 
 ==============================================================================
