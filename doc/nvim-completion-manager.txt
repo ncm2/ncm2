@@ -616,7 +616,7 @@ better option rather than a timer or the limited `TextChangedI`.
 
 7.1 Implementation in pure vimscript		*NCM-vimscript-source*
 
-This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
+This minimal example shows how to popup "foo_bar" and "foo_baz" when "/" is
 typed.
 
 For more complete example, you mignt need to read the source code of
@@ -645,7 +645,7 @@ See |cm#context()| for more information on the second argument {ctx}.
 
 7.2 Implementation via NCM python framework	*NCM-python-source*
 
-This minimal example shows how to popup "foo_bar" and "foo_baz" when "fo" is
+This minimal example shows how to popup "foo_bar" and "foo_baz" when "/" is
 typed.
 
 For more complete example, you mignt need to read the source code of
@@ -655,19 +655,19 @@ Note: This file foo.py should be placed into 'rtp'/pythonx/cm_sources/
 directory.
 >
 	# -*- coding: utf-8 -*-
-	
+
 	from cm import register_source, Base, getLogger
 	register_source(name='foo_bar',
 	                   abbreviation='foo',
-	                   # cm_refresh_patterns=[r'/'],
+	                   cm_refresh_patterns=[r'/'],
 	                   priority=8)
-	
+
 	import re
 
 	logger = getLogger(__name__)
-	
+
 	class Source(Base):
-	
+
 	    def cm_refresh(self, info, ctx):
 	        matches = ['foo_bar','foo_baz']
 	        startcol = ctx['startcol']
@@ -675,6 +675,29 @@ directory.
 <
 You could enable logging for debugging. Read |NCM-trouble-shooting| for
 more information.
+
+Here's explanation on how |cm_refresh| is triggered, with the typing of
+`foo_b/foo` for example.
+
+1. `f|`
+2. `fo|`
+3. `foo|`
+   |cm_refresh| is triggered, with |NCM-startcol|=1, since the default
+   |cm_refresh_length|=3 is matched. Popup menu displays.
+4. `foo_|` 
+   Popup menu displays, with the cached results 'foo_bar' and 'foo_baz'.
+5. `foo_b|` 
+   As above
+6. `foo_b/|`
+   |cm_refresh| is triggered, with |NCM-startcol|=7, since the '/' of
+   |cm_refresh_patterns| is matched. Popup menu displays.
+7. `foo_b/f|`
+   Popup menu displays, with the cached results 'foo_bar' and 'foo_baz'.
+8. `foo_b/fo|` 
+   As above
+9. `foo_b/foo|` 
+   As above
+   
 
 ==============================================================================
 8. Trouble shooting				*NCM-trouble-shooting*
