@@ -86,6 +86,7 @@ completion in html style/script tag.
 | mutt mails               | [#97 mutt-aliases.vim](https://github.com/roxma/nvim-completion-manager/issues/97)     |
 | deoplete                 | [#50 deoplete](https://github.com/roxma/nvim-completion-manager/issues/50)             |
 | css                      | [ncm-css](https://github.com/calebeby/ncm-css)                                         |
+| lbdb (addressbook)       | [ncm-lbdb](https://github.com/katsika/ncm-lbdb)                                        |
 
 
 ## How to extend this framework?
