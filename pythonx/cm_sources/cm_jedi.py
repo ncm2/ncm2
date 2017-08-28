@@ -119,15 +119,17 @@ class Source(Base):
             # snippet support
             try:
                 if (complete.type == 'function' or complete.type == 'class') and not re.search(r'^\s*(from|import)', typed):
-                    params = []
-                    if hasattr(complete,'params'):
-                        params = complete.params
-                    if not params:
-                        params = []
+
+                    logger.debug("building snippet for [%s]", item['word'])
+
+                    # This line has performance issue
+                    # https://github.com/roxma/nvim-completion-manager/issues/126
+                    params = complete.params
+
                     placeholders = []
                     num = 1
                     for param in params:
-                        logger.info('name: %s, description: %s', param.name, param.description)
+                        logger.debug('name: %s, description: %s', param.name, param.description)
                         if re.match(r'^[\w\s]+$', param.description):
                             # param without default value
                             placeholders.append('${%s:%s}' % (num,param.name) )
@@ -137,13 +139,13 @@ class Source(Base):
 
                     snip_args = ', '.join(placeholders)
                     if not placeholders and params:
-                        # don's jump out of parentheses if function has parameters
+                        # don't jump out of parentheses if function has parameters
                         snip_args='${1}'
 
                     snippet = '%s(%s)${0}' % (item['word'], snip_args)
 
                     item['snippet'] = snippet
-                    logger.info('snippet: [%s] placeholders: %s', snippet, placeholders)
+                    logger.debug('snippet: [%s] placeholders: %s', snippet, placeholders)
             except Exception as ex:
                 logger.exception("exception parsing snippet for item: %s, complete: %s", item, complete)
 
