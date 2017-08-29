@@ -94,7 +94,11 @@ class Base:
         """
         convert vim's lnum, col into pos
         """
-        lines = src.split('\n')
+        if type(src)==type(""):
+            lines = src.split('\n')
+        else:
+            lines = src.split(b'\n')
+
         pos = 0
         for i in range(lnum-1):
             pos += len(lines[i])+1
