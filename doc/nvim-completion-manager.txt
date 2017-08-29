@@ -221,6 +221,10 @@ g:cm_matcher.module
 			`"cm_matchers.prefix_matcher"`  
 				Prefix matching. When you type "ab", it only
 				matches candidates start with with "ab".
+			`"cm_matchers.substr_matcher"`  
+				Sub-string matching. When you type "round", it
+				matchings "round", "around", "surroundings"
+				and so on.
 			`"cm_matchers.fuzzy_matcher"`
 				Fuzzy matching.
 				Note: Known issue #8 on github, there may be
