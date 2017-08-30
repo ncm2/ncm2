@@ -183,5 +183,5 @@ class Source(Base):
 
         logger.info('matches %s', matches)
         # workaround upstream issue by letting refresh=True. #116
-        self.complete(info, ctx, ctx['startcol'], matches, True)
+        self.complete(info, ctx, ctx['startcol'], matches)
 
