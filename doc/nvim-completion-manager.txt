@@ -770,5 +770,17 @@ There are two main causes:
   vim8, unlike the |jobstart| in neovim, has no detach option available, which
   means that vim8 has to wait for NCM process exit before shutdown.
 
+9.2 CTRL-L of |popupmenu-keys| is broken	*NCM-issue#127*
+
+It seems this key is in-compatible with vim's |complete()| function.
+
+Try This option:
+	let g:cm_completekeys = "\<Plug>(cm_omnifunc)"
+or 
+	let g:cm_completekeys = "\<Plug>(cm_completefunc)"
+
+But this attempt won't help you with non-prefix-matcher.
+
+
 ==============================================================================
 vim: tw=78:ts=8:softtabstop=8:sw=8:ft=help:norl:noexpandtab:fen:noet:
