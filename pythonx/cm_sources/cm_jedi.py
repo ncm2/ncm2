@@ -124,58 +124,7 @@ class Source(Base):
             # snippet support
             try:
                 if (complete.type == 'function' or complete.type == 'class'):
-
-                    doc = complete.doc
-
-                    # This line has performance issue
-                    # https://github.com/roxma/nvim-completion-manager/issues/126
-                    # params = complete.params
-
-                    fundef = doc.split("\n")[0]
-
-                    params = re.search(r'^\s*' + re.escape(complete.name) + r'\((.*)\)$', fundef)
-
-                    if params:
-                        item['menu'] = fundef
-
-                    if params and not is_import:
-                        logger.debug("building snippet for [%s] [%s] type[%s] doc [%s]", is_import, item['word'], complete.type, doc)
-
-                        num = 1
-                        placeholders = []
-
-                        params = params.group(1)
-                        if params != '':
-                            params = params.split(',')
-                            cnt = 0
-                            for param in params:
-                                cnt += 1
-                                if "=" in param or "*" in param:
-                                    break
-                                else:
-                                    name = param.strip('[').strip(' ')
-
-                                    # Note: this is not accurate
-                                    if cnt==1 and (name=='self' or name=='cls'):
-                                        continue
-
-                                    placeholders.append(self.snippet_placeholder(num, name))
-                                    num += 1
-
-                                    # skip optional parameters
-                                    if "[" in param:
-                                        break
-
-                            snip_args = ', '.join(placeholders)
-                            if len(placeholders) == 0:
-                                # don't jump out of parentheses if function has parameters
-                                snip_args = self.snippet_placeholder(1)
-
-                        snippet = '%s(%s)%s' % (item['word'], snip_args, self.snippet_placeholder(0))
-
-                        item['snippet'] = snippet
-                        logger.debug('snippet: [%s] placeholders: %s', snippet, placeholders)
-
+                    self.render_snippet(item, complete, is_import)
             except Exception as ex:
                 logger.exception("exception parsing snippet for item: %s, complete: %s", item, complete)
 
@@ -185,3 +134,60 @@ class Source(Base):
         # workaround upstream issue by letting refresh=True. #116
         self.complete(info, ctx, ctx['startcol'], matches)
 
+    def render_snippet(self, item, complete, is_import):
+
+        doc = complete.doc
+
+        # This line has performance issue
+        # https://github.com/roxma/nvim-completion-manager/issues/126
+        # params = complete.params
+
+        fundef = doc.split("\n")[0]
+
+        params = re.search(re.escape(complete.name) + r'\((.*)\)', fundef)
+
+        if params:
+            item['menu'] = fundef
+
+        logger.debug("building snippet [%s] type[%s] doc [%s]", item['word'], complete.type, doc)
+
+        if params and not is_import:
+
+            num = 1
+            placeholders = []
+            snip_args = ''
+
+            params = params.group(1)
+            if params != '':
+                params = params.split(',')
+                cnt = 0
+                for param in params:
+                    cnt += 1
+                    if "=" in param or "*" in param or param[0] == '[':
+                        break
+                    else:
+                        name = param.strip('[').strip(' ')
+
+                        # Note: this is not accurate
+                        if cnt==1 and (name=='self' or name=='cls'):
+                            continue
+
+                        ph = self.snippet_placeholder(num, name)
+                        placeholders.append(ph)
+                        num += 1
+
+                        # skip optional parameters
+                        if "[" in param:
+                            break
+
+                snip_args = ', '.join(placeholders)
+                if len(placeholders) == 0:
+                    # don't jump out of parentheses if function has
+                    # parameters
+                    snip_args = self.snippet_placeholder(1)
+
+            ph0 = self.snippet_placeholder(0)
+            snippet = '%s(%s)%s' % (item['word'], snip_args, ph0)
+
+            item['snippet'] = snippet
+            logger.debug('snippet: [%s] placeholders: %s', snippet, placeholders)
