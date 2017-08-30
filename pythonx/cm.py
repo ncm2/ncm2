@@ -151,6 +151,11 @@ class Base:
         self.nvim.call('cm#complete', name, ctx, startcol, matches, refresh, async=True)
 
     def snippet_placeholder(self, num, txt=''):
+        # TODO: this version is so simple, but I haven't met those complicated
+        # use case
+        txt = txt.replace('$', r'\$')
+        txt = txt.replace('$', r'\{')
+        txt = txt.replace('$', r'\}')
         if txt == '':
             return '${%s}' % num
         return '${%s:%s}'  % (num, txt)
