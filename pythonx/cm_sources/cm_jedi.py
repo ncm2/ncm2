@@ -159,7 +159,7 @@ class Source(Base):
                                     if cnt==1 and (name=='self' or name=='cls'):
                                         continue
 
-                                    placeholders.append('${%s:%s}' % (num, name))
+                                    placeholders.append(self.snippet_placeholder(num, name))
                                     num += 1
 
                                     # skip optional parameters
@@ -169,9 +169,9 @@ class Source(Base):
                             snip_args = ', '.join(placeholders)
                             if len(placeholders) == 0:
                                 # don't jump out of parentheses if function has parameters
-                                snip_args='${1}'
+                                snip_args = self.snippet_placeholder(1)
 
-                        snippet = '%s(%s)${0}' % (item['word'], snip_args)
+                        snippet = '%s(%s)%s' % (item['word'], snip_args, self.snippet_placeholder(0))
 
                         item['snippet'] = snippet
                         logger.debug('snippet: [%s] placeholders: %s', snippet, placeholders)

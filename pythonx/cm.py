@@ -51,6 +51,7 @@ class Base:
 
         self.nvim = nvim
         self.logger = getLogger(self.__module__)
+        self.snippet_engine = self.nvim.vars['cm_completed_snippet_engine']
 
     # allow a source to preprocess inputs before committing to the manager
     @property
@@ -148,6 +149,11 @@ class Base:
         if isinstance(name,dict):
             name = name['name']
         self.nvim.call('cm#complete', name, ctx, startcol, matches, refresh, async=True)
+
+    def snippet_placeholder(self, num, txt=''):
+        if txt == '':
+            return '${%s}' % num
+        return '${%s:%s}'  % (num, txt)
 
 def setup_neovim(serveraddr):
 
