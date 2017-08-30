@@ -90,7 +90,7 @@ class Source(Base):
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
                 # refresh=True
                 # call signature popup doesn't need to be cached by the framework
-                self.nvim.call('cm#complete', info['name'], ctx, ctx['col'], matches, True, async=True)
+                self.complete(info, ctx, ctx['col'], matches, True)
             return
 
         completions = script.completions()
@@ -181,7 +181,7 @@ class Source(Base):
 
             matches.append(item)
 
-        # cm#complete(src, context, startcol, matches)
         logger.info('matches %s', matches)
-        self.complete(info, ctx, ctx['startcol'], matches)
+        # workaround upstream issue by letting refresh=True. #116
+        self.complete(info, ctx, ctx['startcol'], matches, True)
 
