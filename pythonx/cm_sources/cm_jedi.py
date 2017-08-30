@@ -21,7 +21,8 @@ register_source(name='cm-jedi',
                 scoping=True,
                 scopes=['python'],
                 multi_thread=0,
-                early_cache=1,
+                # disable early cache to minimize the issue of #116
+                # early_cache=1,
                 # The last two patterns is for displaying function signatures r'\(\s?', r',\s?'
                 cm_refresh_patterns=[r'^(import|from).*\s', r'\.', r'\(\s?', r',\s?'],
                 python=py,)
@@ -80,6 +81,10 @@ class Source(Base):
         except Exception as ex:
             logger.exception("get signature text failed %s", signature_text)
 
+        is_import = False
+        if re.search(r'^\s*(from|import)', typed):
+            is_import = True
+
         if re.search(r'^\s*(?!from|import).*?[(,]\s*$', typed):
             if signature_text:
                 matches = [dict(word='',empty=1,abbr=signature_text,dup=1),]
@@ -118,34 +123,59 @@ class Source(Base):
 
             # snippet support
             try:
-                if (complete.type == 'function' or complete.type == 'class') and not re.search(r'^\s*(from|import)', typed):
+                if (complete.type == 'function' or complete.type == 'class'):
 
-                    logger.debug("building snippet for [%s]", item['word'])
+                    doc = complete.doc
 
                     # This line has performance issue
                     # https://github.com/roxma/nvim-completion-manager/issues/126
-                    params = complete.params
+                    # params = complete.params
 
-                    placeholders = []
-                    num = 1
-                    for param in params:
-                        logger.debug('name: %s, description: %s', param.name, param.description)
-                        if re.match(r'^[\w\s]+$', param.description):
-                            # param without default value
-                            placeholders.append('${%s:%s}' % (num,param.name) )
-                        else:
-                            break
-                        num += 1
+                    fundef = doc.split("\n")[0]
 
-                    snip_args = ', '.join(placeholders)
-                    if not placeholders and params:
-                        # don't jump out of parentheses if function has parameters
-                        snip_args='${1}'
+                    params = re.search(r'^\s*' + re.escape(complete.name) + r'\((.*)\)$', fundef)
 
-                    snippet = '%s(%s)${0}' % (item['word'], snip_args)
+                    if params:
+                        item['menu'] = fundef
 
-                    item['snippet'] = snippet
-                    logger.debug('snippet: [%s] placeholders: %s', snippet, placeholders)
+                    if params and not is_import:
+                        logger.debug("building snippet for [%s] [%s] type[%s] doc [%s]", is_import, item['word'], complete.type, doc)
+
+                        num = 1
+                        placeholders = []
+
+                        params = params.group(1)
+                        if params != '':
+                            params = params.split(',')
+                            cnt = 0
+                            for param in params:
+                                cnt += 1
+                                if "=" in param or "*" in param:
+                                    break
+                                else:
+                                    name = param.strip('[').strip(' ')
+
+                                    # Note: this is not accurate
+                                    if cnt==1 and (name=='self' or name=='cls'):
+                                        continue
+
+                                    placeholders.append('${%s:%s}' % (num, name))
+                                    num += 1
+
+                                    # skip optional parameters
+                                    if "[" in param:
+                                        break
+
+                            snip_args = ', '.join(placeholders)
+                            if len(placeholders) == 0:
+                                # don't jump out of parentheses if function has parameters
+                                snip_args='${1}'
+
+                        snippet = '%s(%s)${0}' % (item['word'], snip_args)
+
+                        item['snippet'] = snippet
+                        logger.debug('snippet: [%s] placeholders: %s', snippet, placeholders)
+
             except Exception as ex:
                 logger.exception("exception parsing snippet for item: %s, complete: %s", item, complete)
 
