@@ -17,6 +17,7 @@ func! cm#sources#neosnippet#trigger_or_popup(trigger_key)
 	endif
 
 	" notify the completion framework
+    let l:ctx['startcol'] = 1
 	call cm#sources#neosnippet#cm_refresh('cm-neosnippet', l:ctx)
 	return ''
 endfunc
