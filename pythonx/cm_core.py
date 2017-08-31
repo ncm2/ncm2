@@ -646,13 +646,21 @@ class CoreHandler(cm.Base):
                 else:
                     m['info'] += '\nsnippet@%s' % len(snippets)
 
-                if snippet and self._completed_snippet_engine=='neosnippet':
-                    # neosnippet does not remove the completed word
-                    # make them compatible if possible
-                    if snippet[0:len(m['snippet_word'])] == m['snippet_word']:
-                        snippet = snippet[len(m['snippet_word']):]
+                if snippet:
 
-                snippets.append(dict(snippet=snippet, word=m['snippet_word']))
+                    if self._completed_snippet_engine=='neosnippet':
+                        # neosnippet does not remove the completed word
+                        # make them compatible if possible
+                        if snippet[0:len(m['snippet_word'])] == m['snippet_word']:
+                            snippet = snippet[len(m['snippet_word']):]
+
+                    # currently only ultisnips supports snippet name with multi words
+                    if self._completed_snippet_engine != 'ultisnips':
+                        rp = m['snippet_word'].split(' ')[0]
+                        m['word'] = m['word'][:-len(m['snippet_word'])] + rp
+                        m['snippet_word'] = rp
+
+                    snippets.append(dict(snippet=snippet, word=m['snippet_word']))
 
             if has_snippets:
                 for m in matches:
