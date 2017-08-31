@@ -154,8 +154,8 @@ class Base:
         # TODO: this version is so simple, but I haven't met those complicated
         # use case
         txt = txt.replace('$', r'\$')
-        txt = txt.replace('$', r'\{')
-        txt = txt.replace('$', r'\}')
+        txt = txt.replace('{', r'\{')
+        txt = txt.replace('}', r'\}')
         if txt == '':
             return '${%s}' % num
         return '${%s:%s}'  % (num, txt)
