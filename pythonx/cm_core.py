@@ -654,11 +654,10 @@ class CoreHandler(cm.Base):
                         if snippet[0:len(m['snippet_word'])] == m['snippet_word']:
                             snippet = snippet[len(m['snippet_word']):]
 
-                    # currently only ultisnips supports snippet name with multi words
-                    if self._completed_snippet_engine != 'ultisnips':
-                        rp = m['snippet_word'].split(' ')[0]
-                        m['word'] = m['word'][:-len(m['snippet_word'])] + rp
-                        m['snippet_word'] = rp
+                    # snippet word should not contain spaces
+                    rp = m['snippet_word'].split(' ')[0]
+                    m['word'] = m['word'][:-len(m['snippet_word'])] + rp
+                    m['snippet_word'] = rp
 
                     snippets.append(dict(snippet=snippet, word=m['snippet_word']))
 
