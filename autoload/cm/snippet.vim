@@ -118,9 +118,10 @@ func! s:snipmate_init()
 endfunc
 
 func! cm#snippet#_snipmate_snippets(scopes, trigger, result)
-	if empty(v:completed_item)
+	if empty(v:completed_item) || get(v:completed_item, 'snippet', '') == ''
 		return
 	endif
-	let a:result[v:completed_item.snippet_word] = {'default': [v:completed_item.snippet, 0] }
+    " use version 1 snippet syntax
+	let a:result[v:completed_item.snippet_word] = {'default': [v:completed_item.snippet, 1] }
 endfunc
 
