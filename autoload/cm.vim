@@ -8,7 +8,7 @@ endif
 let s:init = 1
 let s:already_setup = 0
 
-inoremap <silent> <expr> <Plug>(cm_inject_snippet) <SID>check_and_inject_snippet()
+inoremap <silent> <expr> <Plug>(cm_inject_snippet) cm#snippet#check_and_inject()
 
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
@@ -45,8 +45,9 @@ func! cm#enable_for_buffer(...)
 	endif
 
 	if s:already_setup == 0
-		doautocmd User CmSetup
 		let s:already_setup = 1
+        call cm#snippet#init()
+		doautocmd User CmSetup
 	endif
 
 	" remove to avoid conflict: #34
@@ -268,7 +269,6 @@ let s:channel_jobid = -1
 let g:_cm_channel_id = -1
 let s:channel_started = 0
 let g:_cm_start_py_path = globpath(&rtp,'pythonx/cm_start.py',1)
-let s:snippets = []
 let s:complete_start_timer = 0
 let s:old_rtp = &rtp
 
@@ -377,7 +377,7 @@ func! cm#_core_complete(context, startcol, matches, not_changed, snippets)
 	let s:startcol = a:startcol
 	let l:padcmd = 'extend(v:val,{"abbr":printf("%".strdisplaywidth(v:val["padding"])."s%s","",v:val["abbr"])})'
 	let s:matches = map(a:matches, l:padcmd)
-	let s:snippets = a:snippets
+	let g:cm#snippet#snippets = a:snippets
 
 	call feedkeys(g:cm_completekeys, 'i')
 
@@ -514,68 +514,12 @@ func! s:check_changes(...)
         endif
 	endif
 
-	call s:check_and_inject_snippet()
+	call cm#snippet#check_and_inject()
 endfunc
 
 func! s:complete_start_timer_handler(...)
     let s:complete_start_timer = 0
     call s:on_changed()
-endfunc
-
-func! s:check_and_inject_snippet()
-
-	if empty(v:completed_item) || !has_key(v:completed_item,'info') || empty(v:completed_item.info) || has_key(v:completed_item,'snippet')
-		return ''
-	endif
-
-	let l:last_line = split(v:completed_item.info,'\n')[-1]
-	if l:last_line[0:len('snippet@')-1]!='snippet@'
-		return ''
-	endif
-
-	let l:snippet_id = str2nr(l:last_line[len('snippet@'):])
-	if l:snippet_id>=len(s:snippets) || l:snippet_id<0
-		return ''
-	endif
-
-	" neosnippet recognize the snippet field of v:completed_item. Also useful
-	" for checking. Kind of a hack.
-	let v:completed_item.snippet = s:snippets[l:snippet_id]['snippet']
-    let v:completed_item.snippet_word = s:snippets[l:snippet_id]['word']
-
-    if v:completed_item.snippet == ''
-        return ''
-    endif
-
-	if g:cm_completed_snippet_engine == 'ultisnips'
-		if get(b:,'_cm_us_setup',0)==0
-			" UltiSnips_Manager.add_buffer_filetypes('%s.snips.ncm' % vim.eval('&filetype'))
-			let b:_cm_us_setup = 1
-			let b:_cm_us_filetype = 'ncm'
-			call UltiSnips#AddFiletypes(b:_cm_us_filetype)
-			autocmd InsertLeave <buffer> exec g:_uspy 'UltiSnips_Manager._added_snippets_source._snippets["ncm"]._snippets = []'
-		endif
-		exec g:_uspy 'UltiSnips_Manager._added_snippets_source._snippets["ncm"]._snippets = []'
-		" TODO cleanup when InsertLeave
-		call UltiSnips#AddSnippetWithPriority(v:completed_item.snippet_word, v:completed_item.snippet, '', 'i', b:_cm_us_filetype, 1)
-	elseif g:cm_completed_snippet_engine == 'snipmate'
-		if !exists('s:completed_item')
-			let s:completed_item = {}
-			autocmd InsertLeave * let s:completed_item = {}
-			" inject ncm's handler into snipmate
-			let g:snipMateSources['ncm'] = funcref#Function('cm#_snipmate_snippets')
-		endif
-		let s:completed_item = v:completed_item
-	endif
-
-    return ''
-endfunc
-
-func! cm#_snipmate_snippets(scopes, trigger, result)
-	if empty(s:completed_item)
-		return
-	endif
-	let a:result[s:completed_item['snippet_word']] = {'default': [s:completed_item.snippet,0] }
 endfunc
 
 " on completion context changed

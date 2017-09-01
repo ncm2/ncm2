@@ -648,12 +648,6 @@ class CoreHandler(cm.Base):
 
                 if snippet:
 
-                    if self._completed_snippet_engine=='neosnippet':
-                        # neosnippet does not remove the completed word
-                        # make them compatible if possible
-                        if snippet[0:len(m['snippet_word'])] == m['snippet_word']:
-                            snippet = snippet[len(m['snippet_word']):]
-
                     # snippet word should not contain spaces
                     rp = m['snippet_word'].split(' ')[0]
                     m['word'] = m['word'][:-len(m['snippet_word'])] + rp

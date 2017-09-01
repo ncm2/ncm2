@@ -57,30 +57,6 @@ let g:cm_refresh_length = get(g:, 'cm_refresh_length', get(g:, 'cm_refresh_defau
 
 let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
 
-" runs after snippet plugin is loaded
-func! s:snippet_init()
-	if !exists('g:cm_completed_snippet_enable')
-		if get(g:,'neosnippet#enable_completed_snippet',0)
-			let g:cm_completed_snippet_enable = 1
-			let g:cm_completed_snippet_engine = 'neosnippet'
-		elseif exists('g:did_plugin_ultisnips')
-			let g:cm_completed_snippet_enable = 1
-			let g:cm_completed_snippet_engine = 'ultisnips'
-		elseif exists('g:snipMateSources')
-			let g:cm_completed_snippet_enable = 1
-			let g:cm_completed_snippet_engine = 'snipmate'
-		else
-			let g:cm_completed_snippet_enable = 0
-			let g:cm_completed_snippet_engine = ''
-		endif
-	endif
-	if !exists('g:cm_completed_snippet_engine')
-        let g:cm_completed_snippet_engine = ''
-    endif
-endfunc
-
-au User CmSetup call s:snippet_init()
-
 " use did_plugin_ultisnips to detect the installation of ultisnips
 " https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
 au User CmSetup if exists('g:did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
