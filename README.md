@@ -144,30 +144,6 @@ pip3 install --user neovim jedi mistune psutil setproctitle
 [python-support.nvim](https://github.com/roxma/python-support.nvim) to help
 manage your pip modules for neovim:
 
-```vim
-Plug 'roxma/python-support.nvim'
-" for python completions
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
-" language specific completions on markdown file
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
-
-" utils, optional
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
-
-```
-
-- (Optional) Install typical completion sources
-```vim
-" (optional) javascript completion
-Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
-" (optional) language server protocol framework
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-" (optional) php completion via LanguageClient-neovim
-Plug 'roxma/LanguageServer-php-neovim',  {'do': 'composer install && composer run-script parse-stubs'}
-autocmd FileType php LanguageClientStart
-```
-
 ## Optional Configuration Tips
 
 - Supress the annoying completion messages:
