@@ -185,6 +185,14 @@ set shortmess+=c
 inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 ```
 
+- Here is an example for expanding snippet in the popup menu with `<Enter>`
+  key.  Suppose you use the `<C-U>` key for expanding snippet.
+
+```vim
+imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+```
+
 - When using `CTRL-C` key to leave insert mode, it does not trigger the
   autocmd `InsertLeave`. You should use `CTRL-[`, or map the `<c-c>` to
   `<ESC>`.

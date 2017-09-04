@@ -27,26 +27,35 @@ func! cm#snippet#init()
     endif
 endfunc
 
+func! cm#snippet#completed_is_snippet()
+    call cm#snippet#check_and_inject()
+    return get(v:completed_item, 'is_snippet', 0)
+endfunc
+
 func! cm#snippet#check_and_inject()
 
-	if empty(v:completed_item) || !has_key(v:completed_item,'info') || empty(v:completed_item.info) || has_key(v:completed_item,'snippet')
+    if empty(v:completed_item) || !has_key(v:completed_item,'info') || empty(v:completed_item.info) || has_key(v:completed_item, 'is_snippet')
 		return ''
 	endif
 
 	let l:last_line = split(v:completed_item.info,'\n')[-1]
 	if l:last_line[0:len('snippet@')-1]!='snippet@'
+        let v:completed_item.is_snippet = 0
 		return ''
 	endif
 
 	let l:snippet_id = str2nr(l:last_line[len('snippet@'):])
 	if l:snippet_id>=len(g:cm#snippet#snippets) || l:snippet_id<0
+        let v:completed_item.is_snippet = 0
 		return ''
 	endif
 
 	" neosnippet recognize the snippet field of v:completed_item. Also useful
 	" for checking. Kind of a hack.
+    " TODO: skip empty g:cm#snippet#snippets[l:snippet_id]['snippet']
 	let v:completed_item.snippet = g:cm#snippet#snippets[l:snippet_id]['snippet']
     let v:completed_item.snippet_word = g:cm#snippet#snippets[l:snippet_id]['word']
+    let v:completed_item.is_snippet = 1
 
     if v:completed_item.snippet == ''
         return ''

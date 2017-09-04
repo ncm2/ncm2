@@ -70,6 +70,12 @@ the menu. Use this mapping to hide the menu and also start a new line.
 >
 	inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 <
+Here is an example for expanding snippet in the popup menu with <Enter> key.
+Suppose you use the <C-U> key for expanding snippet.
+>
+    imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+    imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+<
 When using CTRL-C to leave insert mode, it does not trigger the autocmd
 |InsertLeave|. You should use CTRL-[, or map the CTRL-C to <ESC>.
 >
@@ -538,21 +544,19 @@ cm#enable_for_buffer()
 cm#disable_for_buffer()
 	Disable |NCM| for current buffer.
 
+cm#completed_is_snippet()
+	Here is an example for expanding snippet in the popup menu with
+	<Enter> key. Suppose you use the <C-U> key for expanding snippet.
+>
+    imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+    imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+<
 						*<Plug>(cm_force_refresh)*
 <Plug>(cm_force_refresh)
 			A key to trigger the popup manually. 
 
 			Disable |g:cm_auto_popup| to display popup only with
 			this key.
-
-						*<Plug>(cm_inject_snippet)*
-<Plug>(cm_inject_snippet)
-			Here is an example for accepting the item and
-			expanding the snippet with <CR> key. Suppose you use
-			the <C-U> key for expanding snippet.
->
-    imap <expr> <Plug>(expand_or_nl) (has_key(v:completed_item,'snippet')?"\<C-U>":"\<CR>")
-    imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(cm_inject_snippet)\<Plug>(expand_or_nl)" : "\<CR>")
 
 ==============================================================================
 6. Why						*NCM-why*

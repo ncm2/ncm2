@@ -246,6 +246,10 @@ func! cm#complete(src, context, startcol, matches, ...)
 
 endfunc
 
+func! cm#completed_is_snippet()
+    return cm#snippet#completed_is_snippet()
+endfunc
+
 " show message to user
 func! cm#message(msgtype, msg)
     if toupper(a:msgtype) == 'ERROR'

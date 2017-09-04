@@ -646,14 +646,12 @@ class CoreHandler(cm.Base):
                 else:
                     m['info'] += '\nsnippet@%s' % len(snippets)
 
-                if snippet:
+                # snippet word should not contain spaces
+                rp = m['snippet_word'].split(' ')[0]
+                m['word'] = m['word'][:-len(m['snippet_word'])] + rp
+                m['snippet_word'] = rp
 
-                    # snippet word should not contain spaces
-                    rp = m['snippet_word'].split(' ')[0]
-                    m['word'] = m['word'][:-len(m['snippet_word'])] + rp
-                    m['snippet_word'] = rp
-
-                    snippets.append(dict(snippet=snippet, word=m['snippet_word']))
+                snippets.append(dict(snippet=snippet, word=m['snippet_word']))
 
             if has_snippets:
                 for m in matches:
