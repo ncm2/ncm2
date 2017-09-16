@@ -88,6 +88,7 @@ completion in html style/script tag.
 | deoplete                 | [#50 deoplete](https://github.com/roxma/nvim-completion-manager/issues/50)             |
 | css                      | [ncm-css](https://github.com/calebeby/ncm-css)                                         |
 | lbdb (addressbook)       | [ncm-lbdb](https://github.com/katsika/ncm-lbdb)                                        |
+| Java                     | [nvim-cm-eclim](https://github.com/sassanh/nvim-cm-eclim)                              |
 
 
 ## How to extend this framework?
