@@ -102,14 +102,6 @@ class Source(Base):
 
             insert = complete.complete
 
-            try:
-                # simply workaround jedi's bug:
-                # https://github.com/roxma/nvim-completion-manager/issues/43
-                if signature and complete.type=='param' and complete.parent().name!=signature.name:
-                    insert = insert.rstrip('=')
-            except Exception as ex:
-                logger.exception("error processing complete item: %s", complete)
-
             item = dict(word=ctx['base']+insert,
                         icase=1,
                         dup=1,
@@ -136,7 +128,7 @@ class Source(Base):
 
     def render_snippet(self, item, complete, is_import):
 
-        doc = complete.doc
+        doc = complete.docstring()
 
         # This line has performance issue
         # https://github.com/roxma/nvim-completion-manager/issues/126
@@ -144,7 +136,7 @@ class Source(Base):
 
         fundef = doc.split("\n")[0]
 
-        params = re.search(re.escape(complete.name) + r'\((.*)\)', fundef)
+        params = re.search(r'(?:_method|' + re.escape(complete.name) + ')' + r'\((.*)\)', fundef)
 
         if params:
             item['menu'] = fundef
