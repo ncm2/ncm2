@@ -224,6 +224,7 @@ g:cm_matcher
 						*g:cm_matcher.module*
 g:cm_matcher.module
 			The matcher module. Available options are:
+
 			`"cm_matchers.prefix_matcher"`  
 				Prefix matching. When you type "ab", it only
 				matches candidates start with with "ab".
@@ -238,6 +239,11 @@ g:cm_matcher.module
 				matcher.
 			`"cm_matchers.abbrev_matcher"`
 				A more intuitive version of fuzzy matching.
+
+			Note: If you use non-prefix matcher, and haven't set
+			the |g:cm_completekeys| option, NCM will use
+			`"<Plug>(cm_completefunc)"` as the default value,
+			which will change the behavior of the <c-u> key.
 
 						*g:cm_matcher.case*
 g:cm_matcher.case
@@ -266,6 +272,13 @@ g:cm_completed_snippet_enable
 			- You have installed ultisnips
 
 			- You have installed snipMate
+
+						*g:cm_completed_snippet_engine*
+g:cm_completed_snippet_engine
+			Available options:
+			- "ulisnips" by default if UltiSnips is installed
+			- "snipmate" by default if snipMate is installed
+			- "neosnippet" by default if neosnippet is installed
 
 						*g:cm_completekeys*
 g:cm_completekeys

@@ -2,28 +2,30 @@
 let g:cm#snippet#snippets = []
 
 func! cm#snippet#init()
-	if !exists('g:cm_completed_snippet_enable')
-		if exists('g:loaded_neosnippet')
-			let g:cm_completed_snippet_enable = 1
-			let g:cm_completed_snippet_engine = 'neosnippet'
-            " Not compatible with neosnippet#enable_completed_snippet. NCM
-            " choose a different approach
-            let g:neosnippet#enable_completed_snippet=0
-            call s:neosnippet_init()
-		elseif exists('g:did_plugin_ultisnips')
-			let g:cm_completed_snippet_enable = 1
-			let g:cm_completed_snippet_engine = 'ultisnips'
-		elseif exists('g:snipMateSources')
-			let g:cm_completed_snippet_enable = 1
-			let g:cm_completed_snippet_engine = 'snipmate'
-            call s:snipmate_init()
-		else
-			let g:cm_completed_snippet_enable = 0
-			let g:cm_completed_snippet_engine = ''
-		endif
-	endif
-	if !exists('g:cm_completed_snippet_engine')
-        let g:cm_completed_snippet_engine = ''
+	if ((!exists('g:cm_completed_snippet_enable') || g:cm_completed_snippet_enable) && !exists('g:cm_completed_snippet_engine'))
+        if exists('g:loaded_neosnippet')
+            let g:cm_completed_snippet_enable = 1
+            let g:cm_completed_snippet_engine = 'neosnippet'
+        elseif exists('g:did_plugin_ultisnips')
+            let g:cm_completed_snippet_enable = 1
+            let g:cm_completed_snippet_engine = 'ultisnips'
+        elseif exists('g:snipMateSources')
+            let g:cm_completed_snippet_enable = 1
+            let g:cm_completed_snippet_engine = 'snipmate'
+        else
+            let g:cm_completed_snippet_enable = 0
+            let g:cm_completed_snippet_engine = ''
+        endif
+    endif
+
+    let g:cm_completed_snippet_enable = get(g:, 'cm_completed_snippet_enable', 0)
+    let g:cm_completed_snippet_engine = get(g:, 'cm_completed_snippet_engine', '')
+
+    if g:cm_completed_snippet_engine == 'neosnippet'
+        call s:neosnippet_init()
+    endif
+    if g:cm_completed_snippet_engine == 'snipmate'
+        call s:snipmate_init()
     endif
 endfunc
 
@@ -92,6 +94,9 @@ func! s:ultisnips_inject()
 endfunc
 
 func! s:neosnippet_init()
+    " Not compatible with neosnippet#enable_completed_snippet. NCM
+    " choose a different approach
+    let g:neosnippet#enable_completed_snippet=0
     augroup cm
         autocmd InsertEnter * call s:neosnippet_cleanup()
     augroup END
