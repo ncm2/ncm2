@@ -16,6 +16,7 @@ Subscribe it if you are interested.**
 ## Table of Contents
 
 <!-- vim-markdown-toc GFM -->
+
 * [Features](#features)
 * [Scoping Sources:](#scoping-sources)
 * [Completion Sources](#completion-sources)
@@ -69,7 +70,8 @@ completion in html style/script tag.
 | Snipmate hint            | builtin, requires [vim-snipmate](https://github.com/garbas/vim-snipmate)               |
 | neosnippet hint          | builtin, requires [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)           |
 | Language Server Protocal | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
-| C/C++                    | [clang_complete](https://github.com/roxma/clang_complete)                              |
+| C/C++                    | [clang_complete](https://github.com/roxma/clang_complete) [DEPRECATED]                 |
+| C/C++                    | [ncm-clang](https://github.com/roxma/ncm-clang)                                        |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
 | Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
 | elm                      | [ncm-elm-oracle](https://github.com/roxma/ncm-elm-oracle)                              |
