@@ -137,10 +137,9 @@ endif
 ```sh
 # neovim is the required pip module
 # jedi for python completion
-# mistune for markdown completion (optional)
 # psutil (optional)
 # setproctitle (optional)
-pip3 install --user neovim jedi mistune psutil setproctitle
+pip3 install --user neovim jedi psutil setproctitle
 ```
 
 (Optional) It's easier to use
