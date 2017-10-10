@@ -51,7 +51,7 @@ completion in html style/script tag.
 
 ## Scoping Sources:
 
-- Language specific completion for markdown
+- Language specific completion for markdown, reStructuredText
 - Javascript code completion in html script tag
 - Css code completion in html style tag
 
