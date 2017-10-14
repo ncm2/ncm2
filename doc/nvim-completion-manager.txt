@@ -276,7 +276,7 @@ g:cm_completed_snippet_enable
 						*g:cm_completed_snippet_engine*
 g:cm_completed_snippet_engine
 			Available options:
-			- "ulisnips" by default if UltiSnips is installed
+			- "ultisnips" by default if UltiSnips is installed
 			- "snipmate" by default if snipMate is installed
 			- "neosnippet" by default if neosnippet is installed
 
