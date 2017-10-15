@@ -179,7 +179,7 @@ def sync_rtp(nvim):
     sync sys.path with vim's rtp option
     """
     # setup pythonx
-    pythonxs = nvim.eval('globpath(&rtp,"pythonx",1)')
+    pythonxs = nvim.eval(r'globpath(&rtp,"pythonx",1) . "\n" . globpath(&rtp,"rplugin/python3",1)')
     for path in pythonxs.split("\n"):
         if not path:
             continue
