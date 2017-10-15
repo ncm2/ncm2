@@ -108,7 +108,9 @@ created the extension.
 ## Requirements
 
 - `has("python3")`.
-- If you're on vim8, [vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc).
+- For Vim 8:
+  - [roxma/vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc)
+  - `g:python3_host_prog` or `python3` in your `$PATH`
 
 ## Installation
 
