@@ -38,10 +38,10 @@ Main features:
 
 Requirements:
 
-- Neovim.
-- Or vim8 with |has-python| or |has-python3|
-- `python3` found in your `$PATH` env variable or setting
-  |g:python3_host_prog| to the full path of your python3 executable..
+- `has("python3")`.
+- For Vim 8:
+  - [roxma/vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc)
+  - `g:python3_host_prog` or `python3` in your `$PATH`
 
 Install the required pip modules for your python3:
 >
