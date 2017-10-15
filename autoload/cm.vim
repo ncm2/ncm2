@@ -420,7 +420,7 @@ func! s:start_core_channel(...)
 	let s:channel_started = 1
 
 	let g:_cm_py3 = get(g:,'python3_host_prog','')
-    if g:_cm_py3 == '' && has('python3')
+    if g:_cm_py3 == '' && has('nvim') && has('python3')
         " heavy weight
         " but better support for python detection
         python3 import sys
