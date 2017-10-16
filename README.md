@@ -110,7 +110,10 @@ created the extension.
 - `has("python3")`.
 - For Vim 8:
   - [roxma/vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc)
-  - `g:python3_host_prog` or `python3` in your `$PATH`
+  - `g:python3_host_prog` pointed to your python3 executable, or `echo
+      exepath('python3')` is not empty.
+  - [neovim python client](https://github.com/neovim/python-client) (`pip3
+      install neovim`)
 
 ## Installation
 
