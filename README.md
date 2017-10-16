@@ -91,6 +91,7 @@ completion in html style/script tag.
 | css                      | [ncm-css](https://github.com/calebeby/ncm-css)                                         |
 | lbdb (addressbook)       | [ncm-lbdb](https://github.com/katsika/ncm-lbdb)                                        |
 | Java                     | [nvim-cm-eclim](https://github.com/sassanh/nvim-cm-eclim)                              |
+| TypeScript               | [nvim-typescript](https://github.com/mhartington/nvim-typescript)                      |
 
 
 ## How to extend this framework?
