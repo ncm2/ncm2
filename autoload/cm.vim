@@ -443,7 +443,7 @@ fun s:on_core_channel_exit(job_id, data, event)
 		return
 	endif
     " v:exiting is not availale on vim8
-    if get(v:, 'exiting', v:null) is not v:null
+    if get(v:, 'exiting', v:null) isnot v:null
         return
     endif
 	echom 'nvim-completion-manager core channel terminated. '
