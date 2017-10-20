@@ -439,10 +439,14 @@ endfunc
 
 fun s:on_core_channel_exit(job_id, data, event)
 	let s:channel_jobid = -1
-	if s:leaving
+	if s:leaving || v:dying
 		return
 	endif
-	echom 'nvim-completion-manager core channel terminated'
+    " v:exiting is not availale on vim8
+    if get(v:, 'exiting', v:null) is not v:null
+        return
+    endif
+	echom 'nvim-completion-manager core channel terminated. '
 endf
 
 fun s:notify_core_channel(event,...)
