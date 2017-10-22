@@ -35,9 +35,6 @@ if has('nvim')==0
 endif
 
 
-" do nothing. place it here only to avoid the message 'No matching autocommands'
-autocmd User CmSetup silent 
-
 func! cm#enable_for_buffer(...)
 
 	if has('nvim')==0
@@ -47,8 +44,9 @@ func! cm#enable_for_buffer(...)
 	if s:already_setup == 0
 		let s:already_setup = 1
         call cm#snippet#init()
-		doautocmd User CmSetup
 	endif
+
+    call s:cm_setup()
 
 	" remove to avoid conflict: #34
 	" NCM uses cursorpos to detect changes currently, There's no need to keep
@@ -460,6 +458,15 @@ fun s:notify_core_channel(event,...)
 endf
 " }
 
+func! s:cm_setup()
+    "  avoid the message 'No matching autocommands' for doautocmd
+    autocmd User CmSetup silent 
+    doautocmd User CmSetup
+    " remove executed CmSetup, so that when the User CmSetup is lazy
+    " registered, we can doautocmd again
+    autocmd! User CmSetup
+endfunc
+
 func! s:changetick()
 	" return [b:changedtick , getcurpos()]
 	" Note: changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
@@ -474,6 +481,7 @@ endfunc
 func! s:check_rtp()
     if s:old_rtp != &rtp
         let s:old_rtp = &rtp
+        call s:cm_setup()
         call s:notify_core_channel('cm_detect_modules')
     endif
 endfunc
