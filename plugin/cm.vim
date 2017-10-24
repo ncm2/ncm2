@@ -7,8 +7,7 @@ if !has('nvim') && v:version<800
     finish
 endif
 
-" simply ignore files larger than 1M, for performance
-let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
+let g:cm_buffer_size_limit = get(g:, 'cm_buffer_size_limit', 1000000)
 
 " multithreadig, saves more memory, enabled by default
 if !exists('g:cm_multi_threading')
@@ -35,28 +34,14 @@ endif
 
 let g:cm_auto_popup = get(g:,'cm_auto_popup',1)
 
-" Wait for an interval before candidate calculation, to improve editor
-" performance for fast typing.
 let g:cm_complete_start_delay = get(g:,'cm_complete_start_delay', 0)
 
-" Wait for an interval before popping up, in milliseconds, this would reduce
-" the popup menu flickering when multiple sources are updating the popup menu
-" in a short interval, use an interval long enough for computer and short
-" enough for human
-" The name cm_complete_delay is deprecated
 let g:cm_complete_popup_delay = get(g:, 'cm_complete_popup_delay', get(g:, 'cm_complete_delay', 50))
 
-" Automatically enable all registered sources by default. Set it to 0 if you
-" want to manually enable the registered sources you want by
-" g:cm_sources_override.
 let g:cm_sources_enable = get(g:,'cm_sources_enable',1)
 
-" used to override default options of sources
 let g:cm_sources_override = get(g:,'cm_sources_override',{})
 
-" format: [ (minimal priority, min length), ()]
-" the name cm_refresh_default_min_word_len is deprecated, it will be removed
-" in the future
 let g:cm_refresh_length = get(g:, 'cm_refresh_length', get(g:, 'cm_refresh_default_min_word_len', [[1, 4], [7, 3]]))
 
 let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
