@@ -1,6 +1,6 @@
 
 if !has('nvim') && v:version<800
-	finish
+    finish
 endif
 
 " simply ignore files larger than 1M, for performance
@@ -8,25 +8,25 @@ let g:cm_buffer_size_limit = get(g:,'cm_buffer_size_limit',1000000)
 
 " multithreadig, saves more memory, enabled by default
 if !exists('g:cm_multi_threading')
-	if $NVIM_NCM_MULTI_THREAD == ''
-		let g:cm_multi_threading = 1
-	else
-		let g:cm_multi_threading = $NVIM_NCM_MULTI_THREAD
-	endif
+    if $NVIM_NCM_MULTI_THREAD == ''
+        let g:cm_multi_threading = 1
+    else
+        let g:cm_multi_threading = $NVIM_NCM_MULTI_THREAD
+    endif
 endif
 
 let g:cm_matcher = get(g:,'cm_matcher',{'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'})
 
 if !exists('g:cm_completekeys')
-	if g:cm_matcher['module'] == 'cm_matchers.prefix_matcher'
-		" <Plug>(cm_complete) has no flickering issue with prefix_matcher. But
-		" it has terrible popup flickering issue with fuzzy_matcher.
-		let g:cm_completekeys = "\<Plug>(cm_complete)"
-	else
-		" <Plug>(cm_completefunc) has no popup flickering with fuzzy matcher.
-		" But it has cursor flickering issue
-		let g:cm_completekeys = "\<Plug>(cm_completefunc)"
-	endif
+    if g:cm_matcher['module'] == 'cm_matchers.prefix_matcher'
+        " <Plug>(cm_complete) has no flickering issue with prefix_matcher. But
+        " it has terrible popup flickering issue with fuzzy_matcher.
+        let g:cm_completekeys = "\<Plug>(cm_complete)"
+    else
+        " <Plug>(cm_completefunc) has no popup flickering with fuzzy matcher.
+        " But it has cursor flickering issue
+        let g:cm_completekeys = "\<Plug>(cm_completefunc)"
+    endif
 endif
 
 let g:cm_auto_popup = get(g:,'cm_auto_popup',1)
@@ -60,37 +60,37 @@ let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
 " use did_plugin_ultisnips to detect the installation of ultisnips
 " https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
 au User CmSetup if exists('g:did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
-		\ 'priority': 7, 
-		\ 'abbreviation': 'Snip',
-		\ 'word_pattern': '\S+',
-		\ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
-		\ }) | endif
+            \ 'priority': 7, 
+            \ 'abbreviation': 'Snip',
+            \ 'word_pattern': '\S+',
+            \ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
+            \ }) | endif
 
 au User CmSetup if exists('g:loaded_neosnippet') | call cm#register_source({'name' : 'cm-neosnippet',
-		\ 'priority': 7, 
-		\ 'abbreviation': 'Snip',
-		\ 'word_pattern': '\S+',
-		\ 'cm_refresh': 'cm#sources#neosnippet#cm_refresh',
-		\ }) | endif
+            \ 'priority': 7, 
+            \ 'abbreviation': 'Snip',
+            \ 'word_pattern': '\S+',
+            \ 'cm_refresh': 'cm#sources#neosnippet#cm_refresh',
+            \ }) | endif
 
 au User CmSetup if exists('g:snipMateSources') | call cm#register_source({'name' : 'cm-snipmate',
-		\ 'priority': 7,
-		\ 'abbreviation': 'Snip',
-		\ 'word_pattern': '\S+',
-		\ 'cm_refresh': 'cm#sources#snipmate#cm_refresh',
-		\ }) | endif
+            \ 'priority': 7,
+            \ 'abbreviation': 'Snip',
+            \ 'word_pattern': '\S+',
+            \ 'cm_refresh': 'cm#sources#snipmate#cm_refresh',
+            \ }) | endif
 
 " css
 " the omnifunc pattern is PCRE
 au User CmSetup call cm#register_source({'name' : 'cm-css',
-        \ 'priority': 9, 
-        \ 'scoping': 1,
-        \ 'scopes': ['css','scss'],
-        \ 'abbreviation': 'css',
-        \ 'word_pattern': '[\w\-]+',
-        \ 'cm_refresh_patterns':['[\w\-]+\s*:\s+'],
-        \ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
-        \ })
+            \ 'priority': 9, 
+            \ 'scoping': 1,
+            \ 'scopes': ['css','scss'],
+            \ 'abbreviation': 'css',
+            \ 'word_pattern': '[\w\-]+',
+            \ 'cm_refresh_patterns':['[\w\-]+\s*:\s+'],
+            \ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
+            \ })
 
 func! s:startup(...)
     if get(g:,'cm_smart_enable',1)
