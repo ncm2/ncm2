@@ -61,40 +61,10 @@ let g:cm_refresh_length = get(g:, 'cm_refresh_length', get(g:, 'cm_refresh_defau
 
 let g:cm_completeopt=get(g:,'cm_completeopt','menu,menuone,noinsert,noselect')
 
-" use did_plugin_ultisnips to detect the installation of ultisnips
-" https://github.com/SirVer/ultisnips/blob/76ebfec3cf7340a1edd90ea052b16910733c96b0/autoload/UltiSnips.vim#L1
-au User CmSetup if exists('g:did_plugin_ultisnips') | call cm#register_source({'name' : 'cm-ultisnips',
-            \ 'priority': 7, 
-            \ 'abbreviation': 'Snip',
-            \ 'word_pattern': '\S+',
-            \ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
-            \ }) | endif
-
-au User CmSetup if exists('g:loaded_neosnippet') | call cm#register_source({'name' : 'cm-neosnippet',
-            \ 'priority': 7, 
-            \ 'abbreviation': 'Snip',
-            \ 'word_pattern': '\S+',
-            \ 'cm_refresh': 'cm#sources#neosnippet#cm_refresh',
-            \ }) | endif
-
-au User CmSetup if exists('g:snipMateSources') | call cm#register_source({'name' : 'cm-snipmate',
-            \ 'priority': 7,
-            \ 'abbreviation': 'Snip',
-            \ 'word_pattern': '\S+',
-            \ 'cm_refresh': 'cm#sources#snipmate#cm_refresh',
-            \ }) | endif
-
-" css
-" the omnifunc pattern is PCRE
-au User CmSetup call cm#register_source({'name' : 'cm-css',
-            \ 'priority': 9, 
-            \ 'scoping': 1,
-            \ 'scopes': ['css','scss'],
-            \ 'abbreviation': 'css',
-            \ 'word_pattern': '[\w\-]+',
-            \ 'cm_refresh_patterns':['[\w\-]+\s*:\s+'],
-            \ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
-            \ })
+au User CmSetup if exists('g:did_plugin_ultisnips') | call cm#sources#ultisnips#init() | endif
+au User CmSetup if exists('g:loaded_neosnippet') | call cm#sources#neosnippet#init() | endif
+au User CmSetup if exists('g:snipMateSources') | call cm#sources#snipmate#init() | endif
+au User CmSetup call cm#sources#css#init()
 
 func! s:startup(...)
     if get(g:,'cm_smart_enable',1)

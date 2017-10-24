@@ -1,4 +1,13 @@
 
+func! cm#sources#neosnippet#init()
+    call cm#register_source({'name' : 'cm-neosnippet',
+                \ 'priority': 7, 
+                \ 'abbreviation': 'Snip',
+                \ 'word_pattern': '\S+',
+                \ 'cm_refresh': 'cm#sources#neosnippet#cm_refresh',
+                \ }) 
+endfunc
+
 function! cm#sources#neosnippet#cm_refresh(info, ctx)
 	let l:snips = values(neosnippet#helpers#get_completion_snippets())
 	let l:matches = map(l:snips, '{"word":v:val["word"], "dup":1, "icase":1, "menu": "Snip: " . v:val["menu_abbr"], "is_snippet": 1}')

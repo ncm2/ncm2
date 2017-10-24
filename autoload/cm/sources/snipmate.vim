@@ -1,4 +1,13 @@
 
+function! cm#sources#snipmate#init()
+    call cm#register_source({'name' : 'cm-snipmate',
+                \ 'priority': 7,
+                \ 'abbreviation': 'Snip',
+                \ 'word_pattern': '\S+',
+                \ 'cm_refresh': 'cm#sources#snipmate#cm_refresh',
+                \ }) 
+endfunction
+
 function! cm#sources#snipmate#cm_refresh(info, ctx)
 	let l:word    = snipMate#WordBelowCursor()
 	let l:matches = map(snipMate#GetSnippetsForWordBelowCursorForComplete(''),'extend(v:val,{"dup":1, "is_snippet":1})')

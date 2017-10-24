@@ -1,5 +1,14 @@
 
-func! cm#sources#ultisnips#cm_refresh(opt,ctx)
+func! cm#sources#ultisnips#init()
+    call cm#register_source({'name' : 'cm-ultisnips',
+                \ 'priority': 7, 
+                \ 'abbreviation': 'Snip',
+                \ 'word_pattern': '\S+',
+                \ 'cm_refresh': 'cm#sources#ultisnips#cm_refresh',
+                \ })
+endfunc
+
+func! cm#sources#ultisnips#cm_refresh(opt, ctx)
 
 	let l:snips = UltiSnips#SnippetsInCurrentScope()
 
