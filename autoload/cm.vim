@@ -1,7 +1,3 @@
-""
-" An experimental completion framework
-"
-
 if get(s:,'init','0')
     finish
 endif
@@ -15,7 +11,7 @@ inoremap <silent> <expr> <Plug>(cm_inject_snippet) cm#snippet#check_and_inject()
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
 " 
-" They all work. use g:cm_completekeys to decide which one to use.
+" use g:cm_completekeys to decide which one to use.
 inoremap <silent> <Plug>(cm_complete) <C-r>=cm#_complete()<CR>
 inoremap <silent> <Plug>(cm_completefunc) <c-x><c-u>
 inoremap <silent> <Plug>(cm_omnifunc) <c-x><c-o>
@@ -47,16 +43,6 @@ func! cm#enable_for_buffer(...)
     endif
 
     call s:cm_setup()
-
-    " remove to avoid conflict: #34
-    " NCM uses cursorpos to detect changes currently, There's no need to keep
-    " this mapping.
-    "
-    " " Notice: Workaround for neovim's bug. When the popup menu is visible, and
-    " " no item is selected, an enter key will close the popup menu, change and
-    " " move nothong, and then trigger TextChangedI and CursorMovedI
-    " " https://github.com/neovim/neovim/issues/5997
-    " inoremap <expr> <buffer> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 
     let b:cm_enable = 1
     if len(a:000)
@@ -98,15 +84,6 @@ func! cm#disable_for_buffer()
 endfunc
 
 
-"""
-" before calculating the completion candidates, use this function to get the
-" current execution context
-"
-" If the context changed during calculation, the call to
-" cm#complete(source,context, startcol, matches) will be ignored
-"
-" you could use `l:context != cm#context()` to determine wether the context
-" has changed by yourself
 func! cm#context()
     let l:ret = {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
     let l:ret['lnum'] = l:ret['curpos'][1]
@@ -129,45 +106,21 @@ func! cm#context_changed(ctx)
     return getcurpos()!=a:ctx['curpos']
 endfunc
 
-
-
-"""
-" Use this function to register your completion source and detect the
-" existance of this plugin:
-"
-" try
-"   call cm#register_source(info)
-" catch
-"   " this plugin is not installed yet
-"   finish
-" endtry
-"
-" @param info  
-"	{'name':'cm-buffer-keyword', 'priority': 5, 'abbreviation': 'bword'}
-"
-" priority shoud be defined 1 to 9, here's recommended definition:
-"	2 keyword from the otherfiles, from user's openning browsers, etc
-" 	4 keyword from openning buffer
-" 	5 keyword from current buffer
-" 	6 file path
-" 	7 snippet hint
-" 	8 language specific keyword, but not smart
-" 	9 smart programming language aware completion
 func! cm#register_source(info)
 
     let l:name = a:info['name']
 
     " if registered before, ignore this call
-    if has_key(g:_cm_sources,l:name)
+    if has_key(g:_cm_sources, l:name)
         return
     endif
 
-    if has_key(g:cm_sources_override,l:name)
+    if has_key(g:cm_sources_override, l:name)
         " override source default options
-        call extend(a:info,g:cm_sources_override[l:name])
+        call extend(a:info, g:cm_sources_override[l:name])
     endif
 
-    let a:info['enable'] = get(a:info,'enable',g:cm_sources_enable)
+    let a:info['enable'] = get(a:info, 'enable', g:cm_sources_enable)
 
     " the name cm_refresh_min_word_len is deprecated, it will be removed
     " in the future
@@ -218,14 +171,6 @@ func! cm#disable_source(name)
 endfunc
 
 
-"""
-" @param source name of the completion source. 
-" @param startcol `help complete()`
-" @param matches `help complete()`
-"
-" @return 
-"   0 cm accepted
-"	1 context changed
 func! cm#complete(src, context, startcol, matches, ...)
 
     let l:refresh = 0
@@ -615,6 +560,8 @@ func! cm#menu_selected()
     " when the popup menu is visible, v:completed_item will be the
     " current_selected item
     " if v:completed_item is empty, no item is selected
+    " Note: If arrow key is used instead of <c-n> and <c-p>, cm#menu_selected
+    " will not work.
     return pumvisible() && !empty(v:completed_item)
 endfunc
 

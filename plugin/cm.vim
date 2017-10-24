@@ -1,3 +1,7 @@
+if get(s:,'init','0')
+    finish
+endif
+let s:init = 1
 
 if !has('nvim') && v:version<800
     finish
