@@ -23,19 +23,23 @@ inoremap <silent> <expr> <Plug>(cm_force_refresh) (cm#menu_selected()?"\<c-y>\<c
 let s:rpcnotify = 'rpcnotify'
 let s:jobstart = 'jobstart'
 let s:jobstop = 'jobstop'
-let g:_cm_servername = v:servername
+func! s:servername()
+    return v:servername
+endfunc
+
 if has('nvim')==0
     let s:rpcnotify = 'neovim_rpc#rpcnotify'
     let s:jobstart = 'neovim_rpc#jobstart'
     let s:jobstop = 'neovim_rpc#jobstop'
+    func! s:servername()
+        return neovim_rpc#serveraddr()
+    endfunc
 endif
 
 
 func! cm#enable_for_buffer(...)
 
-    if has('nvim')==0
-        let g:_cm_servername = neovim_rpc#serveraddr()
-    endif
+    let g:_cm_servername = s:servername()
 
     if s:already_setup == 0
         let s:already_setup = 1
