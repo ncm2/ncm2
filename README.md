@@ -101,9 +101,9 @@ completion in html style/script tag.
   [github-emoji](https://github.com/roxma/ncm-github/blob/master/pythonx/cm_sources/github_emoji.py),
   [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)
 
-Please upload your new plugin, or possibly screenshot
-[here](https://github.com/roxma/nvim-completion-manager/issues/12) after you
-created the extension.
+Please announce your new plugin
+[here](https://github.com/roxma/nvim-completion-manager/issues/12) after
+you've created the extension.
 
 
 ## Requirements
