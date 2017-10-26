@@ -639,6 +639,15 @@ better option rather than a timer or the limited `TextChangedI`.
 ==============================================================================
 7. Minimal Source Examples			*NCM-source-examples*
 
+NCM has both vimscript API and python API for writing completion source. 
+
+If you just want to write a completion source, it's easier to use the python
+API. The completion source will run in NCM's process.
+
+Sometimes it's more memory efficient for a feature-rich plugin to keep the
+completion running in the same system process along with other features.  In
+this case, you should call the vimscript API from your plugin process.
+
 7.1 Implementation in pure vimscript		*NCM-vimscript-source*
 
 This minimal example shows how to popup "foo_bar" and "foo_baz" when "/" is
