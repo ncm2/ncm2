@@ -69,7 +69,7 @@ completion in html style/script tag.
 | Ultisnips hint           | builtin, requires [Ultisnips](https://github.com/SirVer/ultisnips)                     |
 | Snipmate hint            | builtin, requires [vim-snipmate](https://github.com/garbas/vim-snipmate)               |
 | neosnippet hint          | builtin, requires [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)           |
-| Language Server Protocol | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
+| Language Server Protocol | [autozimu/LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)    |
 | C/C++                    | [clang_complete](https://github.com/roxma/clang_complete) [DEPRECATED]                 |
 | C/C++                    | [ncm-clang](https://github.com/roxma/ncm-clang)                                        |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
