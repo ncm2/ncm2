@@ -92,6 +92,7 @@ completion in html style/script tag.
 | lbdb (addressbook)       | [katsika/ncm-lbdb](https://github.com/katsika/ncm-lbdb)                                |
 | Java                     | [sassanh/nvim-cm-eclim](https://github.com/sassanh/nvim-cm-eclim)                      |
 | TypeScript               | [mhartington/nvim-typescript](https://github.com/mhartington/nvim-typescript)          |
+| Word from other buffers  | [fgrsnau/ncm-otherbuf](https://github.com/fgrsnau/ncm-otherbuf)
 
 
 ## How to extend this framework?
