@@ -69,29 +69,29 @@ completion in html style/script tag.
 | Ultisnips hint           | builtin, requires [Ultisnips](https://github.com/SirVer/ultisnips)                     |
 | Snipmate hint            | builtin, requires [vim-snipmate](https://github.com/garbas/vim-snipmate)               |
 | neosnippet hint          | builtin, requires [neosnippet.vim](https://github.com/Shougo/neosnippet.vim)           |
-| Language Server Protocal | [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)             |
+| Language Server Protocal | [autozimu/LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)    |
 | C/C++                    | [clang_complete](https://github.com/roxma/clang_complete) [DEPRECATED]                 |
 | C/C++                    | [ncm-clang](https://github.com/roxma/ncm-clang)                                        |
 | Javascript               | [nvim-cm-tern](https://github.com/roxma/nvim-cm-tern)                                  |
 | Javascript               | [nvim-cm-flow](https://github.com/roxma/ncm-flow)                                      |
 | elm                      | [ncm-elm-oracle](https://github.com/roxma/ncm-elm-oracle)                              |
-| Clojure                  | [async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                        |
+| Clojure                  | [clojure-async-clj-omni](https://github.com/clojure-vim/async-clj-omni)                |
 | Rust                     | [nvim-cm-racer](https://github.com/roxma/nvim-cm-racer)                                |
-| Vimscript                | [neco-vim](https://github.com/Shougo/neco-vim)                                         |
+| Vimscript                | [Shougo/neco-vim](https://github.com/Shougo/neco-vim)                                  |
 | Ruby                     | [ncm-rct-complete](https://github.com/roxma/ncm-rct-complete)                          |
 | PHP                      | [LanguageServer-php-neovim](https://github.com/roxma/LanguageServer-php-neovim)        |
 | PHP                      | [ncm-phpactor](https://github.com/roxma/ncm-phpactor)                                  |
-| Swift                    | [nvim-cm-swift-completer](https://github.com/dafufer/nvim-cm-swift-completer)          |
-| gtags completion         | [gen_tags.vim](https://github.com/jsfaint/gen_tags.vim)                                |
-| syntax completion        | [neco-syntax](https://github.com/Shougo/neco-syntax)                                   |
-| include completion       | [neoinclude](https://github.com/Shougo/neoinclude.vim)                                 |
+| Swift                    | [dafufer/nvim-cm-swift-completer](https://github.com/dafufer/nvim-cm-swift-completer)  |
+| gtags completion         | [jsfaint/gen_tags.vim](https://github.com/jsfaint/gen_tags.vim)                        |
+| syntax completion        | [Shougo/neco-syntax](https://github.com/Shougo/neco-syntax)                            |
+| include completion       | [Shougo/neoinclude](https://github.com/Shougo/neoinclude.vim)                          |
 | github completion        | [ncm-github](https://github.com/roxma/ncm-github)                                      |
 | mutt mails               | [#97 mutt-aliases.vim](https://github.com/roxma/nvim-completion-manager/issues/97)     |
 | deoplete                 | [#50 deoplete](https://github.com/roxma/nvim-completion-manager/issues/50)             |
-| css                      | [ncm-css](https://github.com/calebeby/ncm-css)                                         |
-| lbdb (addressbook)       | [ncm-lbdb](https://github.com/katsika/ncm-lbdb)                                        |
-| Java                     | [nvim-cm-eclim](https://github.com/sassanh/nvim-cm-eclim)                              |
-| TypeScript               | [nvim-typescript](https://github.com/mhartington/nvim-typescript)                      |
+| css                      | [calebeby/ncm-css](https://github.com/calebeby/ncm-css)                                |
+| lbdb (addressbook)       | [katsika/ncm-lbdb](https://github.com/katsika/ncm-lbdb)                                |
+| Java                     | [sassanh/nvim-cm-eclim](https://github.com/sassanh/nvim-cm-eclim)                      |
+| TypeScript               | [mhartington/nvim-typescript](https://github.com/mhartington/nvim-typescript)          |
 
 
 ## How to extend this framework?
