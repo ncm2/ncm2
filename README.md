@@ -93,6 +93,7 @@ completion in html style/script tag.
 | Java                     | [sassanh/nvim-cm-eclim](https://github.com/sassanh/nvim-cm-eclim)                      |
 | TypeScript               | [mhartington/nvim-typescript](https://github.com/mhartington/nvim-typescript)          |
 | Word from other buffers  | [fgrsnau/ncm-otherbuf](https://github.com/fgrsnau/ncm-otherbuf)
+| R                        | [gaalcaras/ncm-R](https://github.com/gaalcaras/ncm-R)
 
 
 ## How to extend this framework?
