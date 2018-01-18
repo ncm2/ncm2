@@ -111,7 +111,7 @@ you've created the extension.
 ## Requirements
 
 - For Neovim:
-  - `has("python3")`
+  - `echo has("python3")`
 - For Vim 8:
   - [roxma/vim-hug-neovim-rpc](https://github.com/roxma/vim-hug-neovim-rpc)
   - `g:python3_host_prog` pointed to your python3 executable, or `echo
