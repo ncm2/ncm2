@@ -107,7 +107,7 @@ for NCM.
 		\ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
 		\ })
 <
-Note: 'omnifunc' is implemented in a synchronouse style, and vim-vimscript is
+Note: 'omnifunc' is implemented in a synchronous style, and vim-vimscript is
 single threaded, it would potentially block the ui with the introduction of a
 heavy weight 'omnifunc', for example the builtin phpcomplete. If you get some
 time, please try implementing a source for NCM as a replacement for the old
