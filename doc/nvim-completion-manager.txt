@@ -243,6 +243,8 @@ g:cm_matcher.module
 				matcher.
 			`"cm_matchers.abbrev_matcher"`
 				A more intuitive version of fuzzy matching.
+				This module requires the ag binary from 
+				the_silver_searcher
 
 			Note: If you use non-prefix matcher, and haven't set
 			the |g:cm_completekeys| option, NCM will use
