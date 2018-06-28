@@ -1,5 +1,8 @@
+*.swp
+*.pyc
 __pycache__
 /node_modules
 /doc/tags
-*.swp
-*.pyc
+/.envrc
+/test.vim
+/nvim.log*
