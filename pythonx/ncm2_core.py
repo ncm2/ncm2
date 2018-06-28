@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import copy
 import re
 import vim
@@ -153,6 +155,7 @@ class Ncm2Core(Ncm2Base):
                 ctx['early_cache'] = False
                 ctx['source'] = name
                 ctx['filter'] = self.get_filter_opt(data, sr)
+                ctx['sorter'] = self.get_sorter_opt(data, sr)
 
                 if not self.check_source_notify(data, sr, ctx):
                     continue
@@ -517,13 +520,23 @@ class Ncm2Core(Ncm2Base):
         if 'filter' in sr:
             return sr['filter']
         else:
-            return data['default_filter']
+            return data['filter']
+
+    def get_sorter_opt(self, data, sr):
+        if 'sorter' in sr:
+            return sr['sorter']
+        else:
+            return data['sorter']
 
     def matches_filter(self, data, sr, base, matches):
         opt = self.get_filter_opt(data, sr)
 
         filt = self.get_filter(opt)
         matches = filt.filter(base, matches)
+
+        opt = self.get_sorter_opt(data, sr)
+        sorter = self.get_sorter(opt)
+        sorter.sort(matches)
 
         for opt in data['extra_filter']:
             filt = self.get_filter(opt)

@@ -86,18 +86,31 @@ class Ncm2Base:
             formalized.append(e)
         return formalized
 
-    def get_filter(self, filt):
-        if type(filt) is dict:
-            name = filt['name']
-            args = filt.get('args', [])
+    def get_filter(self, opt):
+        if type(opt) is dict:
+            name = opt['name']
+            args = opt.get('args', [])
         else:
-            name = filt
+            name = opt
             args = []
 
         mod_name = "ncm2_filter.%s" % name
         mod = importlib.import_module(mod_name)
 
         return mod.Filter(*args)
+
+    def get_sorter(self, opt):
+        if type(opt) is dict:
+            name = opt['name']
+            args = opt.get('args', [])
+        else:
+            name = opt
+            args = []
+
+        mod_name = "ncm2_sorter.%s" % name
+        mod = importlib.import_module(mod_name)
+
+        return mod.Sorter(*args)
 
     def lccol2pos(self, lnum, ccol, src: str):
         """

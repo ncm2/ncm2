@@ -14,7 +14,8 @@ call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
 call s:opt('ncm2#popup_delay', 50)
 call s:opt('ncm2#complete_length', [[1,4],[7,3]])
-call s:opt('ncm2#default_filter', 'prefix')
+call s:opt('ncm2#filter', 'prefix')
+call s:opt('ncm2#sorter', 'swapcase_word')
 call s:opt('ncm2#extra_filter', [])
 let ncm2#core_data = {}
 
@@ -324,7 +325,8 @@ func! ncm2#_core_data(...)
                 \ 'complete_key': g:ncm2#complete_key,
                 \ 'auto_popup': g:ncm2#auto_popup,
                 \ 'complete_length': g:ncm2#complete_length,
-                \ 'default_filter': g:ncm2#default_filter,
+                \ 'filter': g:ncm2#filter,
+                \ 'sorter': g:ncm2#sorter,
                 \ 'extra_filter': g:ncm2#extra_filter,
                 \ 'context': ncm2#context(),
                 \ 'sources': s:sources,
