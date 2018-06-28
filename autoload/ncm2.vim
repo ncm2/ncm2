@@ -2,7 +2,6 @@ if get(s:,'loaded','0')
     finish
 endif
 let s:loaded = 1
-let s:already_setup = 0
 
 func! s:opt(name, default)
     let val = get(g:, a:name, a:default)
@@ -17,6 +16,7 @@ call s:opt('ncm2#popup_delay', 50)
 call s:opt('ncm2#complete_length', [[1,4],[7,3]])
 call s:opt('ncm2#default_filter', 'prefix')
 call s:opt('ncm2#extra_filter', [])
+let ncm2#core_data = {}
 
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
@@ -44,8 +44,8 @@ let s:subscope_detectors = {}
 
 augroup ncm2_hooks
     autocmd!
-    autocmd User Ncm2Setup silent 
-    autocmd User Ncm2EnableForBufferPre call s:ncm2_setup()
+    autocmd User Ncm2EnableForBufferPre silent
+    autocmd User Ncm2CoreData silent
     autocmd User Ncm2EnableForBufferPost call ncm2#_check_rtp() 
     autocmd CursorHold,CursorHoldI * call ncm2#_check_rtp()
 augroup END
@@ -57,10 +57,6 @@ augroup ncm2_auto_trigger
 augroup END
 
 func! ncm2#enable_for_buffer()
-    if s:already_setup == 0
-        let s:already_setup = 1
-    endif
-
     doautocmd User Ncm2EnableForBufferPre
 
     let b:ncm2_enable = 1
@@ -244,18 +240,8 @@ endfunc
 func! ncm2#_check_rtp()
     if s:old_rtp != &rtp
         let s:old_rtp = &rtp
-        call s:ncm2_setup()
         call s:load_plugin()
     endif
-endfunc
-
-func! s:ncm2_setup()
-    "  avoid the message 'No matching autocommands' for doautocmd
-    autocmd User Ncm2Setup silent 
-    doautocmd User Ncm2Setup
-    " remove executed Ncm2Setup, so that when the User Ncm2Setup is lazy
-    " registered, we can doautocmd again
-    autocmd! User Ncm2Setup
 endfunc
 
 func! ncm2#auto_trigger()
@@ -332,8 +318,13 @@ func! ncm2#_core_data(...)
         let event = a:1
     endif
 
+    let g:ncm2#core_data = {}
+
+    " some ncm-plugin might need extra data
+    doautocmd User Ncm2CoreData
+
     " data sync between ncm2.vim and ncm2_core.py
-    let data = {
+    let data = extend(g:ncm2#core_data, {
                 \ 'complete_key': g:ncm2#complete_key,
                 \ 'auto_popup': g:ncm2#auto_popup,
                 \ 'complete_length': g:ncm2#complete_length,
@@ -343,7 +334,9 @@ func! ncm2#_core_data(...)
                 \ 'sources': s:sources,
                 \ 'subscope_detectors': s:subscope_detectors,
                 \ 'lines': []
-                \ }
+                \ }, 'force')
+
+    let g:ncm2#core_data = {}
 
     " if subscope detector is available for this buffer, we need to send
     " the whole buffer for on_complete event
