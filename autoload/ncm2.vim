@@ -226,10 +226,6 @@ func! ncm2#_complete()
     return ''
 endfunc
 
-func! s:changetick()
-    return [b:changedtick , getcurpos()]
-endfunc
-
 func! s:should_skip()
     return !get(b:,'ncm2_enable',0) ||
                 \ &paste!=0 ||
