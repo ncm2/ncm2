@@ -42,8 +42,8 @@ class Ncm2Core(Ncm2Base):
     def notify(self, method: str, *args):
         self.nvim.call(method, *args, async=True)
 
-    def word_pattern(self, ctx, info):
-        pat = info.get('word_pattern', None)
+    def word_pattern(self, ctx, sr):
+        pat = sr.get('word_pattern', None)
         scope = ctx.get('scope', ctx.get('filetype', '')).lower()
 
         if type(pat) == dict:
@@ -367,6 +367,7 @@ class Ncm2Core(Ncm2Base):
             word_len = 0
 
         ctx['match_end'] = len(word_removed)
+        ctx['word_pattern'] = self.word_pattern(ctx, sr)
 
         # check source extra patterns
         for pat in patterns:
@@ -574,7 +575,7 @@ class Ncm2Core(Ncm2Base):
             tag = sr.get('mark', '')
             if tag == '':
                 continue
-            e['menu'] = "<%s> %s" % (tag, e['menu'])
+            e['menu'] = "[%s] %s" % (tag, e['menu'])
         return matches
 
     def matches_do_popup(self, ctx, startccol, matches):

@@ -2,12 +2,12 @@ import sys
 import os
 from importlib import import_module
 import logging
-from neovim.api import Nvim
 from neovim import attach, setup_logging
 import platform
 from subprocess import Popen
 from os import path
 import unicodedata
+from copy import deepcopy
 
 __all__ = ['Ncm2Base', 'Ncm2Source', 'Popen']
 
@@ -48,7 +48,7 @@ def getLogger(name: str):
 
 
 class Ncm2Base:
-    def __init__(self, nvim: Nvim):
+    def __init__(self, nvim):
         self.nvim = nvim
 
     def matcher_get(self, opts):
@@ -86,7 +86,7 @@ class Ncm2Base:
         if type(item) == type(''):
             e['word'] = item
         else:
-            e = copy.deepcopy(item)
+            e = deepcopy(item)
 
         e['icase'] = 1
         if 'menu' not in e or type(e['menu']) != str:
@@ -182,8 +182,8 @@ class Ncm2Base:
 
 class Ncm2Source(Ncm2Base):
     def __init__(self, nvim):
-        super.__init__(nvim)
+        super(Ncm2Source, self).__init__(nvim)
 
-    def complete(self, ctx: dict, startccol: int, matches: list, refresh=False):
-        self.nvim.call('cm#complete', ctx, startccol,
+    def complete(self, ctx, startccol, matches, refresh=False):
+        self.nvim.call('ncm2#complete', ctx, startccol,
                        matches, refresh, async=True)
