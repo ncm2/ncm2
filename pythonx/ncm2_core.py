@@ -189,6 +189,12 @@ class Ncm2Core(Ncm2Base):
         name = sr['name']
         cache = self._matches.get(name, None)
 
+        # ncm2 doesn't cannot detect <CR> key to cleanup cache, check the cache
+        # here
+        if cache and cache['context']['lnum'] != ctx['lnum']:
+            self._matches[name] = None
+            cache = None
+
         if not sr['enable']:
             return False
 
