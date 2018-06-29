@@ -7,13 +7,12 @@ from ncm2 import Ncm2Base, getLogger
 import json
 import glob
 from os import path, environ
-import importlib
+from importlib import import_module
 
 # don't import this module by other processes
 assert environ['NVIM_YARP_MODULE'] == 'ncm2_core'
 
 logger = getLogger(__name__)
-
 
 class Ncm2Core(Ncm2Base):
 
@@ -90,16 +89,13 @@ class Ncm2Core(Ncm2Base):
 
         # auto find scopers
         for py in paths:
-            if not py:
+            if py in self._loaded_plugins:
                 continue
-
-            mod = os.path.splitext(os.path.basename(py))[0]
-            mod = "ncm2_subscope_detector.%s" % mod
-            if mod in self._loaded_modules:
-                continue
+            self._loaded_plugins[py] = True
 
             try:
-                self._loaded_modules[mod] = True
+                mod = os.path.splitext(os.path.basename(py))[0]
+                mod = "ncm2_subscope_detector.%s" % mod
                 m = importlib.import_module(mod)
             except Exception as ex:
                 logger.exception('importing scoper <%s> failed', py)
@@ -154,8 +150,8 @@ class Ncm2Core(Ncm2Base):
                 ctx = copy.deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
                 ctx['source'] = name
-                ctx['filter'] = self.get_filter_opt(data, sr)
-                ctx['sorter'] = self.get_sorter_opt(data, sr)
+                ctx['matcher'] = self.matcher_opt_get(data, sr)
+                ctx['sorter'] = self.sorter_opt_get(data, sr)
 
                 if not self.check_source_notify(data, sr, ctx):
                     continue
@@ -516,31 +512,54 @@ class Ncm2Core(Ncm2Base):
 
         self.matches_do_popup(ctx, startccol, matches)
 
-    def get_filter_opt(self, data, sr):
-        if 'filter' in sr:
-            return sr['filter']
+    def matcher_opt_get(self, data, sr):
+        if 'matcher' in sr:
+            return sr['matcher']
         else:
-            return data['filter']
+            return data['matcher']
 
-    def get_sorter_opt(self, data, sr):
+    def sorter_opt_get(self, data, sr):
         if 'sorter' in sr:
             return sr['sorter']
         else:
             return data['sorter']
 
+    def filter_get(self, opts):
+        if type(opts) is str:
+            opts = [opts]
+
+        filts = []
+        for opt in opts:
+            fields = opt.split(',')
+            name = fields[0]
+            args = fields[1:]
+
+            mod = import_module('ncm2_filter.' + name)
+            filts.append(mod.Filter(*args))
+
+        def filt(base, matches):
+            for fl in filts:
+                matches = fl.filter(base, matches)
+            return matches
+
+        return filt
+
     def matches_filter(self, data, sr, base, matches):
-        opt = self.get_filter_opt(data, sr)
+        opt = self.matcher_opt_get(data, sr)
+        matcher = self.matcher_get(opt)
 
-        filt = self.get_filter(opt)
-        matches = filt.filter(base, matches)
+        tmp = []
+        for m in matches:
+            if matcher(base, m):
+                tmp.append(m)
+        matches = tmp
 
-        opt = self.get_sorter_opt(data, sr)
-        sorter = self.get_sorter(opt)
-        sorter.sort(matches)
+        opt = self.sorter_opt_get(data, sr)
+        sorter = self.sorter_get(opt)
+        matches = sorter(matches)
 
-        for opt in data['extra_filter']:
-            filt = self.get_filter(opt)
-            matches = filt.filter(base, matches)
+        filt = self.filter_get(data['filter'])
+        matches = filt(base, matches)
 
         return matches
 

@@ -14,9 +14,9 @@ call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
 call s:opt('ncm2#popup_delay', 50)
 call s:opt('ncm2#complete_length', [[1,4],[7,3]])
-call s:opt('ncm2#filter', 'prefix')
+call s:opt('ncm2#matcher', ['prefix'])
 call s:opt('ncm2#sorter', 'swapcase_word')
-call s:opt('ncm2#extra_filter', [])
+call s:opt('ncm2#filter', [])
 let ncm2#core_data = {}
 
 " use silent mapping that doesn't slower the terminal ui
@@ -325,9 +325,9 @@ func! ncm2#_core_data(...)
                 \ 'complete_key': g:ncm2#complete_key,
                 \ 'auto_popup': g:ncm2#auto_popup,
                 \ 'complete_length': g:ncm2#complete_length,
-                \ 'filter': g:ncm2#filter,
+                \ 'matcher': g:ncm2#matcher,
                 \ 'sorter': g:ncm2#sorter,
-                \ 'extra_filter': g:ncm2#extra_filter,
+                \ 'filter': g:ncm2#filter,
                 \ 'context': ncm2#context(),
                 \ 'sources': s:sources,
                 \ 'subscope_detectors': s:subscope_detectors,
