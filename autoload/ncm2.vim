@@ -37,7 +37,6 @@ let s:sources = {}
 let s:lasttick = []
 let s:popup_timer = 0
 let s:complete_timer = 0
-let s:old_rtp = &rtp
 let s:lock = {}
 let s:context = {}
 let s:startbcol = 1
@@ -46,10 +45,9 @@ let s:subscope_detectors = {}
 
 augroup ncm2_hooks
     autocmd!
-    autocmd User Ncm2EnableForBufferPre silent
-    autocmd User Ncm2CoreData silent
-    autocmd User Ncm2EnableForBufferPost call ncm2#_check_rtp() 
-    autocmd CursorHold,CursorHoldI * call ncm2#_check_rtp()
+    autocmd User Ncm2EnableForBufferPre,Ncm2EnableForBufferPost silent
+    autocmd User Ncm2CoreData silent 
+    autocmd OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
 augroup END
 
 func! ncm2#enable_for_buffer()
@@ -247,13 +245,6 @@ func! s:should_skip()
                 \ mode() != 'i'
 endfunc
 
-func! ncm2#_check_rtp()
-    if s:old_rtp != &rtp
-        let s:old_rtp = &rtp
-        call s:load_plugin()
-    endif
-endfunc
-
 func! ncm2#auto_trigger()
     call feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
@@ -362,10 +353,6 @@ func! s:try_rnotify(event, ...)
     return call(s:core.try_notify, [a:event, data] + a:000, s:core)
 endfunc
 
-func! s:load_plugin()
-    call s:try_rnotify('load_plugin', &rtp)
-endfunc
-
 func! s:warmup()
     if !get(b:, 'ncm2_enable', 0)
         return
@@ -374,7 +361,7 @@ func! s:warmup()
 endfunc
 
 func! ncm2#_core_started()
-    call s:load_plugin()
+    call s:try_rnotify('load_plugin', &rtp)
     call s:warmup()
 endfunc
 
