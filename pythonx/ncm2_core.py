@@ -14,6 +14,7 @@ assert environ['NVIM_YARP_MODULE'] == 'ncm2_core'
 
 logger = getLogger(__name__)
 
+
 class Ncm2Core(Ncm2Base):
 
     def __init__(self, nvim):
@@ -21,10 +22,11 @@ class Ncm2Core(Ncm2Base):
         super().__init__(nvim)
 
         # { '{source_name}': {'startccol': , 'matches'}
+        self._cache_lnum = 0
         self._matches = {}
+        self._last_popup = []
+        self._notified = {}
         self._subscope_detectors = {}
-        self._last_startccol = 0
-        self._last_matches = []
 
         self._loaded_plugins = {}
 
@@ -126,19 +128,9 @@ class Ncm2Core(Ncm2Base):
         root_ctx = data['context']
         root_ctx['manual'] = manual
 
+        self.cache_cleanup_check(root_ctx)
+
         contexts = self.detect_subscopes(data)
-
-        if manual:
-            # if this is forcing refresh, clear the cached variable to avoid
-            # being filtered by the self.do_popup function
-            self._last_matches = []
-            self._last_startccol = 0
-
-        # cleanup cache
-        if root_ctx['typed'] == '':
-            self._matches = {}
-        elif re.match(r'\s', root_ctx['typed'][-1]):
-            self._matches = {}
 
         # do notify_sources_to_refresh
         notifies = []
@@ -187,13 +179,8 @@ class Ncm2Core(Ncm2Base):
 
     def check_source_notify(self, data, sr, ctx):
         name = sr['name']
-        cache = self._matches.get(name, None)
 
-        # ncm2 doesn't cannot detect <CR> key to cleanup cache, check the cache
-        # here
-        if cache and cache['context']['lnum'] != ctx['lnum']:
-            self._matches[name] = None
-            cache = None
+        cache = self._matches.get(name, None)
 
         if not sr['enable']:
             return False
@@ -222,22 +209,41 @@ class Ncm2Core(Ncm2Base):
         else:
             # enable cached
             if cache:
+                logger.debug('<%s> enable cache', name)
                 cache['enable'] = True
 
-        if (cache and
-                not cache['refresh'] and
-                not manual and
-                cache['startccol'] == ctx['startccol'] and
-                cache['context'].get('match_end', 0) == ctx['match_end']):
-            logger.debug('<%s> was cached, <%s> candidates', name,
-                         len(cache['matches']))
-            return False
+        if not manual:
+            need_refresh = False
 
+            # if there's valid cache
+            if cache:
+                need_refresh = cache['refresh']
+                cc = cache['context']
+                ccs, cce = cache['startccol'], cc['match_end']
+                cs, ce = ctx['startccol'], ctx['match_end']
+                if (not need_refresh and
+                        ccs == cs and
+                        cce == ce):
+                    logger.debug('<%s> was cached, <%s> %s',
+                                 name, ccs, cache['matches'])
+                    return False
+
+            # we only notify once for each word
+            notified = self._notified.get(name, None)
+            if notified and not need_refresh:
+                ns, nb = notified['startccol'], notified['base']
+                cs, cb = ctx['startccol'], ctx['base']
+                if ns == cs and nb == cb[:len(nb)]:
+                    logger.debug('<%s> has been notified', name)
+                    return False
+
+        self._notified[name] = ctx
         return True
 
     def complete(self, data, ctx, startccol, matches, refresh):
-
         cur_ctx = data['context']
+        self.cache_cleanup_check(cur_ctx)
+
         name = ctx['source']
 
         sr = data['sources'].get(name, None)
@@ -300,10 +306,16 @@ class Ncm2Core(Ncm2Base):
         # startccol is set in self.source_check_patterns
         return ctx1['startccol'] == ctx2['startccol']
 
-    def on_insert_enter(self, _):
+    # InsertEnter, InsertLeave, or lnum changed
+    def cache_cleanup(self, *args):
         self._matches = {}
-        self._last_matches = []
-        self._last_startccol = 0
+        self._notified = {}
+        self._last_popup = []
+
+    def cache_cleanup_check(self, ctx):
+        if self._cache_lnum != ctx['lnum']:
+            self.cache_cleanup()
+            self._cache_lnum = ctx['lnum']
 
     def detect_subscopes(self, data):
         root_ctx = data['context']
@@ -585,35 +597,29 @@ class Ncm2Core(Ncm2Base):
         return matches
 
     def matches_do_popup(self, ctx, startccol, matches):
-        if not matches and not self._last_matches:
-            logger.info('matches==0, _last_matches==0, skip')
-            return
-
-        not_changed = 0
-        if self._last_startccol == startccol and self._last_matches == matches:
-            not_changed = 1
-
         # json_encode user_data
         for m in matches:
             m['user_data'] = json.dumps(m['user_data'])
 
-        self._last_matches = matches
-        self._last_startccol = startccol
+        popup = [startccol, matches]
+        if self._last_popup == popup:
+            return
+        self._last_popup = popup
 
         # startccol -> startbcol
         typed = ctx['typed']
         startbcol = len(typed[: startccol-1].encode()) + 1
 
-        self.notify('ncm2#_popup', ctx, startbcol, matches, not_changed)
+        self.notify('ncm2#_popup', ctx, startbcol, matches)
 
 
 ncm2_core = Ncm2Core(vim)
 
-events = ['on_complete', 'on_insert_enter',
+events = ['on_complete', 'cache_cleanup',
           'complete', 'load_plugin', 'load_python', 'on_warmup', 'ncm2_core']
 
 on_complete = ncm2_core.on_complete
-on_insert_enter = ncm2_core.on_insert_enter
+cache_cleanup = ncm2_core.cache_cleanup
 complete = ncm2_core.complete
 load_plugin = ncm2_core.load_plugin
 load_python = ncm2_core.load_python

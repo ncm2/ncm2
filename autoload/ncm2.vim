@@ -40,6 +40,7 @@ let s:complete_timer = 0
 let s:lock = {}
 let s:context = {}
 let s:startbcol = 1
+let s:lnum = 0
 let s:matches = []
 let s:subscope_detectors = {}
 
@@ -57,8 +58,7 @@ func! ncm2#enable_for_buffer()
 
     augroup ncm2_buf_hooks
         autocmd! * <buffer>
-        autocmd InsertEnter,InsertLeave <buffer> let s:matches = []
-        autocmd InsertEnter <buffer> call s:try_rnotify('on_insert_enter')
+        autocmd InsertEnter,InsertLeave <buffer> call s:cache_cleanup()
         autocmd BufEnter,CursorHold,CursorHoldI <buffer> call s:warmup()
         autocmd InsertEnter <buffer> call ncm2#auto_trigger()
         autocmd InsertCharPre <buffer> call ncm2#auto_trigger()
@@ -68,6 +68,12 @@ func! ncm2#enable_for_buffer()
     call s:warmup()
 
     doautocmd User Ncm2EnableForBufferPost
+endfunc
+
+func! s:cache_cleanup()
+    let s:matches = []
+    let s:lnum = 0
+    call s:try_rnotify('cache_cleanup')
 endfunc
 
 func! ncm2#disable_for_buffer()
@@ -146,13 +152,18 @@ func! ncm2#complete(ctx, startccol, matches, ...)
         let refresh = a:1
     endif
 
-    let a:ctx.dated = ncm2#context_dated(a:ctx)
+    let dated = ncm2#context_dated(a:ctx)
+    let a:ctx.dated = dated
 
     call s:try_rnotify('complete',
             \   a:ctx,
             \   a:startccol,
             \   a:matches,
             \   refresh)
+
+    if dated && refresh
+        call ncm2#_auto_trigger()
+    endif
 endfunc
 
 func! ncm2#menu_selected()
@@ -175,7 +186,7 @@ func! ncm2#unlock(name)
     unlet s:lock[a:name]
 endfunc
 
-func! ncm2#_popup(ctx, startbcol, matches, not_changed)
+func! ncm2#_popup(ctx, startbcol, matches)
     if s:popup_timer
         call timer_stop(s:popup_timer)
         let s:popup_timer = 0
@@ -186,23 +197,18 @@ func! ncm2#_popup(ctx, startbcol, matches, not_changed)
             \ {_ -> s:popup_timed(
             \           a:ctx,
             \           a:startbcol,
-            \           a:matches,
-            \           a:not_changed) })
+            \           a:matches) })
     else
-        call s:do_popup(a:ctx, a:startbcol, a:matches, a:not_changed)
+        call s:do_popup(a:ctx, a:startbcol, a:matches)
     endif
 endfunc
 
-func! s:popup_timed(ctx, startbcol, matches, not_changed)
+func! s:popup_timed(ctx, startbcol, matches)
     let s:popup_timer = 0
-    call s:do_popup(a:ctx, a:startbcol, a:matches, a:not_changed)
+    call s:do_popup(a:ctx, a:startbcol, a:matches)
 endfunc
 
-func! s:do_popup(ctx, startbcol, matches, not_changed)
-    if s:should_skip()
-        return
-    endif
-
+func! s:do_popup(ctx, startbcol, matches)
     let shown = pumvisible()
 
     " When the popup menu is expected to be displayed but it is not, I
@@ -211,12 +217,12 @@ func! s:do_popup(ctx, startbcol, matches, not_changed)
         return
     endif
 
-    if a:not_changed && shown
-        return
-    endif
+    let s:context = a:ctx
+    let s:startbcol = a:startbcol
+    let s:matches = a:matches
+    let s:lnum = a:ctx.lnum
 
-    " ignore the request if ctx has changed
-    if  ncm2#context_dated(a:ctx)
+    if s:should_skip()
         return
     endif
 
@@ -226,14 +232,14 @@ func! s:do_popup(ctx, startbcol, matches, not_changed)
         return
     endif
 
-    let s:context = a:ctx
-    let s:startbcol = a:startbcol
-    let s:matches = a:matches
-
     call feedkeys("\<Plug>(ncm2_complete_popup)", 'i')
 endfunc
 
 func! ncm2#_complete_popup()
+    if s:lnum != getcurpos()[1]
+        let s:lnum = getcurpos()[1]
+        let s:matches = []
+    endif
     call complete(s:startbcol, s:matches)
     return ''
 endfunc
