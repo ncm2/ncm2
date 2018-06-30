@@ -30,7 +30,7 @@ inoremap <silent> <Plug>(ncm2_trigger_complete_manual)
             \ <C-r>=ncm2#_trigger_complete(1)<CR>
 inoremap <silent> <Plug>(ncm2_trigger_complete_auto)
             \ <C-r>=ncm2#_trigger_complete(0)<CR>
-inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#auto_trigger()<CR>
+inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
 
 let s:core = yarp#py3('ncm2_core')
 let s:sources = {}
@@ -52,12 +52,6 @@ augroup ncm2_hooks
     autocmd CursorHold,CursorHoldI * call ncm2#_check_rtp()
 augroup END
 
-augroup ncm2_auto_trigger
-    autocmd!
-    autocmd InsertCharPre * call ncm2#auto_trigger()
-    autocmd InsertEnter * call feedkeys("\<Plug>(ncm2_auto_trigger)")
-augroup END
-
 func! ncm2#enable_for_buffer()
     doautocmd User Ncm2EnableForBufferPre
 
@@ -72,8 +66,11 @@ func! ncm2#enable_for_buffer()
 
     augroup ncm2_buf_hooks
         autocmd! * <buffer>
+        autocmd InsertEnter,InsertLeave <buffer> let s:matches = []
         autocmd InsertEnter <buffer> call s:try_rnotify('on_insert_enter')
         autocmd BufEnter,CursorHold,CursorHoldI <buffer> call s:warmup()
+        autocmd InsertEnter <buffer> call ncm2#auto_trigger()
+        autocmd InsertCharPre <buffer> call ncm2#auto_trigger()
     augroup END
 
     call s:core.jobstart()
@@ -266,12 +263,21 @@ func! ncm2#_check_rtp()
 endfunc
 
 func! ncm2#auto_trigger()
+    call feedkeys("\<Plug>(ncm2_auto_trigger)")
+endfunc
+
+func! ncm2#_auto_trigger()
     if s:should_skip()
         return ''
     endif
 
     if g:ncm2#auto_popup == 0
         return ''
+    endif
+
+    " refresh the popup menu to supress flickering
+    if g:ncm2#complete_key == "\<Plug>(ncm2_complete)"
+        call feedkeys(g:ncm2#complete_key, 'm')
     endif
 
     if g:ncm2#complete_delay == 0
