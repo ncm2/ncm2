@@ -44,6 +44,6 @@ inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 " ncm2 plugins
-Plug 'ncm2/nvim-bufword'
-Plug 'ncm2/nvim-tmux'
+Plug 'ncm2/ncm2-bufword'
+Plug 'ncm2/ncm2-tmux'
 ```
