@@ -105,14 +105,14 @@ class Ncm2Core(Ncm2Base):
 
             sd = m.SubscopeDetector(self.nvim)
 
-            for scope in sd.scopes:
+            for scope in sd.scope:
                 if scope not in self._subscope_detectors:
                     self._subscope_detectors[scope] = []
                     new_scope = True
 
                 self._subscope_detectors[scope].append(sd)
 
-            logger.info('subscope detector <%s> for %s', py, sd.scopes)
+            logger.info('subscope detector <%s> for %s', py, sd.scope)
 
         if not new_scope:
             return
@@ -264,7 +264,7 @@ class Ncm2Core(Ncm2Base):
 
         # adjust for subscope
         if ctx['lnum'] == 1:
-            startccol += ctx.get('scope_ccol', 1)-1
+            startccol += ctx.get('scope_ccol', 1) - 1
 
         matches = self.matches_formalize(ctx, matches)
 
@@ -360,8 +360,10 @@ class Ncm2Core(Ncm2Base):
         return ctx_list
 
     def source_check_patterns(self, data, sr, ctx):
+        pats = sr.get('complete_pattern', [])
+        if type(pats) == str:
+            pats = [pats]
 
-        patterns = sr.get('complete_pattern', [])
         typed = ctx['typed']
         word_pat = self.word_pattern(ctx, sr)
 
@@ -383,7 +385,7 @@ class Ncm2Core(Ncm2Base):
         ctx['word_pattern'] = self.word_pattern(ctx, sr)
 
         # check source extra patterns
-        for pat in patterns:
+        for pat in pats:
             # use greedy match '.*', to push the match to the last occurance
             # pattern
             if not pat.startswith("^"):
@@ -420,19 +422,19 @@ class Ncm2Core(Ncm2Base):
         return val
 
     def source_check_scope(self, sr, ctx):
-        scopes = sr.get('scopes', None)
+        scope = sr.get('scope', None)
         cur_scope = ctx['scope']
         ctx['scope_match'] = ''
         is_root = ctx['scope_level'] == 1
-        if not scopes:
-            # scopes setting is None, means that this is a general purpose
+        if not scope:
+            # scope setting is None, means that this is a general purpose
             # completion source, only complete for the root scope
             if is_root:
                 return True
             else:
                 return False
 
-        for scope in scopes:
+        for scope in scope:
             if scope == cur_scope:
                 ctx['scope_match'] = scope
                 if sr['subscope_enable']:

@@ -296,7 +296,11 @@ func! ncm2#_notify_sources(calls)
         try
             let sr = s:sources[name]
             let ctx = ele.context
-            call call(sr.on_complete, [ctx], sr)
+            if type(sr.on_complete) == v:t_list
+                call call(sr.on_complete[0], sr.on_complete[1:] + [ctx], sr)
+            else
+                call call(sr.on_complete, [ctx], sr)
+            endif
         catch
             call s:core.error(name . ' on_complete: ' . v:exception)
         endtry
