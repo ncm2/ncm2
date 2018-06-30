@@ -9,7 +9,6 @@ func! s:opt(name, default)
     execute cmd
 endfunc
 
-call s:opt('ncm2#complete_key', "\<Plug>(ncm2_complete)")
 call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
 call s:opt('ncm2#popup_delay', 100)
@@ -23,9 +22,8 @@ let ncm2#core_data = {}
 " Note: `:help complete()` says:
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
-inoremap <silent> <Plug>(ncm2_complete) <C-r>=ncm2#_complete()<CR>
-inoremap <silent> <Plug>(ncm2_completefunc) <c-x><c-u>
-inoremap <silent> <Plug>(ncm2_omnifunc) <c-x><c-o>
+inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_complete_popup()<CR>
+
 inoremap <silent> <Plug>(ncm2_trigger_complete_manual)
             \ <C-r>=ncm2#_trigger_complete(1)<CR>
 inoremap <silent> <Plug>(ncm2_trigger_complete_auto)
@@ -56,13 +54,6 @@ func! ncm2#enable_for_buffer()
     doautocmd User Ncm2EnableForBufferPre
 
     let b:ncm2_enable = 1
-
-    if g:ncm2#complete_key=="\<Plug>(ncm2_completefunc)"
-        set completefunc=ncm2#_completefunc
-    endif
-    if g:ncm2#complete_key=="\<Plug>(ncm2_omnifunc)"
-        set omnifunc=ncm2#_completefunc
-    endif
 
     augroup ncm2_buf_hooks
         autocmd! * <buffer>
@@ -214,6 +205,12 @@ func! s:do_popup(ctx, startbcol, matches, not_changed)
 
     let shown = pumvisible()
 
+    " When the popup menu is expected to be displayed but it is not, I
+    " guess it probably has been closed by the user
+    if !shown && !empty(s:matches) && !empty(a:matches)
+        return
+    endif
+
     if a:not_changed && shown
         return
     endif
@@ -233,17 +230,10 @@ func! s:do_popup(ctx, startbcol, matches, not_changed)
     let s:startbcol = a:startbcol
     let s:matches = a:matches
 
-    call feedkeys(g:ncm2#complete_key, 'i')
+    call feedkeys("\<Plug>(ncm2_complete_popup)", 'i')
 endfunc
 
-func! ncm2#_completefunc(findstart, base)
-    if a:findstart
-        return s:startbcol - 1
-    endif
-    return {'refresh': 'always', 'words': s:matches }
-endfunc
-
-func! ncm2#_complete()
+func! ncm2#_complete_popup()
     call complete(s:startbcol, s:matches)
     return ''
 endfunc
@@ -276,9 +266,7 @@ func! ncm2#_auto_trigger()
     endif
 
     " refresh the popup menu to supress flickering
-    if g:ncm2#complete_key == "\<Plug>(ncm2_complete)"
-        call feedkeys(g:ncm2#complete_key, 'm')
-    endif
+    call feedkeys("\<Plug>(ncm2_complete_popup)", 'm')
 
     if g:ncm2#complete_delay == 0
         call feedkeys("\<Plug>(ncm2_trigger_complete_auto)", "m")
@@ -352,7 +340,6 @@ func! ncm2#_core_data(...)
 
     " data sync between ncm2.vim and ncm2_core.py
     let data = extend(g:ncm2#core_data, {
-                \ 'complete_key': g:ncm2#complete_key,
                 \ 'auto_popup': g:ncm2#auto_popup,
                 \ 'complete_length': g:ncm2#complete_length,
                 \ 'matcher': g:ncm2#matcher,
