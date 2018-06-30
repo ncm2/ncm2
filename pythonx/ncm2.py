@@ -186,4 +186,4 @@ class Ncm2Source(Ncm2Base):
 
     def complete(self, ctx, startccol, matches, refresh=False):
         self.nvim.call('ncm2#complete', ctx, startccol,
-                       matches, refresh, async=True)
+                       matches, refresh, async_=True)

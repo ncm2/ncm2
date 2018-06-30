@@ -40,7 +40,7 @@ class Ncm2Core(Ncm2Base):
         self.notify('ncm2#_core_started')
 
     def notify(self, method: str, *args):
-        self.nvim.call(method, *args, async=True)
+        self.nvim.call(method, *args, async_=True)
 
     def word_pattern(self, ctx, sr):
         pat = sr.get('word_pattern', None)
