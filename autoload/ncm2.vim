@@ -16,7 +16,9 @@ call s:opt('ncm2#complete_length', [[1,4],[7,3]])
 call s:opt('ncm2#matcher', ['prefix'])
 call s:opt('ncm2#sorter', 'swapcase_word')
 call s:opt('ncm2#filter', [])
-let ncm2#core_data = {}
+
+let g:ncm2#core_data = {}
+let g:ncm2#core_event = {}
 
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
@@ -327,17 +329,7 @@ func! ncm2#_s(name, ...)
     return get(s:, a:name)
 endfunc
 
-func! ncm2#_core_data(...)
-    let event = ''
-    if len(a:000)
-        let event = a:1
-    endif
-
-    let g:ncm2#core_data = {}
-
-    " some ncm-plugin might need extra data
-    doautocmd User Ncm2CoreData
-
+func! ncm2#_core_data(event)
     " data sync between ncm2.vim and ncm2_core.py
     let data = extend(g:ncm2#core_data, {
                 \ 'auto_popup': g:ncm2#auto_popup,
@@ -351,11 +343,9 @@ func! ncm2#_core_data(...)
                 \ 'lines': []
                 \ }, 'force')
 
-    let g:ncm2#core_data = {}
-
     " if subscope detector is available for this buffer, we need to send
     " the whole buffer for on_complete event
-    if event == 'on_complete' && has_key(s:subscope_detectors, &filetype)
+    if a:event == 'on_complete' && has_key(s:subscope_detectors, &filetype)
         let data.lines = getline(1, '$')
     endif
 
@@ -363,7 +353,13 @@ func! ncm2#_core_data(...)
 endfunc
 
 func! s:try_rnotify(event, ...)
-    return call(s:core.try_notify, [a:event, ncm2#_core_data(a:event)] + a:000, s:core)
+    let g:ncm2#core_event = [a:event, a:000]
+    let g:ncm2#core_data = {}
+    doautocmd User Ncm2CoreData
+    let data = ncm2#_core_data(a:event)
+    let g:ncm2#core_data = {}
+    let g:ncm2#core_event = []
+    return call(s:core.try_notify, [a:event, data] + a:000, s:core)
 endfunc
 
 func! s:load_plugin()
