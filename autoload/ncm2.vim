@@ -35,6 +35,7 @@ inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#auto_trigger()<CR>
 let s:core = yarp#py3('ncm2_core')
 let s:sources = {}
 let s:lasttick = []
+let s:popup_timer = 0
 let s:complete_timer = 0
 let s:old_rtp = &rtp
 let s:lock = {}
@@ -187,6 +188,29 @@ func! ncm2#unlock(name)
 endfunc
 
 func! ncm2#_popup(ctx, startbcol, matches, not_changed)
+    if s:popup_timer
+        call timer_stop(s:popup_timer)
+        let s:popup_timer = 0
+    endif
+    if g:ncm2#popup_delay && !pumvisible()
+        let s:popup_timer = timer_start(
+            \ g:ncm2#popup_delay,
+            \ {_ -> s:popup_timed(
+            \           a:ctx,
+            \           a:startbcol,
+            \           a:matches,
+            \           a:not_changed) })
+    else
+        call s:do_popup(a:ctx, a:startbcol, a:matches, a:not_changed)
+    endif
+endfunc
+
+func! s:popup_timed(ctx, startbcol, matches, not_changed)
+    let s:popup_timer = 0
+    call s:do_popup(a:ctx, a:startbcol, a:matches, a:not_changed)
+endfunc
+
+func! s:do_popup(ctx, startbcol, matches, not_changed)
     if s:should_skip()
         return
     endif
@@ -258,7 +282,7 @@ func! ncm2#auto_trigger()
         endif
         let s:complete_timer = timer_start(
             \ g:ncm2#complete_delay,
-            \ { s:complete_timer_handler() })
+            \ {_ -> s:complete_timer_handler() })
     endif
     return ''
 endfunc
