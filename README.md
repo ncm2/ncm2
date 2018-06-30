@@ -6,8 +6,9 @@ list of plugins.
 
 ## Requirements
 
-- `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested.
+- `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested
 - `:echo has("python3")` prints 1
+- Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
 ## Usage
 
