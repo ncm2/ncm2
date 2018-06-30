@@ -219,21 +219,15 @@ class Ncm2Core(Ncm2Base):
             if cache:
                 need_refresh = cache['refresh']
                 cc = cache['context']
-                ccs, cce = cache['startccol'], cc['match_end']
-                cs, ce = ctx['startccol'], ctx['match_end']
-                if (not need_refresh and
-                        ccs == cs and
-                        cce == ce):
-                    logger.debug('<%s> was cached, <%s> %s',
-                                 name, ccs, cache['matches'])
+                if not need_refresh and self.is_kw_type(data, sr, cc, ctx):
+                    logger.debug('<%s> was cached, context: %s matches: %s',
+                                 name, cc, cache['matches'])
                     return False
 
             # we only notify once for each word
-            notified = self._notified.get(name, None)
-            if notified and not need_refresh:
-                ns, nb = notified['startccol'], notified['base']
-                cs, cb = ctx['startccol'], ctx['base']
-                if ns == cs and nb == cb[:len(nb)]:
+            noti = self._notified.get(name, None)
+            if noti and not need_refresh:
+                if self.is_kw_type(data, sr, noti, ctx):
                     logger.debug('<%s> has been notified', name)
                     return False
 
@@ -260,7 +254,7 @@ class Ncm2Core(Ncm2Base):
 
         # be careful when completion matches context is dated
         if dated:
-            if not self.is_kw_type(data, sr, ctx):
+            if not self.is_kw_type(data, sr, ctx, cur_ctx):
                 logger.info("[%s] dated is_kw_type fail, old[%s] cur[%s]",
                             name, ctx['typed'], cur_ctx['typed'])
                 return
@@ -290,10 +284,9 @@ class Ncm2Core(Ncm2Base):
 
         self.matches_update_popup(data)
 
-    def is_kw_type(self, data, sr, ctx):
-
-        ctx1 = copy.deepcopy(ctx)
-        ctx2 = copy.deepcopy(data['context'])
+    def is_kw_type(self, data, sr, ctx1, ctx2):
+        ctx1 = copy.deepcopy(ctx1)
+        ctx2 = copy.deepcopy(ctx2)
 
         if not self.source_check_patterns(data, sr, ctx1):
             logger.debug('old_ctx source_check_patterns failed')
@@ -304,7 +297,9 @@ class Ncm2Core(Ncm2Base):
 
         logger.debug('old ctx [%s] cur ctx [%s]', ctx1, ctx2)
         # startccol is set in self.source_check_patterns
-        return ctx1['startccol'] == ctx2['startccol']
+        c1s, c1e, c1b = ctx1['startccol'], ctx1['match_end'], ctx1['base']
+        c2s, c2e, c2b = ctx2['startccol'], ctx1['match_end'], ctx2['base']
+        return c1s == c2s and c1b == c2b[:len(c1b)]
 
     # InsertEnter, InsertLeave, or lnum changed
     def cache_cleanup(self, *args):
