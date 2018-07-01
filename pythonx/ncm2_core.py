@@ -123,7 +123,15 @@ class Ncm2Core(Ncm2Base):
 
         self.notify('ncm2#_s', 'subscope_detectors', detectors_sync)
 
-    def on_complete(self, data, manual):
+    def on_complete(self, data, manual, failed_notifies = []):
+
+        for ele in failed_notifies:
+            name = ele['name']
+            ctx = ele['context']
+            notified = self._notified
+            if name in notified and notified[name] == ctx:
+                logger.debug('%s notification is dated', name)
+                del notified[name]
 
         root_ctx = data['context']
         root_ctx['manual'] = manual
@@ -151,7 +159,7 @@ class Ncm2Core(Ncm2Base):
                 notifies.append(dict(name=name, context=ctx))
 
         if notifies:
-            self.notify('ncm2#_notify_sources', notifies)
+            self.notify('ncm2#_notify_sources', root_ctx, notifies)
         else:
             logger.debug('ncm2#_notify_sources argument is empty %s', notifies)
         self.matches_update_popup(data)
