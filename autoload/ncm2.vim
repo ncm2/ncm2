@@ -60,7 +60,7 @@ func! ncm2#enable_for_buffer()
     augroup ncm2_buf_hooks
         autocmd! * <buffer>
         autocmd InsertEnter,InsertLeave <buffer> call s:cache_cleanup()
-        autocmd BufEnter,CursorHold,CursorHoldI <buffer> call s:warmup()
+        autocmd InsertEnter,BufEnter,CursorHold <buffer> call s:warmup()
         autocmd InsertEnter <buffer> call ncm2#auto_trigger()
         autocmd InsertCharPre <buffer> call ncm2#auto_trigger()
     augroup END
@@ -351,7 +351,8 @@ func! ncm2#_core_data(event)
 
     " if subscope detector is available for this buffer, we need to send
     " the whole buffer for on_complete event
-    if a:event == 'on_complete' && has_key(s:subscope_detectors, &filetype)
+    if (a:event == 'on_complete' || a:event == 'on_warmup') &&
+                \ has_key(s:subscope_detectors, &filetype)
         let data.lines = getline(1, '$')
     endif
 
