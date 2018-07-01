@@ -1,4 +1,4 @@
-A fast, slim and hackable completion framework for
+A slim, fast and hackable completion framework for
 [neovim](https://github.com/neovim/neovim) :heart:
 
 Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) for a
@@ -43,9 +43,14 @@ inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
+" trigger completion on <backspace> and <c-w>
+imap <backspace> <backspace><Plug>(ncm2_auto_trigger)
+imap <c-w> <c-w><Plug>(ncm2_auto_trigger)
+
 " ncm2 plugins
 Plug 'ncm2/ncm2-bufword'
 Plug 'ncm2/ncm2-tmux'
+Plug 'ncm2/ncm2-path'
 
 " wrap existing omnifunc.
 " Note that omnifunc is not running in background and may block the
