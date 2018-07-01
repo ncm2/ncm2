@@ -20,17 +20,18 @@ call s:opt('ncm2#filter', [])
 let g:ncm2#core_data = {}
 let g:ncm2#core_event = {}
 
+inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
+inoremap <silent> <Plug>(ncm2_manual_trigger)
+            \ <C-r>=ncm2#_trigger_complete(1)<CR>
+
+inoremap <silent> <Plug>(ncm2_trigger_complete_auto)
+            \ <C-r>=ncm2#_trigger_complete(0)<CR>
+
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
 inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_complete_popup()<CR>
-
-inoremap <silent> <Plug>(ncm2_trigger_complete_manual)
-            \ <C-r>=ncm2#_trigger_complete(1)<CR>
-inoremap <silent> <Plug>(ncm2_trigger_complete_auto)
-            \ <C-r>=ncm2#_trigger_complete(0)<CR>
-inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
 
 let s:core = yarp#py3('ncm2_core')
 let s:sources = {}
