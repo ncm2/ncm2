@@ -150,7 +150,10 @@ class Ncm2Core(Ncm2Base):
 
                 notifies.append(dict(name=name, context=ctx))
 
-        self.notify('ncm2#_notify_sources', notifies)
+        if notifies:
+            self.notify('ncm2#_notify_sources', notifies)
+        else:
+            logger.debug('ncm2#_notify_sources argument is empty %s', notifies)
         self.matches_update_popup(data)
 
     def on_warmup(self, data):
@@ -228,7 +231,7 @@ class Ncm2Core(Ncm2Base):
             noti = self._notified.get(name, None)
             if noti and not need_refresh:
                 if self.is_kw_type(data, sr, noti, ctx):
-                    logger.debug('<%s> has been notified', name)
+                    logger.debug('<%s> has been notified, cache %s', name, cache)
                     return False
 
         self._notified[name] = ctx
@@ -247,7 +250,7 @@ class Ncm2Core(Ncm2Base):
 
         cache = self._matches.get(name, None)
         if cache and cache['context']['reltime'] > ctx['reltime']:
-            # we have a newer cache
+            logger.debug('%s cache is newer, %s', name, cache)
             return
 
         dated = ctx['dated']
@@ -268,19 +271,15 @@ class Ncm2Core(Ncm2Base):
 
         matches = self.matches_formalize(ctx, matches)
 
-        # cache matches
         if not cache:
             self._matches[name] = {}
-
-        if len(matches) == 0:
-            del self._matches[name]
-        else:
             cache = self._matches[name]
-            cache['startccol'] = startccol
-            cache['refresh'] = refresh
-            cache['matches'] = matches
-            cache['context'] = ctx
-            cache['enable'] = not ctx.get('early_cache', False)
+
+        cache['startccol'] = startccol
+        cache['refresh'] = refresh
+        cache['matches'] = matches
+        cache['context'] = ctx
+        cache['enable'] = not ctx.get('early_cache', False)
 
         self.matches_update_popup(data)
 

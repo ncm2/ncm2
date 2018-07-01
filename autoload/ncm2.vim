@@ -100,7 +100,7 @@ func! ncm2#context(...)
     if len(a:000)
         let ctx['source'] = a:1
     endif
-    let ctx['reltime'] = reltime()
+    let ctx['reltime'] = reltimefloat(reltime())
     return ctx
 endfunc
 

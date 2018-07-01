@@ -6,3 +6,4 @@ __pycache__
 /.envrc
 /test.vim
 /nvim.log*
+/gitcommit
