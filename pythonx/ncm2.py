@@ -24,7 +24,7 @@ if platform.system() == 'Windows':
             cls.__init__(self, *args, **keys)
 
 
-def getLogger(name: str):
+def getLogger(name):
     def get_loglevel():
         # logging setup
         level = logging.INFO
@@ -104,13 +104,13 @@ class Ncm2Base:
         ud['ncm2'] = 1
         return e
 
-    def matches_formalize(self, ctx, matches: list):
+    def matches_formalize(self, ctx, matches):
         formalized = []
         for e in matches:
             formalized.append(self.match_formalize(ctx, e))
         return formalized
 
-    def lccol2pos(self, lnum, ccol, src: str):
+    def lccol2pos(self, lnum, ccol, src):
         """
         convert lnum, ccol into pos
         """
@@ -123,7 +123,7 @@ class Ncm2Base:
 
         return pos
 
-    def pos2lccol(self, pos, src: str):
+    def pos2lccol(self, pos, src):
         """
         convert pos into lnum, ccol
         """
@@ -134,7 +134,7 @@ class Ncm2Base:
                 return (idx + 1, pos - p + 1)
             p += len(line) + 1
 
-    def get_src(self, src: str, ctx: dict) -> str:
+    def get_src(self, src, ctx):
         """
         Get the source code of current scope identified by the ctx object.
         """
@@ -146,7 +146,7 @@ class Ncm2Base:
 
         return src[scope_offset: scope_offset + scope_len]
 
-    def update_rtp(self, rtp: str):
+    def update_rtp(self, rtp):
         for ele in rtp.split(','):
             pyx = path.join(ele, 'pythonx')
             if pyx not in sys.path:
@@ -155,7 +155,7 @@ class Ncm2Base:
             if py3 not in sys.path:
                 sys.path.append(py3)
 
-    def strdisplaywidth(self, s: str):
+    def strdisplaywidth(self, s):
         def get_char_display_width(unicode_str):
             r = unicodedata.east_asian_width(unicode_str)
             if r == "F":  # Fullwidth
@@ -182,7 +182,7 @@ class Ncm2Base:
 
 class Ncm2Source(Ncm2Base):
     def __init__(self, nvim):
-        super(Ncm2Source, self).__init__(nvim)
+        Ncm2Base.__init__(self, nvim)
 
     def complete(self, ctx, startccol, matches, refresh=False):
         self.nvim.call('ncm2#complete', ctx, startccol,
