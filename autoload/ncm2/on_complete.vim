@@ -31,7 +31,7 @@ endfunc
 func! ncm2#on_complete#omni(funcname, ctx)
     " omni function's startbcol is zero based, convert it to one based
     let startbcol = call(a:funcname, [1,'']) + 1
-    let typed = a:ctx['typed']
+    let typed = strpart(getline('.'), 0, col('.')-1)
     let base = typed[startbcol - 1: ]
     let matches = call(a:funcname, [0, base])
     let refresh = 0

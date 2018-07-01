@@ -96,9 +96,9 @@ class Ncm2Core(Ncm2Base):
             self._loaded_plugins[py] = True
 
             try:
-                mod = os.path.splitext(os.path.basename(py))[0]
+                mod = path.splitext(path.basename(py))[0]
                 mod = "ncm2_subscope_detector.%s" % mod
-                m = importlib.import_module(mod)
+                m = import_module(mod)
             except Exception as ex:
                 logger.exception('importing scoper <%s> failed', py)
                 continue
@@ -123,7 +123,7 @@ class Ncm2Core(Ncm2Base):
 
         self.notify('ncm2#_s', 'subscope_detectors', detectors_sync)
 
-    def on_complete(self, data, manual, failed_notifies = []):
+    def on_complete(self, data, manual, failed_notifies=[]):
 
         for ele in failed_notifies:
             name = ele['name']
@@ -239,7 +239,8 @@ class Ncm2Core(Ncm2Base):
             noti = self._notified.get(name, None)
             if noti and not need_refresh:
                 if self.is_kw_type(data, sr, noti, ctx):
-                    logger.debug('<%s> has been notified, cache %s', name, cache)
+                    logger.debug(
+                        '<%s> has been notified, cache %s', name, cache)
                     return False
 
         self._notified[name] = ctx
@@ -490,6 +491,9 @@ class Ncm2Core(Ncm2Base):
                 smat = self.matches_filter(data, sr, base, smat)
 
                 cache['filtered_matches'] = smat
+
+                logger.debug('%s matches %s filtered %s sccol %s base %s',
+                             name, cache['matches'], smat, sccol, base)
 
                 if not smat:
                     continue

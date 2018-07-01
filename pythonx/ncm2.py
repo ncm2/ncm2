@@ -114,7 +114,7 @@ class Ncm2Base:
         """
         convert lnum, ccol into pos
         """
-        lines = src.splitlines()
+        lines = src.splitlines() or [""]
 
         pos = 0
         for i in range(lnum - 1):
@@ -127,7 +127,7 @@ class Ncm2Base:
         """
         convert pos into lnum, ccol
         """
-        lines = src.splitlines()
+        lines = src.splitlines() or [""]
         p = 0
         for idx, line in enumerate(lines):
             if p <= pos and p + len(line) >= pos:
