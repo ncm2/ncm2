@@ -53,10 +53,9 @@ Plug 'ncm2/ncm2-tmux'
 Plug 'ncm2/ncm2-path'
 
 " wrap existing omnifunc.
-" Note that omnifunc is not running in background and may block the
-" editor. If you don't want to trigger omnifunc too early, so that nvim won't
-" be blocked by omnifunc too often, you could add 180ms delay before the omni
-" wrapper:
+" Note that omnifunc does not run in background and may block the editor. If
+" you don't want to trigger omnifunc too early, so that nvim won't be blocked
+" by omnifunc too often, you could add 180ms delay before the omni wrapper:
 "  'on_complete': ['ncm2#on_complete#delay', 180,
 "               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
 call ncm2#register_source({'name' : 'css',
