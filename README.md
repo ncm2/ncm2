@@ -1,4 +1,4 @@
-A fast, slim completion framework for
+A fast, slim and hackable completion framework for
 [neovim](https://github.com/neovim/neovim) :heart:
 
 Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) for a
@@ -47,7 +47,13 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 Plug 'ncm2/ncm2-bufword'
 Plug 'ncm2/ncm2-tmux'
 
-" wrap existing omnifunc
+" wrap existing omnifunc.
+" Note that omnifunc is not running in background and may block the
+" editor. If you don't want to trigger omnifunc too early, so that nvim won't
+" be blocked by omnifunc too often, you could add 180ms delay before the omni
+" wrapper:
+"  'on_complete': ['ncm2#on_complete#delay', 180,
+"               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
 call ncm2#register_source({'name' : 'css',
         \ 'priority': 9, 
         \ 'subscope_enable': 1,
@@ -55,6 +61,6 @@ call ncm2#register_source({'name' : 'css',
         \ 'mark': 'css',
         \ 'word_pattern': '[\w\-]+',
         \ 'complete_pattern': ':\s*',
-        \ 'on_complete': ['ncm2#omni#complete', 'csscomplete#CompleteCSS'],
+        \ 'on_complete': ['ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
         \ })
 ```
