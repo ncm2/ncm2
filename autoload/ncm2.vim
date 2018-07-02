@@ -392,3 +392,9 @@ endfunc
 func! ncm2#_load_python(py)
     call s:try_rnotify('load_python', a:py)
 endfunc
+
+func! ncm2#_autocmd_plugin()
+    autocmd User Ncm2Plugin silent
+    doautocmd User Ncm2Plugin
+    autocmd! User Ncm2Plugin
+endfunc

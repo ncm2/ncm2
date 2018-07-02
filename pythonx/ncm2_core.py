@@ -81,6 +81,8 @@ class Ncm2Core(Ncm2Base):
                 glob.glob(path.join(d, 'python3/ncm2_subscope_detector/*.py'))
             self.load_subscope_detectors(dts)
 
+        self.notify('ncm2#_autocmd_plugin')
+
     def load_python(self, _, py):
         with open(py, "rb") as f:
             src = f.read()
