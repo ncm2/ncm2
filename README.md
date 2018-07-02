@@ -18,7 +18,7 @@ Here is a basic vimrc example:
 " assuming your using vim-plug: https://github.com/junegunn/vim-plug
 Plug 'ncm2/ncm2'
 " ncm2 requires nvim-yarp
-Plug 'ncm2/nvim-yarp'
+Plug 'roxma/nvim-yarp'
 
 " enable ncm2 for all buffer
 autocmd BufEnter * call ncm2#enable_for_buffer()
