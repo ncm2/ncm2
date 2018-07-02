@@ -465,9 +465,9 @@ class Ncm2Core(Ncm2Base):
         names = sorted(names, key=lambda x: srcs[x]['priority'], reverse=True)
 
         ccol = ctx['ccol']
-        startccol = ccol
 
-        # basick processing per source
+        # basic filtering for matches of each source
+        names_with_matches = []
         for name in names:
 
             try:
@@ -477,38 +477,39 @@ class Ncm2Core(Ncm2Base):
                 cache['filtered_matches'] = []
 
                 if not cache['enable']:
-                    logger.debug('<%s> ignore by disabled', name)
+                    logger.debug('<%s> is disabled', name)
                     continue
 
                 sccol = cache['startccol']
                 if sccol > ccol or sccol == 0:
-                    logger.warn(
-                        'ignoring invalid startccol for %s %s', name, sccol)
+                    logger.warn('%s invalid startccol %s', name, sccol)
                     continue
 
                 smat = copy.deepcopy(cache['matches'])
-                sctx = cache['context']
-
                 base = typed[sccol - 1:]
                 smat = self.matches_filter(data, sr, base, smat)
-
                 cache['filtered_matches'] = smat
 
-                logger.debug('%s matches %s filtered %s sccol %s base %s',
-                             name, cache['matches'], smat, sccol, base)
-
                 if not smat:
+                    logger.debug('%s matches is empty after filtered', name)
                     continue
 
-                if sccol < startccol:
-                    startccol = sccol
+                names_with_matches.append(name)
 
             except Exception as inst:
-                logger.exception(
-                    '_refresh_completions process exception: %s', inst)
-                continue
+                logger.exception('%s matches_update_popup exception', inst)
+
+        # additional filtering on inter-source level
+        names = self.get_sources_for_popup(data, names_with_matches)
 
         # merge results of sources
+        startccol = ccol
+        for name in names:
+            cache = self._matches[name]
+            sccol = cache['startccol']
+            if sccol < startccol:
+                startccol = sccol
+
         for name in names:
 
             try:
@@ -540,6 +541,9 @@ class Ncm2Core(Ncm2Base):
         matches = self.matches_decorate(data, matches)
 
         self.matches_do_popup(ctx, startccol, matches)
+
+    def get_sources_for_popup(self, data, names):
+        return names
 
     def matcher_opt_get(self, data, sr):
         if 'matcher' in sr:
