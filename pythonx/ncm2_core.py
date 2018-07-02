@@ -151,7 +151,7 @@ class Ncm2Core(Ncm2Base):
 
                 ctx = copy.deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
-                ctx['source'] = name
+                ctx['source'] = sr
                 ctx['matcher'] = self.matcher_opt_get(data, sr)
                 ctx['sorter'] = self.sorter_opt_get(data, sr)
 
@@ -178,7 +178,7 @@ class Ncm2Core(Ncm2Base):
 
                 ctx = copy.deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
-                ctx['source'] = name
+                ctx['source'] = sr
 
                 if not sr['enable']:
                     continue
@@ -252,7 +252,7 @@ class Ncm2Core(Ncm2Base):
         cur_ctx = data['context']
         self.cache_cleanup_check(cur_ctx)
 
-        name = ctx['source']
+        name = ctx['source']['name']
 
         sr = data['sources'].get(name, None)
         if not sr:
