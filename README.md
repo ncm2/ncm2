@@ -1,6 +1,9 @@
 A slim, fast and hackable completion framework for
 [neovim](https://github.com/neovim/neovim) :heart:
 
+Formerly known as
+[nvim-completion-manager](https://github.com/roxma/nvim-completion-manager).
+
 Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) for a
 list of plugins.
 
