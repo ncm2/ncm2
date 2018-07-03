@@ -35,11 +35,9 @@ inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_complete_popup()<CR>
 
 let s:core = yarp#py3('ncm2_core')
 let s:sources = {}
-let s:lasttick = []
 let s:popup_timer = 0
 let s:complete_timer = 0
 let s:lock = {}
-let s:context = {}
 let s:startbcol = 1
 let s:lnum = 0
 let s:matches = []
@@ -220,7 +218,6 @@ func! s:do_popup(ctx, startbcol, matches)
         return
     endif
 
-    let s:context = a:ctx
     let s:startbcol = a:startbcol
     let s:matches = a:matches
     let s:lnum = a:ctx.lnum
