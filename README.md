@@ -47,10 +47,6 @@ inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-" trigger completion on <backspace> and <c-w>
-imap <backspace> <backspace><Plug>(ncm2_auto_trigger)
-imap <c-w> <c-w><Plug>(ncm2_auto_trigger)
-
 " wrap existing omnifunc
 " Note that omnifunc does not run in background and may probably block the
 " editor. If you don't want to be blocked by omnifunc too often, you could add
