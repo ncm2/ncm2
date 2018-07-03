@@ -100,7 +100,7 @@ class Ncm2Base:
             e['user_data'] = {}
 
         ud = e['user_data']
-        ud['source'] = ctx['source']
+        ud['source'] = ctx['source']['name']
         ud['ncm2'] = 1
         return e
 
