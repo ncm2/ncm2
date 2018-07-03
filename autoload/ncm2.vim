@@ -44,6 +44,7 @@ let s:startbcol = 1
 let s:lnum = 0
 let s:matches = []
 let s:subscope_detectors = {}
+let s:auto_complete_tick = []
 
 augroup ncm2_hooks
     autocmd!
@@ -59,10 +60,9 @@ func! ncm2#enable_for_buffer()
 
     augroup ncm2_buf_hooks
         autocmd! * <buffer>
-        autocmd InsertEnter,InsertLeave <buffer> call s:cache_cleanup()
-        autocmd InsertEnter,BufEnter,CursorHold <buffer> call s:warmup()
-        autocmd InsertEnter <buffer> call ncm2#auto_trigger()
-        autocmd InsertCharPre <buffer> call ncm2#auto_trigger()
+        autocmd InsertLeave <buffer> call s:cache_cleanup()
+        autocmd BufEnter,CursorHold <buffer> call s:warmup()
+        autocmd InsertEnter,TextChangedI,InsertCharPre <buffer> call ncm2#auto_trigger()
     augroup END
 
     call s:core.jobstart()
@@ -73,7 +73,9 @@ endfunc
 
 func! s:cache_cleanup()
     let s:matches = []
+    let s:auto_complete_tick = []
     let s:lnum = 0
+    let s:startbcol = 1
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -163,7 +165,7 @@ func! ncm2#complete(ctx, startccol, matches, ...)
             \   refresh)
 
     if dated && refresh
-        call ncm2#_auto_trigger()
+        call ncm2#_trigger_complete(2)
     endif
 endfunc
 
@@ -233,7 +235,7 @@ func! s:do_popup(ctx, startbcol, matches)
         return
     endif
 
-    call feedkeys("\<Plug>(ncm2_complete_popup)", 'i')
+    call feedkeys("\<Plug>(ncm2_complete_popup)")
 endfunc
 
 func! ncm2#_complete_popup()
@@ -257,14 +259,6 @@ func! ncm2#auto_trigger()
 endfunc
 
 func! ncm2#_auto_trigger()
-    if s:should_skip()
-        return ''
-    endif
-
-    if g:ncm2#auto_popup == 0
-        return ''
-    endif
-
     " refresh the popup menu to supress flickering
     call feedkeys("\<Plug>(ncm2_complete_popup)", 'm')
 
@@ -286,8 +280,29 @@ func! s:complete_timer_handler()
     call feedkeys("\<Plug>(ncm2_trigger_complete_auto)", "m")
 endfunc
 
-func! ncm2#_trigger_complete(manual)
-    call s:try_rnotify('on_complete', a:manual)
+" 0 auto, 1 manual, 2 auto for dated source
+func! ncm2#_trigger_complete(trigger_type)
+    if s:should_skip()
+        return ''
+    endif
+
+    let l:manual = a:trigger_type == 1
+    if l:manual == 0
+        if g:ncm2#auto_popup == 0
+            return ''
+        endif
+
+        " not auto for dated source, no need duplicate on_complete
+        if a:trigger_type != 2
+            let tick = [getcurpos(), b:changedtick]
+            if tick == s:auto_complete_tick
+                return ''
+            endif
+            let s:auto_complete_tick = tick
+        endif
+    endif
+
+    call s:try_rnotify('on_complete', l:manual)
     return ''
 endfunc
 

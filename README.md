@@ -31,7 +31,8 @@ set completeopt=noinsert,menuone,noselect
 ## Optional vimrc tips
 
 ```vim
-" supress the annoying 'match x of y', 'The only match' messages
+" supress the annoying 'match x of y', 'The only match' and 'Pattern not
+" found' messages
 set shortmess+=c
 
 " CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
