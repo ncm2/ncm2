@@ -13,9 +13,7 @@ list of plugins.
 - `:echo has("python3")` prints 1
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
-## Usage
-
-Here is a basic vimrc example:
+## Install
 
 ```vim
 " assuming your using vim-plug: https://github.com/junegunn/vim-plug
@@ -28,9 +26,11 @@ autocmd BufEnter * call ncm2#enable_for_buffer()
 
 " note that must keep noinsert in completeopt, the others is optional
 set completeopt=noinsert,menuone,noselect
+```
 
-" ### The following vimrc is optional
+## Optional vimrc tips
 
+```vim
 " supress the annoying 'match x of y', 'The only match' messages
 set shortmess+=c
 
@@ -77,30 +77,14 @@ Plug 'ncm2/ncm2-path'
 Plug 'ncm2/ncm2-jedi'
 ```
 
-Check the [ncm2-source topic](https://github.com/topics/ncm2-source) for more
+Check the [ncm2-source](https://github.com/topics/ncm2-source)  topic for more
 information.
 
+## Snippet Integration
 
-## Snippet
+- [ncm2-snipmate](https://github.com/ncm2/ncm2-snipmate)
 
-Snippet plugin integration example, based on
-[ncm2-snipmate](https://github.com/ncm2/ncm2-snipmate) and
-[vim-snipmate](https://github.com/garbas/vim-snipmate):
-
-```vim
-" based on snipmate
-Plug 'ncm2/ncm2-snipmate'
-
-" snipmate dependencies
-Plug 'tomtom/tlib_vim'
-Plug 'marcweber/vim-addon-mw-utils'
-Plug 'garbas/vim-snipmate'
-
-" trigger snippet expansion by pressing enter key
-imap <expr> <CR> ncm2_snipmate#expand_or("\<CR>")
-```
-
-Check the [ncm2-snippet topic](https://github.com/topics/ncm2-snippet) for
+Check the [ncm2-snippet](https://github.com/topics/ncm2-snippet) topic for
 more information.
 
 ## Subscope
