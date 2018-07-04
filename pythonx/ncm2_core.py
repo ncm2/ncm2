@@ -225,8 +225,9 @@ class Ncm2Core(Ncm2Base):
                 logger.debug('<%s> enable cache', name)
                 cache['enable'] = True
 
+        need_refresh = False
+
         if not manual:
-            need_refresh = False
 
             # if there's valid cache
             if cache:
@@ -245,6 +246,9 @@ class Ncm2Core(Ncm2Base):
                         '<%s> has been notified, cache %s', name, cache)
                     return False
 
+        if need_refresh:
+            # reduce further duplicate notification
+            cache['refresh'] = 0
         self._notified[name] = ctx
         return True
 
