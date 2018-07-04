@@ -92,5 +92,17 @@ Example of enabling css/javascript completion in html file:
 Plug 'ncm2/ncm2-html-subscope'
 ```
 
-Check the [ncm2-subscope topic](https://github.com/topics/ncm2-subscope) for
+Check the [ncm2-subscope](https://github.com/topics/ncm2-subscope) topic for
 more information.
+
+## Other utilities
+
+```vim
+" fuzzy matcher
+let g:ncm2#matcher = 'abbrfuzzy'
+Plug 'ncm2/ncm2-abbrfuzzy'
+```
+
+Check the [ncm2-utils](https://github.com/topics/ncm2-utils) topic for
+more information.
+
