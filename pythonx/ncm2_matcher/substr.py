@@ -38,7 +38,7 @@ class Matcher:
                     match = False
                     break
             if match:
-                e['user_data']['word_highlight'] = [[i, i + lb]]
+                e['user_data']['match_highlight'] = [[i, i + lb]]
                 return True
 
         return False
@@ -48,11 +48,11 @@ class Matcher:
         i = w.find(b)
         if i == -1:
             return False
-        e['user_data']['word_highlight'] = [[i, i + len(b)]]
+        e['user_data']['match_highlight'] = [[i, i + len(b)]]
 
     def match_icase(self, b, e):
         w = e['word']
         i = w.lower().find(b.lower())
         if i == -1:
             return False
-        e['user_data']['word_highlight'] = [[i, i + len(b)]]
+        e['user_data']['match_highlight'] = [[i, i + len(b)]]

@@ -16,7 +16,7 @@ class Matcher:
         w = m['word'][ : lb]
         if b != w:
             return False
-        m['user_data']['word_highlight'] = [[0, lb]]
+        m['user_data']['match_highlight'] = [[0, lb]]
         return True
 
     def match_icase(self, b, m):
@@ -24,7 +24,7 @@ class Matcher:
         w = m['word'][ : lb]
         if b.lower() != w.lower():
             return False
-        m['user_data']['word_highlight'] = [[0, lb]]
+        m['user_data']['match_highlight'] = [[0, lb]]
         return True
 
     def match_smart_case(self, b, m):
@@ -44,5 +44,5 @@ class Matcher:
             else:
                 return False
 
-        m['user_data']['word_highlight'] = [[0, lb]]
+        m['user_data']['match_highlight'] = [[0, lb]]
         return True
