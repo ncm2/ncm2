@@ -4,8 +4,8 @@ A slim, fast and hackable completion framework for
 Formerly known as
 [nvim-completion-manager](https://github.com/roxma/nvim-completion-manager).
 
-Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) for a
-list of plugins.
+Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) or our
+[wiki](https://github.com/ncm2/ncm2/wiki) for a list of plugins.
 
 ## Requirements
 
