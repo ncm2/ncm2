@@ -52,26 +52,12 @@ class Ncm2Base:
         self.nvim = nvim
 
     def matcher_get(self, opts):
-        if type(opts) == str:
+        mod = import_module('ncm2_matcher.match_any')
+        from ncm2_matcher.match_any import Matcher
+        if type(opts) != list:
             opts = [opts]
-
-        matchers = []
-        for opt in opts:
-            fields = opt.split(',')
-            name = fields[0]
-            args = fields[1:]
-
-            mod = import_module('ncm2_matcher.' + name)
-            matchers.append([name, mod.Matcher(*args)])
-
-        def match(b, w):
-            for name, m in matchers:
-                if m.match(b, w):
-                    w['user_data']['matcher'] = name
-                    return True
-            return False
-
-        return match
+        m = Matcher(*opts)
+        return lambda *args: m.match(*args)
 
     def sorter_get(self, opt):
         fields = opt.split(',')
