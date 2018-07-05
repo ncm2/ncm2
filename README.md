@@ -1,11 +1,24 @@
-A slim, fast and hackable completion framework for
-[neovim](https://github.com/neovim/neovim) :heart:
+## Introduction
 
-Formerly known as
-[nvim-completion-manager](https://github.com/roxma/nvim-completion-manager).
+NCM2, formerly known as
+[nvim-completion-manager](https://github.com/roxma/nvim-completion-manager),
+is a slim, fast hackable completion framework, for neovim.
 
-Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) or our
-[wiki](https://github.com/ncm2/ncm2/wiki) for a list of plugins.
+Main features:
+
+1. Fast and asynchronous completion support, with vimscript friendly API.
+2. Smart on files with different languages, for example, css/javascript
+   completion in html style/script tag.
+3. Function parameter expansion support using ncm2-plugin.
+
+Here's a list of links where you can find extensions for ncm2.
+
+- [wiki](https://github.com/ncm2/ncm2/wiki)
+- [ncm2-plugin](https://github.com/topics/ncm2-plugin)
+- [ncm2-source](https://github.com/topics/ncm2-source)
+- [ncm2-subscope](https://github.com/topics/ncm2-subscope)
+- [ncm2-snippet](https://github.com/topics/ncm2-snippet)
+- [ncm2-utils](https://github.com/topics/ncm2-utils)
 
 ## Requirements
 
@@ -16,93 +29,57 @@ Check the [ncm2-plugin topic](https://github.com/topics/ncm2-plugin) or our
 ## Install
 
 ```vim
-" assuming your using vim-plug: https://github.com/junegunn/vim-plug
-Plug 'ncm2/ncm2'
-" ncm2 requires nvim-yarp
-Plug 'roxma/nvim-yarp'
+    " assuming your using vim-plug: https://github.com/junegunn/vim-plug
+    Plug 'ncm2/ncm2'
+    " ncm2 requires nvim-yarp
+    Plug 'roxma/nvim-yarp'
 
-" enable ncm2 for all buffer
-autocmd BufEnter * call ncm2#enable_for_buffer()
+    " enable ncm2 for all buffer
+    autocmd BufEnter * call ncm2#enable_for_buffer()
 
-" note that must keep noinsert in completeopt, the others is optional
-set completeopt=noinsert,menuone,noselect
+    " note that must keep noinsert in completeopt, the others is optional
+    set completeopt=noinsert,menuone,noselect
 ```
 
 ## Optional vimrc tips
 
 ```vim
-" supress the annoying 'match x of y', 'The only match' and 'Pattern not
-" found' messages
-set shortmess+=c
+    " supress the annoying 'match x of y', 'The only match' and 'Pattern not
+    " found' messages
+    set shortmess+=c
 
-" CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
-inoremap <c-c> <ESC>
+    " CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
+    inoremap <c-c> <ESC>
 
-" When the <Enter> key is pressed while the popup menu is visible, it only
-" hides the menu. Use this mapping to close the menu and also start a new
-" line.
-inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+    " When the <Enter> key is pressed while the popup menu is visible, it only
+    " hides the menu. Use this mapping to close the menu and also start a new
+    " line.
+    inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 
-" Use <TAB> to select the popup menu:
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    " Use <TAB> to select the popup menu:
+    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-" wrap existing omnifunc
-" Note that omnifunc does not run in background and may probably block the
-" editor. If you don't want to be blocked by omnifunc too often, you could add
-" 180ms delay before the omni wrapper:
-"  'on_complete': ['ncm2#on_complete#delay', 180,
-"               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
-au User Ncm2Plugin call ncm2#register_source({
-        \ 'name' : 'css',
-        \ 'priority': 9, 
-        \ 'subscope_enable': 1,
-        \ 'scope': ['css','scss'],
-        \ 'mark': 'css',
-        \ 'word_pattern': '[\w\-]+',
-        \ 'complete_pattern': ':\s*',
-        \ 'on_complete': ['ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
-        \ })
+    " wrap existing omnifunc
+    " Note that omnifunc does not run in background and may probably block the
+    " editor. If you don't want to be blocked by omnifunc too often, you could
+    " add 180ms delay before the omni wrapper:
+    "  'on_complete': ['ncm2#on_complete#delay', 180,
+    "               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
+    au User Ncm2Plugin call ncm2#register_source({
+            \ 'name' : 'css',
+            \ 'priority': 9, 
+            \ 'subscope_enable': 1,
+            \ 'scope': ['css','scss'],
+            \ 'mark': 'css',
+            \ 'word_pattern': '[\w\-]+',
+            \ 'complete_pattern': ':\s*',
+            \ 'on_complete': ['ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
+            \ })
+
+    " some completion sources
+    Plug 'ncm2/ncm2-bufword'
+    Plug 'ncm2/ncm2-tmux'
+    Plug 'ncm2/ncm2-path'
+    Plug 'ncm2/ncm2-jedi'
 ```
-
-## Completion Source
-
-```vim
-Plug 'ncm2/ncm2-bufword'
-Plug 'ncm2/ncm2-tmux'
-Plug 'ncm2/ncm2-path'
-Plug 'ncm2/ncm2-jedi'
-```
-
-Check the [ncm2-source](https://github.com/topics/ncm2-source)  topic for more
-information.
-
-## Snippet Integration
-
-- [ncm2-snipmate](https://github.com/ncm2/ncm2-snipmate)
-
-Check the [ncm2-snippet](https://github.com/topics/ncm2-snippet) topic for
-more information.
-
-## Subscope
-
-Example of enabling css/javascript completion in html file:
-
-```vim
-Plug 'ncm2/ncm2-html-subscope'
-```
-
-Check the [ncm2-subscope](https://github.com/topics/ncm2-subscope) topic for
-more information.
-
-## Other utilities
-
-```vim
-" fuzzy matcher
-let g:ncm2#matcher = 'abbrfuzzy'
-Plug 'ncm2/ncm2-abbrfuzzy'
-```
-
-Check the [ncm2-utils](https://github.com/topics/ncm2-utils) topic for
-more information.
-
