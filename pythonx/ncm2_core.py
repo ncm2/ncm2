@@ -414,6 +414,9 @@ class Ncm2Core(Ncm2Base):
         if cmplen is None:
             return False
 
+        if cmplen < 0:
+            return False
+
         return word_len >= cmplen
 
     def source_get_complete_len(self, data, sr):
