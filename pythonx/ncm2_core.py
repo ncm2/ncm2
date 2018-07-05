@@ -571,6 +571,13 @@ class Ncm2Core(Ncm2Base):
         fl = Filter(*opts)
         return lambda *args: fl.filter(*args)
 
+    def filter_opt_get(self, data, sr):
+        if 'filter' in sr:
+            o = sr['filter']
+            return o if type(o) is list else [o]
+        o = data['filter']
+        return o if type(o) is list else [o]
+
     def matches_filter(self, data, sr, base, matches):
         opt = self.matcher_opt_get(data, sr)
         matcher = self.matcher_get(opt)
@@ -585,7 +592,8 @@ class Ncm2Core(Ncm2Base):
         sorter = self.sorter_get(opt)
         matches = sorter(matches)
 
-        filt = self.filter_get(data['filter'])
+        opt = self.filter_opt_get(data, sr)
+        filt = self.filter_get(opt)
         matches = filt(base, matches)
 
         return matches
