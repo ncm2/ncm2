@@ -13,12 +13,12 @@ Main features:
 
 Here's a list of links where you can find extensions for ncm2.
 
-- [wiki](https://github.com/ncm2/ncm2/wiki)
-- [ncm2-plugin](https://github.com/topics/ncm2-plugin)
-- [ncm2-source](https://github.com/topics/ncm2-source)
-- [ncm2-subscope](https://github.com/topics/ncm2-subscope)
-- [ncm2-snippet](https://github.com/topics/ncm2-snippet)
-- [ncm2-utils](https://github.com/topics/ncm2-utils)
+- our [wiki](https://github.com/ncm2/ncm2/wiki) page
+- [ncm2-plugin](https://github.com/topics/ncm2-plugin) github topic
+- [ncm2-source](https://github.com/topics/ncm2-source) github topic
+- [ncm2-subscope](https://github.com/topics/ncm2-subscope) github topic
+- [ncm2-snippet](https://github.com/topics/ncm2-snippet) github topic
+- [ncm2-utils](https://github.com/topics/ncm2-utils) github topic
 
 ## Requirements
 
