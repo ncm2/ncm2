@@ -567,22 +567,9 @@ class Ncm2Core(Ncm2Base):
     def filter_get(self, opts):
         if type(opts) is str:
             opts = [opts]
-
-        filts = []
-        for opt in opts:
-            fields = opt.split(',')
-            name = fields[0]
-            args = fields[1:]
-
-            mod = import_module('ncm2_filter.' + name)
-            filts.append(mod.Filter(*args))
-
-        def filt(base, matches):
-            for fl in filts:
-                matches = fl.filter(base, matches)
-            return matches
-
-        return filt
+        from ncm2_filter.filter_chain import Filter
+        fl = Filter(*opts)
+        return lambda *args: fl.filter(*args)
 
     def matches_filter(self, data, sr, base, matches):
         opt = self.matcher_opt_get(data, sr)

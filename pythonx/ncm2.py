@@ -52,10 +52,9 @@ class Ncm2Base:
         self.nvim = nvim
 
     def matcher_get(self, opts):
-        mod = import_module('ncm2_matcher.match_any')
-        from ncm2_matcher.match_any import Matcher
         if type(opts) != list:
             opts = [opts]
+        from ncm2_matcher.match_any import Matcher
         m = Matcher(*opts)
         return lambda *args: m.match(*args)
 
