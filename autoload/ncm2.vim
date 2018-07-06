@@ -21,17 +21,14 @@ let g:ncm2#core_data = {}
 let g:ncm2#core_event = {}
 
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
-inoremap <silent> <Plug>(ncm2_manual_trigger)
-            \ <C-r>=ncm2#_trigger_complete(1)<CR>
-
-inoremap <silent> <Plug>(ncm2_trigger_complete_auto)
-            \ <C-r>=ncm2#_trigger_complete(0)<CR>
+inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_trigger(1)<CR>
 
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
 inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_complete_popup()<CR>
+inoremap <silent> <Plug>(_ncm2_auto_trigger) <C-r>=ncm2#_trigger(0)<CR>
 
 let s:core = yarp#py3('ncm2_core')
 let s:sources = {}
@@ -106,8 +103,6 @@ func! ncm2#context(...)
 endfunc
 
 func! ncm2#context_dated(ctx)
-    " changedtick is triggered when `<c-x><c-u>` is pressed due to vim's
-    " bug, use curpos as workaround
     return getcurpos() != a:ctx.curpos ||
         \ b:changedtick != a:ctx.changedtick
 endfunc
@@ -163,7 +158,7 @@ func! ncm2#complete(ctx, startccol, matches, ...)
             \   refresh)
 
     if dated && refresh
-        call ncm2#_trigger_complete(2)
+        call ncm2#_trigger(2)
     endif
 endfunc
 
@@ -252,15 +247,17 @@ func! s:should_skip()
 endfunc
 
 func! ncm2#auto_trigger()
+    " Use feedkeys, to makesure that the auto complete check works for autocmd
+    " InsertEnter, it is not yet in insert mode at the time.
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
 
 func! ncm2#_auto_trigger()
-    " refresh the popup menu to supress flickering
+    " refresh the popup menu to reduce popup flickering
     call s:feedkeys("\<Plug>(ncm2_complete_popup)")
 
     if g:ncm2#complete_delay == 0
-        call s:feedkeys("\<Plug>(ncm2_trigger_complete_auto)")
+        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     else
         if s:complete_timer
             call timer_stop(s:complete_timer)
@@ -277,11 +274,11 @@ func! s:complete_timer_handler()
         return
     endif
     let s:complete_timer = 0
-    call s:feedkeys("\<Plug>(ncm2_trigger_complete_auto)")
+    call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
 endfunc
 
 " 0 auto, 1 manual, 2 auto for dated source
-func! ncm2#_trigger_complete(trigger_type)
+func! ncm2#_trigger(trigger_type)
     if s:should_skip()
         return ''
     endif
