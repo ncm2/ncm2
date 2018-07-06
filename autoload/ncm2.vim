@@ -232,7 +232,7 @@ func! s:do_popup(ctx, startbcol, matches)
         return
     endif
 
-    call feedkeys("\<Plug>(ncm2_complete_popup)")
+    call s:feedkeys("\<Plug>(ncm2_complete_popup)")
 endfunc
 
 func! ncm2#_complete_popup()
@@ -246,21 +246,21 @@ endfunc
 
 func! s:should_skip()
     return !get(b:,'ncm2_enable',0) ||
-                \ &paste!=0 ||
+                \ &paste != 0 ||
                 \ !empty(s:lock) ||
                 \ mode() != 'i'
 endfunc
 
 func! ncm2#auto_trigger()
-    call feedkeys("\<Plug>(ncm2_auto_trigger)")
+    call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
 
 func! ncm2#_auto_trigger()
     " refresh the popup menu to supress flickering
-    call feedkeys("\<Plug>(ncm2_complete_popup)", 'm')
+    call s:feedkeys("\<Plug>(ncm2_complete_popup)")
 
     if g:ncm2#complete_delay == 0
-        call feedkeys("\<Plug>(ncm2_trigger_complete_auto)", "m")
+        call s:feedkeys("\<Plug>(ncm2_trigger_complete_auto)")
     else
         if s:complete_timer
             call timer_stop(s:complete_timer)
@@ -273,8 +273,11 @@ func! ncm2#_auto_trigger()
 endfunc
 
 func! s:complete_timer_handler()
+    if &paste
+        return
+    endif
     let s:complete_timer = 0
-    call feedkeys("\<Plug>(ncm2_trigger_complete_auto)", "m")
+    call s:feedkeys("\<Plug>(ncm2_trigger_complete_auto)")
 endfunc
 
 " 0 auto, 1 manual, 2 auto for dated source
@@ -409,4 +412,11 @@ func! ncm2#_autocmd_plugin()
     autocmd User Ncm2Plugin silent
     doautocmd User Ncm2Plugin
     autocmd! User Ncm2Plugin
+endfunc
+
+func! s:feedkeys(key)
+    if &paste
+        return
+    endif
+    call feedkeys(a:key, 'im')
 endfunc
