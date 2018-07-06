@@ -420,3 +420,7 @@ func! s:feedkeys(key)
     endif
     call feedkeys(a:key, 'im')
 endfunc
+
+if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
+    call s:core.error("auto-popup requries `:set completeopt+=noinsert`")
+endif
