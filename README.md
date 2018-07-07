@@ -48,6 +48,10 @@ Here's a list of links where you can find extensions for ncm2.
     " found' messages
     set shortmess+=c
 
+    " enable auto complete for `<backspace>`, `<c-w>` keys.
+    " known issue https://github.com/ncm2/ncm2/issues/7
+    au TextChangedI * call ncm2#auto_trigger()
+
     " CTRL-C doesn't trigger the InsertLeave autocmd . map to <ESC> instead.
     inoremap <c-c> <ESC>
 

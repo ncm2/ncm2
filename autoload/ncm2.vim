@@ -21,14 +21,14 @@ let g:ncm2#core_data = {}
 let g:ncm2#core_event = {}
 
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
-inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_trigger(1)<CR>
+inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
 
 " use silent mapping that doesn't slower the terminal ui
 " Note: `:help complete()` says:
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
-inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_complete_popup()<CR>
-inoremap <silent> <Plug>(_ncm2_auto_trigger) <C-r>=ncm2#_trigger(0)<CR>
+inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_real_popup()<CR>
+inoremap <silent> <Plug>(_ncm2_auto_trigger) <C-r>=ncm2#_on_complete(0)<CR>
 
 let s:core = yarp#py3('ncm2_core')
 let s:sources = {}
@@ -42,28 +42,33 @@ let s:subscope_detectors = {}
 let s:auto_complete_tick = []
 
 augroup ncm2_hooks
-    autocmd!
-    autocmd User Ncm2EnableForBufferPre,Ncm2EnableForBufferPost silent
-    autocmd User Ncm2CoreData silent 
-    autocmd OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
+    au!
+    au User Ncm2EnableForBuffer call s:warmup()
+    au User Ncm2CoreData silent 
+    au OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
 augroup END
 
 func! ncm2#enable_for_buffer()
-    doautocmd User Ncm2EnableForBufferPre
-
+    if get(b:, 'ncm2_enable', 0)
+        return
+    endif
     let b:ncm2_enable = 1
 
     augroup ncm2_buf_hooks
-        autocmd! * <buffer>
-        autocmd InsertLeave <buffer> call s:cache_cleanup()
-        autocmd BufEnter,CursorHold <buffer> call s:warmup()
-        autocmd InsertEnter,TextChangedI,InsertCharPre <buffer> call ncm2#auto_trigger()
+        au! * <buffer>
+        au InsertLeave <buffer> call s:cache_cleanup()
+        au BufEnter,CursorHold <buffer> call s:warmup()
+        au InsertEnter,InsertCharPre <buffer> call ncm2#auto_trigger()
     augroup END
 
-    call s:core.jobstart()
-    call s:warmup()
+    if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
+        call s:core.error("auto-popup requries `:set completeopt+=noinsert`")
+    endif
+    if g:ncm2#auto_popup && stridx(&completeopt, 'longest') != -1
+        call s:core.error("auto-popup requries `:set completeopt-=longest`")
+    endif
 
-    doautocmd User Ncm2EnableForBufferPost
+    doau User Ncm2EnableForBuffer
 endfunc
 
 func! s:cache_cleanup()
@@ -77,11 +82,11 @@ endfunc
 func! ncm2#disable_for_buffer()
     let b:ncm2_enable = 0
     augroup ncm2_buf_hooks
-        autocmd! * <buffer>
+        au! * <buffer>
     augroup END
 endfunc
 
-func! ncm2#context(...)
+func! ncm2#context()
     let ctx = {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
     let ctx['lnum'] = ctx['curpos'][1]
     let ctx['bcol'] = ctx['curpos'][2]
@@ -95,9 +100,6 @@ func! ncm2#context(...)
     endif
     let ctx['typed'] = strpart(getline(ctx['lnum']), 0, ctx['bcol']-1)
     let ctx['ccol'] = strchars(ctx['typed']) + 1
-    if len(a:000)
-        let ctx['source'] = a:1
-    endif
     let ctx['reltime'] = reltimefloat(reltime())
     return ctx
 endfunc
@@ -124,13 +126,8 @@ func! ncm2#register_source(sr)
     if !has_key(sr, 'on_complete')
         throw "ncm2#register_source on_complete is required"
     endif
-    " these fields are allowed to be zero/empty
-    "   complete_pattern: []
-    "   complete_length
-    "   on_warmup
 
     let s:sources[name] = sr
-
     call s:warmup()
 endfunc
 
@@ -158,22 +155,16 @@ func! ncm2#complete(ctx, startccol, matches, ...)
             \   refresh)
 
     if dated && refresh
-        call ncm2#_trigger(2)
+        call ncm2#_on_complete(2)
     endif
 endfunc
 
 func! ncm2#menu_selected()
-    " when the popup menu is visible, v:completed_item will be the
-    " current_selected item
-    "
-    " if v:completed_item is empty, no item is selected
-    "
     " Note: If arrow key is used instead of <c-n> and <c-p>,
     " ncm2#menu_selected will not work.
     return pumvisible() && !empty(v:completed_item)
 endfunc
 
-" useful when working with other plugins
 func! ncm2#lock(name)
     let s:lock[a:name] = 1
 endfunc
@@ -182,7 +173,7 @@ func! ncm2#unlock(name)
     unlet s:lock[a:name]
 endfunc
 
-func! ncm2#_popup(ctx, startbcol, matches)
+func! ncm2#_update_matches(ctx, startbcol, matches)
     if s:popup_timer
         call timer_stop(s:popup_timer)
         let s:popup_timer = 0
@@ -195,16 +186,16 @@ func! ncm2#_popup(ctx, startbcol, matches)
             \           a:startbcol,
             \           a:matches) })
     else
-        call s:do_popup(a:ctx, a:startbcol, a:matches)
+        call s:update_matches(a:ctx, a:startbcol, a:matches)
     endif
 endfunc
 
 func! s:popup_timed(ctx, startbcol, matches)
     let s:popup_timer = 0
-    call s:do_popup(a:ctx, a:startbcol, a:matches)
+    call s:update_matches(a:ctx, a:startbcol, a:matches)
 endfunc
 
-func! s:do_popup(ctx, startbcol, matches)
+func! s:update_matches(ctx, startbcol, matches)
     let shown = pumvisible()
 
     " When the popup menu is expected to be displayed but it is not, I
@@ -217,37 +208,25 @@ func! s:do_popup(ctx, startbcol, matches)
     let s:matches = a:matches
     let s:lnum = a:ctx.lnum
 
-    if s:should_skip()
-        return
-    endif
-
-    " from core channel
-    " something selected by user, do not refresh the menu
-    if ncm2#menu_selected()
-        return
-    endif
-
     call s:feedkeys("\<Plug>(ncm2_complete_popup)")
 endfunc
 
-func! ncm2#_complete_popup()
+func! ncm2#_real_popup()
     if s:lnum != getcurpos()[1]
         let s:lnum = getcurpos()[1]
         let s:matches = []
     endif
+
+    if ncm2#menu_selected()
+        return
+    endif
+
     call complete(s:startbcol, s:matches)
     return ''
 endfunc
 
-func! s:should_skip()
-    return !get(b:,'ncm2_enable',0) ||
-                \ &paste != 0 ||
-                \ !empty(s:lock) ||
-                \ mode() != 'i'
-endfunc
-
 func! ncm2#auto_trigger()
-    " Use feedkeys, to makesure that the auto complete check works for autocmd
+    " Use feedkeys, to makesure that the auto complete check works for au
     " InsertEnter, it is not yet in insert mode at the time.
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
@@ -277,12 +256,7 @@ func! s:complete_timer_handler()
     call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
 endfunc
 
-" 0 auto, 1 manual, 2 auto for dated source
-func! ncm2#_trigger(trigger_type)
-    if s:should_skip()
-        return ''
-    endif
-
+func! ncm2#_on_complete(trigger_type)
     let l:manual = a:trigger_type == 1
     if l:manual == 0
         if g:ncm2#auto_popup == 0
@@ -374,7 +348,7 @@ endfunc
 func! s:try_rnotify(event, ...)
     let g:ncm2#core_event = [a:event, a:000]
     let g:ncm2#core_data = {}
-    doautocmd User Ncm2CoreData
+    doau User Ncm2CoreData
     let data = ncm2#_core_data(a:event)
     let g:ncm2#core_data = {}
     let g:ncm2#core_event = []
@@ -405,22 +379,17 @@ func! ncm2#_load_python(py)
     call s:try_rnotify('load_python', a:py)
 endfunc
 
-func! ncm2#_autocmd_plugin()
-    autocmd User Ncm2Plugin silent
-    doautocmd User Ncm2Plugin
-    autocmd! User Ncm2Plugin
+func! ncm2#_au_plugin()
+    au User Ncm2Plugin silent
+    doau User Ncm2Plugin
+    au! User Ncm2Plugin
 endfunc
 
 func! s:feedkeys(key)
-    if &paste
+    if !get(b:,'ncm2_enable',0) ||
+                \ &paste != 0 ||
+                \ !empty(s:lock)
         return
     endif
-    call feedkeys(a:key, 'im')
+    call feedkeys(a:key, 'm')
 endfunc
-
-if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
-    call s:core.error("auto-popup requries `:set completeopt+=noinsert`")
-endif
-if g:ncm2#auto_popup && stridx(&completeopt, 'longest') != -1
-    call s:core.error("auto-popup requries `:set completeopt-=longest`")
-endif

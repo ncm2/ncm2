@@ -626,7 +626,7 @@ class Ncm2Core(Ncm2Base):
         typed = ctx['typed']
         startbcol = len(typed[: startccol-1].encode()) + 1
 
-        self.notify('ncm2#_popup', ctx, startbcol, matches)
+        self.notify('ncm2#_update_matches', ctx, startbcol, matches)
 
 
 ncm2_core = Ncm2Core(vim)
