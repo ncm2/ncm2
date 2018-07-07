@@ -421,3 +421,6 @@ endfunc
 if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
     call s:core.error("auto-popup requries `:set completeopt+=noinsert`")
 endif
+if g:ncm2#auto_popup && stridx(&completeopt, 'longest') != -1
+    call s:core.error("auto-popup requries `:set completeopt-=longest`")
+endif
