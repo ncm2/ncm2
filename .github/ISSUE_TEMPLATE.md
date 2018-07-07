@@ -3,6 +3,9 @@ along with your detailed issue description:
 
 ### OS
 
+(If you're using Linux, sharing a reproducible, vimrc minimized docker image,
+can definitely help solving the issue)
+
 ### neovim `:version` output
 
 ### Minimal vimrc for reproducing the issue
