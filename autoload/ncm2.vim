@@ -58,7 +58,7 @@ func! ncm2#enable_for_buffer()
         au! * <buffer>
         au InsertLeave <buffer> call s:cache_cleanup()
         au BufEnter,CursorHold <buffer> call s:warmup()
-        au InsertEnter,InsertCharPre <buffer> call ncm2#auto_trigger()
+        au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
     augroup END
 
     if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
@@ -226,6 +226,16 @@ func! ncm2#_real_popup()
 endfunc
 
 func! ncm2#auto_trigger()
+    " do not send duplicate auto trigger
+    " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
+    " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
+    " position to filter the requests.
+    let tick = getcurpos()[0:2]
+    if tick == s:auto_complete_tick
+        return
+    endif
+    let s:auto_complete_tick = tick
+
     " Use feedkeys, to makesure that the auto complete check works for au
     " InsertEnter, it is not yet in insert mode at the time.
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
@@ -261,15 +271,6 @@ func! ncm2#_on_complete(trigger_type)
     if l:manual == 0
         if g:ncm2#auto_popup == 0
             return ''
-        endif
-
-        " not auto for dated source, no need duplicate on_complete
-        if a:trigger_type != 2
-            let tick = [getcurpos(), b:changedtick]
-            if tick == s:auto_complete_tick
-                return ''
-            endif
-            let s:auto_complete_tick = tick
         endif
     endif
 
