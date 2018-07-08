@@ -1,7 +1,7 @@
-if get(s:,'loaded','0')
+if get(g:,'ncm2_loaded','0')
     finish
 endif
-let s:loaded = 1
+let g:ncm2_loaded = 1
 
 func! s:opt(name, default)
     let val = get(g:, a:name, a:default)
