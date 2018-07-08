@@ -188,7 +188,7 @@ class Ncm2Core(Ncm2Base):
 
                 warmups.append(dict(name=name, context=ctx))
 
-        self.notify('ncm2#_warmup_sources', warmups)
+        self.notify('ncm2#_warmup_sources', data['context'], warmups)
 
     def check_source_notify(self, data, sr, ctx):
         name = sr['name']

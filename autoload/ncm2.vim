@@ -280,7 +280,6 @@ endfunc
 
 func! ncm2#_notify_sources(ctx, calls)
     if ncm2#context_dated(a:ctx) && !get(a:ctx, 'manual', 0)
-        " better to refresh
         call s:try_rnotify('on_complete', 0, a:calls)
     endif
     for ele in a:calls
@@ -299,7 +298,10 @@ func! ncm2#_notify_sources(ctx, calls)
     endfor
 endfunc
 
-func! ncm2#_warmup_sources(calls)
+func! ncm2#_warmup_sources(ctx, calls)
+    if bufnr('%') != ctx.bufnr
+        return
+    endif
     for ele in a:calls
         let name = ele['name']
         try
