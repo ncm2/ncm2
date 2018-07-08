@@ -299,7 +299,7 @@ func! ncm2#_notify_sources(ctx, calls)
 endfunc
 
 func! ncm2#_warmup_sources(ctx, calls)
-    if bufnr('%') != ctx.bufnr
+    if bufnr('%') != a:ctx.bufnr
         return
     endif
     for ele in a:calls
