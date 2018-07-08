@@ -11,14 +11,8 @@ Main features:
    completion in html style/script tag.
 3. Function parameter expansion support using ncm2-plugin.
 
-Here's a list of links where you can find extensions for ncm2.
-
-- our [wiki](https://github.com/ncm2/ncm2/wiki) page
-- [ncm2-plugin](https://github.com/topics/ncm2-plugin) github topic
-- [ncm2-source](https://github.com/topics/ncm2-source) github topic
-- [ncm2-subscope](https://github.com/topics/ncm2-subscope) github topic
-- [ncm2-snippet](https://github.com/topics/ncm2-snippet) github topic
-- [ncm2-utils](https://github.com/topics/ncm2-utils) github topic
+Read [our wiki page](https://github.com/ncm2/ncm2/wiki) for a list of
+extensions and languages support for ncm2.
 
 ## Requirements
 
