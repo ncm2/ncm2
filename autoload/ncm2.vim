@@ -75,7 +75,7 @@ func! ncm2#enable_for_buffer()
         endif
     augroup END
 
-    doau User Ncm2EnableForBuffer
+    doau <nomodeline> User Ncm2EnableForBuffer
 endfunc
 
 func! ncm2#disable_for_buffer()
@@ -340,11 +340,11 @@ func! ncm2#_real_popup()
         if pumvisible()
             call s:feedkeys("\<c-e>", "ni")
         endif
-        doau User Ncm2PopupClose
+        doau <nomodeline> User Ncm2PopupClose
         return ''
     endif
 
-    doau User Ncm2PopupOpen
+    doau <nomodeline> User Ncm2PopupOpen
     call complete(s:startbcol, s:matches)
     return ''
 endfunc
@@ -356,7 +356,7 @@ func! ncm2#skip_auto_trigger()
     let s:context_tick_extra += 1
     " skip auto ncm2#_on_complete
     let s:skip_tick = s:context_tick()
-    doau User Ncm2PopupClose
+    doau <nomodeline> User Ncm2PopupClose
     if pumvisible()
         call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
     endif
@@ -512,7 +512,7 @@ endfunc
 func! s:try_rnotify(event, ...)
     let g:ncm2#core_event = [a:event, a:000]
     let g:ncm2#core_data = {}
-    doau User Ncm2CoreData
+    doau <nomodeline> User Ncm2CoreData
     let data = ncm2#_core_data(a:event)
     let g:ncm2#core_data = {}
     let g:ncm2#core_event = []
@@ -522,7 +522,7 @@ endfunc
 func! s:request(event, ...)
     let g:ncm2#core_event = [a:event, a:000]
     let g:ncm2#core_data = {}
-    doau User Ncm2CoreData
+    doau <nomodeline> User Ncm2CoreData
     let data = ncm2#_core_data(a:event)
     let g:ncm2#core_data = {}
     let g:ncm2#core_event = []
@@ -557,7 +557,7 @@ endfunc
 func! ncm2#_au_plugin()
     try
         au User Ncm2Plugin silent
-        doau User Ncm2Plugin
+        doau <nomodeline> User Ncm2Plugin
         au! User Ncm2Plugin
     catch
         call s:core.error(v:exception)
