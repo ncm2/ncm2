@@ -10,6 +10,8 @@ can definitely help solving the issue)
 
 ### Minimal vimrc for reproducing the issue
 
+### neovim `:messages` output when the error occurs
+
 ### Log files if you think the issue is a bug
 
 ```sh
