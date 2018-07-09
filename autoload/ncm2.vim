@@ -212,15 +212,22 @@ func! s:update_matches(ctx, startbcol, matches)
 endfunc
 
 func! ncm2#_real_popup()
-    if s:lnum != getcurpos()[1]
-        let s:lnum = getcurpos()[1]
+    let pos = getcurpos()
+    if s:lnum != pos[1]
+        let s:lnum = pos[1]
+        let s:matches = []
+    endif
+    if pos[2] < s:startbcol
         let s:matches = []
     endif
 
     if ncm2#menu_selected()
-        return
+        return ''
     endif
 
+    if empty(s:matches) && !pumvisible()
+        return ''
+    endif
     call complete(s:startbcol, s:matches)
     return ''
 endfunc
