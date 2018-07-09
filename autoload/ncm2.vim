@@ -225,7 +225,12 @@ func! ncm2#_real_popup()
         return ''
     endif
 
-    if empty(s:matches) && !pumvisible()
+    if empty(s:matches)
+        " this enables the vanilla <c-n> and <c-p> keys behavior when
+        " there's no popup
+        if pumvisible()
+            call feedkeys("\<c-y>", "ni")
+        endif
         return ''
     endif
     call complete(s:startbcol, s:matches)
