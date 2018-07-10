@@ -8,6 +8,7 @@ from subprocess import Popen
 from os import path
 import unicodedata
 from copy import deepcopy
+import json
 
 __all__ = ['Ncm2Base', 'Ncm2Source', 'Popen']
 
@@ -81,9 +82,15 @@ class Ncm2Base:
         if 'abbr' not in e or type(e['abbr']) != str:
             e['abbr'] = e['word']
 
+        # LanguageClient-neovim sends json-encoded user_data
+        if type(e.get('user_data', None)) is str:
+            try:
+                e['user_data'] = json.loads(item['user_data'])
+            except:
+                pass
+
         if 'user_data' not in e or type(e['user_data']) != dict:
             e['user_data'] = {}
-
         ud = e['user_data']
         ud['source'] = ctx['source']['name']
         ud['ncm2'] = 1
