@@ -238,22 +238,22 @@ func! ncm2#_real_popup()
 endfunc
 
 func! ncm2#auto_trigger()
-    " do not send duplicate auto trigger
-    " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
-    " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
-    " position to filter the requests.
-    let tick = getcurpos()[0:2]
-    if tick == s:auto_complete_tick
-        return
-    endif
-    let s:auto_complete_tick = tick
-
     " Use feedkeys, to makesure that the auto complete check works for au
     " InsertEnter, it is not yet in insert mode at the time.
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
 
 func! ncm2#_auto_trigger()
+    " do not send duplicate auto trigger
+    " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
+    " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
+    " position to filter the requests.
+    let tick = getcurpos()[0:2]
+    if tick == s:auto_complete_tick
+        return ""
+    endif
+    let s:auto_complete_tick = tick
+
     " refresh the popup menu to reduce popup flickering
     call s:feedkeys("\<Plug>(ncm2_complete_popup)")
 
