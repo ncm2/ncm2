@@ -498,8 +498,10 @@ class Ncm2Core(Ncm2Base):
                 cache['filtered_matches'] = smat
 
                 if not smat:
-                    logger.debug('%s matches is empty after filtered', name)
+                    logger.debug('%s empty matches after filtering', name)
                     continue
+
+                logger.debug('%s matches is filtered %s -> %s', name, len(cache['matches']), len(smat))
 
                 names_with_matches.append(name)
 
