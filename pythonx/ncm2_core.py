@@ -518,22 +518,28 @@ class Ncm2Core(Ncm2Base):
             sccol = cache['startccol']
             if sccol < startccol:
                 startccol = sccol
+            for m in cache['filtered_matches']:
+                ud = m['user_data']
+                if ud.get('startccol', startccol) < startccol:
+                    startccol = ud['startccol']
 
         for name in names:
 
             try:
                 sr = srcs[name]
                 cache = self._matches[name]
-                sccol = cache['startccol']
                 smat = cache['filtered_matches']
                 if not smat:
                     continue
 
-                prefix = ctx['typed'][startccol-1: sccol-1]
-                dw = self.strdisplaywidth(prefix)
-                space_pad = ' ' * dw
-
                 for e in smat:
+                    ud = e['user_data']
+                    sccol = cache['startccol']
+                    sccol = ud.get('startccol', sccol)
+                    prefix = ctx['typed'][startccol-1: sccol-1]
+                    dw = self.strdisplaywidth(prefix)
+                    space_pad = ' ' * dw
+
                     e['abbr'] = space_pad + e['abbr']
                     e['word'] = prefix + e['word']
 
