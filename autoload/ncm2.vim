@@ -20,6 +20,7 @@ call s:opt('ncm2#filter', [])
 let g:ncm2#core_data = {}
 let g:ncm2#core_event = {}
 
+inoremap <silent> <Plug>(ncm2_skipi_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
 
@@ -243,6 +244,11 @@ func! ncm2#auto_trigger()
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
 
+func! ncm2#skip_auto_trigger()
+    let s:auto_complete_tick = getcurpos()[0:2]
+    return ''
+endfunc
+
 func! ncm2#_auto_trigger()
     " do not send duplicate auto trigger
     " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
@@ -250,7 +256,7 @@ func! ncm2#_auto_trigger()
     " position to filter the requests.
     let tick = getcurpos()[0:2]
     if tick == s:auto_complete_tick
-        return ""
+        return ''
     endif
     let s:auto_complete_tick = tick
 
