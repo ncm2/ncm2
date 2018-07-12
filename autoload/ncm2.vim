@@ -41,6 +41,7 @@ let s:lnum = 0
 let s:matches = []
 let s:subscope_detectors = {}
 let s:auto_complete_tick = []
+let s:context_tick_extra = 0
 
 augroup ncm2_hooks
     au!
@@ -57,7 +58,7 @@ func! ncm2#enable_for_buffer()
 
     augroup ncm2_buf_hooks
         au! * <buffer>
-        au InsertLeave <buffer> call s:cache_cleanup()
+        au Insertenter,InsertLeave <buffer> call s:cache_cleanup()
         au BufEnter,CursorHold <buffer> call s:warmup()
         au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
     augroup END
@@ -77,6 +78,7 @@ func! s:cache_cleanup()
     let s:auto_complete_tick = []
     let s:lnum = 0
     let s:startbcol = 1
+    let s:context_tick_extra += 1
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -102,12 +104,12 @@ func! ncm2#context()
     let ctx['typed'] = strpart(getline(ctx['lnum']), 0, ctx['bcol']-1)
     let ctx['ccol'] = strchars(ctx['typed']) + 1
     let ctx['reltime'] = reltimefloat(reltime())
+    let ctx['tick'] = ncm2#context_tick()
     return ctx
 endfunc
 
 func! ncm2#context_dated(ctx)
-    return getcurpos() != a:ctx.curpos ||
-        \ b:changedtick != a:ctx.changedtick
+    return ncm2#context_tick() != a:ctx.tick
 endfunc
 
 func! ncm2#register_source(sr)
@@ -168,10 +170,12 @@ endfunc
 
 func! ncm2#lock(name)
     let s:lock[a:name] = 1
+    call ncm2#skip_auto_trigger()
 endfunc
 
 func! ncm2#unlock(name)
     unlet s:lock[a:name]
+    call ncm2#auto_trigger()
 endfunc
 
 func! ncm2#_update_matches(ctx, startbcol, matches)
@@ -202,6 +206,10 @@ func! s:update_matches(ctx, startbcol, matches)
     " When the popup menu is expected to be displayed but it is not, I
     " guess it probably has been closed by the user
     if !shown && !empty(s:matches) && !empty(a:matches)
+        return
+    endif
+
+    if ncm2#context_dated(a:ctx)
         return
     endif
 
@@ -245,8 +253,14 @@ func! ncm2#auto_trigger()
 endfunc
 
 func! ncm2#skip_auto_trigger()
-    let s:auto_complete_tick = getcurpos()[0:2]
+    call s:cache_cleanup()
+    let s:auto_complete_tick = ncm2#context_tick()
+    call s:feedkeys("\<Plug>(ncm2_complete_popup)")
     return ''
+endfunc
+
+func! ncm2#context_tick()
+    return [getcurpos()[0:2], s:context_tick_extra]
 endfunc
 
 func! ncm2#_auto_trigger()
@@ -254,7 +268,7 @@ func! ncm2#_auto_trigger()
     " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
     " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
     " position to filter the requests.
-    let tick = getcurpos()[0:2]
+    let tick = ncm2#context_tick()
     if tick == s:auto_complete_tick
         return ''
     endif

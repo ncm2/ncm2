@@ -295,7 +295,8 @@ class Ncm2Core(Ncm2Base):
         base = ctx['base']
         matcher = self.matcher_get(ctx['matcher'])
         matches = [m for m in matches if matcher(base, m)]
-        logger.debug('%s matches is filtered %s -> %s', name, old_le, len(matches))
+        logger.debug('%s matches is filtered %s -> %s',
+                     name, old_le, len(matches))
 
         cache['startccol'] = startccol
         cache['refresh'] = refresh
@@ -508,7 +509,8 @@ class Ncm2Core(Ncm2Base):
                     logger.debug('%s empty matches after filtering', name)
                     continue
 
-                logger.debug('%s matches is filtered %s -> %s', name, len(cache['matches']), len(smat))
+                logger.debug('%s matches is filtered %s -> %s',
+                             name, len(cache['matches']), len(smat))
 
                 names_with_matches.append(name)
 
@@ -632,7 +634,7 @@ class Ncm2Core(Ncm2Base):
         for m in matches:
             m['user_data'] = json.dumps(m['user_data'])
 
-        popup = [startccol, matches]
+        popup = [ctx['tick'], startccol, matches]
         if self._last_popup == popup:
             return
         self._last_popup = popup
