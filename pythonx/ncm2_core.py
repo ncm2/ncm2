@@ -290,6 +290,13 @@ class Ncm2Core(Ncm2Base):
             self._matches[name] = {}
             cache = self._matches[name]
 
+        # filter before cache
+        old_le = len(matches)
+        base = ctx['base']
+        matcher = self.matcher_get(ctx['matcher'])
+        matches = [m for m in matches if matcher(base, m)]
+        logger.debug('%s matches is filtered %s -> %s', name, old_le, len(matches))
+
         cache['startccol'] = startccol
         cache['refresh'] = refresh
         cache['matches'] = matches
