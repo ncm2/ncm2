@@ -90,21 +90,28 @@ func! ncm2#disable_for_buffer()
 endfunc
 
 func! ncm2#context()
-    let ctx = {'bufnr':bufnr('%'), 'curpos':getcurpos(), 'changedtick':b:changedtick}
-    let ctx['lnum'] = ctx['curpos'][1]
-    let ctx['bcol'] = ctx['curpos'][2]
-    let ctx['filetype'] = &filetype
-    let ctx['scope'] = &filetype
-    let ctx['filepath'] = expand('%:p')
-    if ctx['filepath'] == ''
+    let pos = getcurpos()
+    let bcol = pos[2]
+    let typed = strpart(getline('.'), 0, bcol-1)
+    let ctx = {
+                \ 'bufnr': bufnr('%'),
+                \ 'curpos': pos,
+                \ 'changedtick': b:changedtick,
+                \ 'lnum': pos[1],
+                \ 'bcol': bcol,
+                \ 'ccol': strchars(typed) + 1,
+                \ 'filetype': &filetype,
+                \ 'scope': &filetype,
+                \ 'filepath': expand('%:p'),
+                \ 'typed': strpart(getline('.'), 0, pos[2]-1),
+                \ 'reltime': reltimefloat(reltime()),
+                \ 'tick': ncm2#context_tick(),
+                \ }
+    if ctx.filepath == ''
         " FIXME this is necessary here, otherwise empty filepath is
-        " somehow converted to None in vim's python binding.
-        let ctx['filepath'] = ""
+        " somehow converted to None in vim8's python binding.
+        let ctx.filepath = ""
     endif
-    let ctx['typed'] = strpart(getline(ctx['lnum']), 0, ctx['bcol']-1)
-    let ctx['ccol'] = strchars(ctx['typed']) + 1
-    let ctx['reltime'] = reltimefloat(reltime())
-    let ctx['tick'] = ncm2#context_tick()
     return ctx
 endfunc
 
