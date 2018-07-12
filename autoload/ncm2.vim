@@ -414,3 +414,15 @@ func! s:feedkeys(key)
     endif
     call feedkeys(a:key, 'm')
 endfunc
+
+func! ncm2#insert_mode_only_key(key)
+    exe 'map' a:key '<nop>'
+    exe 'cmap' a:key '<nop>'
+    exe 'tmap' a:key '<nop>'
+endfunc
+
+call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')
+call ncm2#insert_mode_only_key('<Plug>(ncm2_auto_trigger)')
+call ncm2#insert_mode_only_key('<Plug>(ncm2_manual_trigger)')
+call ncm2#insert_mode_only_key('<Plug>(ncm2_complete_popup)')
+call ncm2#insert_mode_only_key('<Plug>(_ncm2_auto_trigger)')
