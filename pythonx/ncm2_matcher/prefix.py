@@ -3,7 +3,8 @@
 
 class Matcher:
 
-    def __init__(self, c='smartcase'):
+    def __init__(self, c='smartcase', key='abbr'):
+        self.key = key
         if c == 'smartcase':
             self.match = self.match_smart_case
         elif c == 'icase':
@@ -13,23 +14,25 @@ class Matcher:
 
     def match_case(self, b, m):
         lb = len(b)
-        w = m['word'][ : lb]
+        w = m[self.key][ : lb]
         if b != w:
             return False
+        m['user_data']['match_key'] = self.key
         m['user_data']['match_highlight'] = [[0, lb]]
         return True
 
     def match_icase(self, b, m):
         lb = len(b)
-        w = m['word'][ : lb]
+        w = m[self.key][ : lb]
         if b.lower() != w.lower():
             return False
+        m['user_data']['match_key'] = self.key
         m['user_data']['match_highlight'] = [[0, lb]]
         return True
 
     def match_smart_case(self, b, m):
         lb = len(b)
-        w = m['word'][ : lb]
+        w = m[self.key][ : lb]
 
         if lb != len(w):
             return False
@@ -44,5 +47,6 @@ class Matcher:
             else:
                 return False
 
+        m['user_data']['match_key'] = self.key
         m['user_data']['match_highlight'] = [[0, lb]]
         return True
