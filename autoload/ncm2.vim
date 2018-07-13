@@ -61,7 +61,9 @@ func! ncm2#enable_for_buffer()
         au Insertenter,InsertLeave <buffer> call s:cache_cleanup()
         au BufEnter,CursorHold <buffer> call s:warmup()
         au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
-        au CompleteDone <buffer> call s:skip_if_non_ncm2_completed()
+        if has("patch-8.0.1493")
+            au CompleteDone <buffer> call s:skip_if_non_ncm2_completed()
+        endif
     augroup END
 
     if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
@@ -79,7 +81,7 @@ func! s:skip_if_non_ncm2_completed()
     if empty(v:completed_item)
         return
     endif
-    silent! let ud = json_decode(v:completed_item.uesr_data)
+    silent! let ud = json_decode(v:completed_item.user_data)
     if type(ud) != v:t_dict || get(ud, 'ncm2', 0) == 0
         call s:feedkeys("\<Plug>(ncm2_skip_auto_trigger)", "im")
     endif
@@ -257,7 +259,7 @@ func! ncm2#_real_popup()
         " this enables the vanilla <c-n> and <c-p> keys behavior when
         " there's no popup
         if pumvisible()
-            call s:feedkeys("\<c-y>", "ni")
+            call s:feedkeys("\<c-e>", "ni")
         endif
         return ''
     endif
