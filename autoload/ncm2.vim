@@ -257,7 +257,7 @@ func! ncm2#_real_popup()
         " this enables the vanilla <c-n> and <c-p> keys behavior when
         " there's no popup
         if pumvisible()
-            call feedkeys("\<c-y>", "ni")
+            call s:feedkeys("\<c-y>", "ni")
         endif
         return ''
     endif
@@ -274,7 +274,7 @@ endfunc
 func! ncm2#skip_auto_trigger()
     call s:cache_cleanup()
     let s:auto_complete_tick = ncm2#context_tick()
-    call s:feedkeys("\<Plug>(ncm2_complete_popup)")
+    call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
     return ''
 endfunc
 
