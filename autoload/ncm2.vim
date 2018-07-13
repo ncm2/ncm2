@@ -176,8 +176,8 @@ func! ncm2#menu_selected()
 endfunc
 
 func! ncm2#lock(name)
-    let s:lock[a:name] = 1
     call ncm2#skip_auto_trigger()
+    let s:lock[a:name] = 1
 endfunc
 
 func! ncm2#unlock(name)
