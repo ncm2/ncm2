@@ -61,6 +61,7 @@ func! ncm2#enable_for_buffer()
         au Insertenter,InsertLeave <buffer> call s:cache_cleanup()
         au BufEnter,CursorHold <buffer> call s:warmup()
         au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
+        au CompleteDone <buffer> call s:skip_if_non_ncm2_completed()
     augroup END
 
     if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
@@ -71,6 +72,17 @@ func! ncm2#enable_for_buffer()
     endif
 
     doau User Ncm2EnableForBuffer
+endfunc
+
+func! s:skip_if_non_ncm2_completed()
+    let ud = {}
+    if empty(v:completed_item)
+        return
+    endif
+    silent! let ud = json_decode(v:completed_item.uesr_data)
+    if type(ud) != v:t_dict || get(ud, 'ncm2', 0) == 0
+        call s:feedkeys("\<Plug>(ncm2_skip_auto_trigger)", "im")
+    endif
 endfunc
 
 func! s:cache_cleanup()
@@ -427,13 +439,17 @@ func! ncm2#_au_plugin()
     au! User Ncm2Plugin
 endfunc
 
-func! s:feedkeys(key)
+func! s:feedkeys(key, ...)
     if !get(b:,'ncm2_enable',0) ||
                 \ &paste != 0 ||
                 \ !empty(s:lock)
         return
     endif
-    call feedkeys(a:key, 'm')
+    let m = 'm'
+    if len(a:000)
+        let m = a:1
+    endif
+    call feedkeys(a:key, m)
 endfunc
 
 func! ncm2#insert_mode_only_key(key)
