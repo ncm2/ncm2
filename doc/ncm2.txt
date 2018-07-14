@@ -20,8 +20,8 @@ ncm2			            *nvim-completion-manager* *NCM2*
 ==============================================================================
 1. Introduction					    *NCM2-introduction*
 
-NCM2, formerly known as nvim-completion-manager, is a slim, fast hackable
-completion framework, for neovim.
+NCM2, formerly known as nvim-completion-manager, is a slim, fast and hackable
+completion framework for neovim.
 
 Main features:
 
@@ -190,7 +190,7 @@ ncm2#register_source({source})
 	Register a completion source. {source} is a |Dict| that defines the
 	source, it may contain these fields:
 
-	name					        *NCM2-name*
+	name
 			Required, the unique name of the completion source.
 
 	mark				            *NCM2-mark*
@@ -247,8 +247,15 @@ ncm2#register_source({source})
             An extra |List| of PCRE patterns (python regex), besides
             complete_length, for auto triggering popup menu. 
 
-    Here are some examples, shich should give you some hint about how
-    word_pattern, complete_pattern and complete_length works.
+    matcher                         *NCM2-matcher*
+            Set this field if you want customized matcher instead of the
+            global |g:ncm2#matcher|.
+            If you want the matcher to filter the menu field of the
+            |complete-item| instead of the default |abbr| field. set the
+            matcher to `{'key': 'menu'}`
+
+    Here are some examples, that should give you some hints on how
+    word_pattern, complete_pattern and complete_length work.
 >
         complete_length: 3
         complete_pattern: ['\.']
@@ -261,6 +268,7 @@ ncm2#register_source({source})
 
             typing            : fd.read()
             complete trigger  :   ^
+            complete trigger  :    x
             base              :    [..]
 
         complete_length: -1
@@ -279,9 +287,11 @@ ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
     {context} is an arugment passed to the |NCM2-on_complete| handler. Don't
     modify the contents. It is important for synchronization. 
 
-    {startccol} and {matches} are are similar to vim's builtin |complete()|
-    function. Except that startccol is counted by characters instead of by
-    bytes.
+    {startccol} is similar to the `startcol` argument of the |complete()|
+    function. However, startccol is counted by characters instead of by bytes.
+
+    {matches} is similar to the `matches` argument of the |complete()|
+    function.
 
     {refresh} is 0 by default. Normally ncm2 will cache the result properly.
     set it to 1 if you want another on_complete notification as the the user
@@ -329,26 +339,25 @@ ncm2#context()
 			Current editting scope.
 
 	startccol				            *NCM2-startccol*
-            Calaulated by NCM2 for convenience, usually you could pass it as
-            an argument to the |ncm2#complete()| function.
+            Calaulated by NCM2 for convenience, usually you could simply pass
+            it as an argument to the |ncm2#complete()| function.
 
 	base
-            Set according to the startccol. The value is the same as the
-            {base} passed to |complete-functions|.
+            The string that starts from `startccol` ends before the cursor.
 
 						                 *ncm2#context_dated()*
 ncm2#context_dated({context})
 	Check if the {context} is dated.
 
-						*ncm2#enable_for_buffer()*
+						                *ncm2#enable_for_buffer()*
 ncm2#enable_for_buffer()
 	Enable ncm2 for current buffer.
 
-						*ncm2#disable_for_buffer()*
+						                *ncm2#disable_for_buffer()*
 ncm2#disable_for_buffer()
 	Disable ncm2 for current buffer.
 
-						*<Plug>(ncm2_manual_trigger)*
+						                *<Plug>(ncm2_manual_trigger)*
 <Plug>(ncm2_manual_trigger)
 			A key to trigger the completion manually. 
 

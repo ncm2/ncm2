@@ -2,17 +2,18 @@
 
 NCM2, formerly known as
 [nvim-completion-manager](https://github.com/roxma/nvim-completion-manager),
-is a slim, fast hackable completion framework, for neovim.
+is a slim, fast and hackable completion framework for neovim.
 
 Main features:
 
 1. Fast and asynchronous completion support, with vimscript friendly API.
 2. Smart on files with different languages, for example, css/javascript
    completion in html style/script tag.
-3. Function parameter expansion support using ncm2-plugin.
+3. Function parameter expansion support using
+   [ncm2-snippet](https://github.com/topics/ncm2-snippet) plugins.
 
 Read [our wiki page](https://github.com/ncm2/ncm2/wiki) for a list of
-extensions and languages support for ncm2.
+extensions and languages support for NCM2.
 
 ## Requirements
 
@@ -21,7 +22,7 @@ extensions and languages support for ncm2.
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
 For vim8 user, read the [nvim-yarp](https://github.com/roxma/nvim-yarp)
-README. Note that vim8 support is simply a bonus. It's not the goal of ncm2.
+README. Note that vim8 support is simply a bonus. It's not the goal of NCM2.
 
 ## Install
 
@@ -34,11 +35,13 @@ README. Note that vim8 support is simply a bonus. It's not the goal of ncm2.
     " enable ncm2 for all buffers
     autocmd BufEnter * call ncm2#enable_for_buffer()
 
-    " note that you must keep noinsert in completeopt, the others are optional
+    " note that you must keep `noinsert` in completeopt, you must not use
+    " `longest`. The others are optional. Read `:help completeopt` for
+    " more info
     set completeopt=noinsert,menuone,noselect
 ```
 
-## Optional vimrc tips
+## Optional Vimrc Tips
 
 ```vim
     " suppress the annoying 'match x of y', 'The only match' and 'Pattern not
@@ -81,7 +84,7 @@ README. Note that vim8 support is simply a bonus. It's not the goal of ncm2.
     Plug 'ncm2/ncm2-jedi'
 ```
 
-## Buy Me A Coffee
+## Buy Me A Coffee :coffee:
 
 This project is always gonna be FOSS. While it still takes me [lots of
 effert](https://github.com/ncm2) to create & tune things amazing.

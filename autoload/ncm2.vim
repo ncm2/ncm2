@@ -18,7 +18,7 @@ call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
 
 let g:ncm2#core_data = {}
-let g:ncm2#core_event = {}
+let g:ncm2#core_event = []
 
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
