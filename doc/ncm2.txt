@@ -140,7 +140,7 @@ g:ncm2#matcher
             "abbrfuzzy"
                 Abbreviation based fuzzy matching. For example, `fooba`
                 matches `foo_bar`, but `fooar` doesn't match `foo_bar`.
-            Default: "prefix"
+            Default: "abbrfuzzy"
 
                                     *g:ncm2#sorter*
 g:ncm2#sorter
@@ -149,7 +149,7 @@ g:ncm2#sorter
                 use the swapped-case word as the sort key.
             "abbrfuzzy"
                 This is more friendly for "abbrfuzzy" matcher.
-            Default: "swapcase_word"
+            Default: "abbrfuzzy"
 
                                     *g:ncm2#filter*
 g:ncm2#filter
