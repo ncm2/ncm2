@@ -117,16 +117,16 @@ Optional vimrc tips:
 
                                     *g:ncm2#complete_delay* 
 g:ncm2#complete_delay 
-            Wait for an interval, in milliseconds, before starting to compute
-            completions. This is useful when dealing with slow, sync
-            completion source.
+            Wait for an interval, in milliseconds, before starting to
+            compute completions. This is useful when dealing with slow,
+            sync completion source.
 			Default: 0
 
                                     *g:ncm2#popup_delay*
 g:ncm2#popup_delay
             Adds a delay before the popup menu actually popups up. This
-            reduces popup menu flickering when multiple sources is updating
-            the popup menu in a short interval.
+            reduces popup menu flickering when multiple sources is
+            updating the popup menu in a short interval.
 			Default: 100
 
                                     *g:ncm2#matcher*
@@ -135,14 +135,20 @@ g:ncm2#matcher
             "prefix"
                 match if the typing is the prefix of the completion item.
             "substr"
-                match if the typing is a substring of the completion item.
+                match if the typing is a substring of the completion
+                item.
+            "abbrfuzzy"
+                Abbreviation based fuzzy matching. For example, `fooba`
+                matches `foo_bar`, but `fooar` doesn't match `foo_bar`.
             Default: "prefix"
 
                                     *g:ncm2#sorter*
 g:ncm2#sorter
 			Available builtin sorters:
-            "swapcase_word"
+            "alphanum"
                 use the swapped-case word as the sort key.
+            "abbrfuzzy"
+                This is more friendly for "abbrfuzzy" matcher.
             Default: "swapcase_word"
 
                                     *g:ncm2#filter*
@@ -156,8 +162,8 @@ g:ncm2#filter
                                     *g:ncm2#auto_popup*
 g:ncm2#auto_popup
             If set to 0, then you have to map the
-            `<Plug>(ncm2_manual_trigger)` key, and use this key to trigger the
-            completion.
+            `<Plug>(ncm2_manual_trigger)` key, and use this key to
+            trigger the completion.
 			Default: 1
 
 						            *g:ncm2#complete_length*
@@ -165,15 +171,16 @@ g:ncm2#complete_length
 			The default value for |ncm2-complete_length|.
 
 			Default: `[[1,4],[7,3]]`
-            Format: a |List| as [[ min priority, min len ],...], or single
-            integer value.
+            Format: a |List| as [[ min priority, min len ],...], or
+            single integer value.
 
-            The default value means that sources with priority between 1 and 6
-            will have the value of 4, and sources with priority >= 7 will have
-            the value of 3.  
+            The default value means that sources with priority between 1
+            and 6 will have the value of 4, and sources with priority >=
+            7 will have the value of 3.  
 
-            Priority >= 7 is more semantic completion source, So it's better
-            to use a smaller value to trigger the popup than others.
+            Priority >= 7 is more semantic completion source, So it's
+            better to use a smaller value to trigger the popup than
+            others.
 
 ==============================================================================
 5. API						            *NCM2-API*

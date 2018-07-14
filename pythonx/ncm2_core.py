@@ -153,7 +153,6 @@ class Ncm2Core(Ncm2Base):
                 ctx['early_cache'] = False
                 ctx['source'] = sr
                 ctx['matcher'] = self.matcher_opt_get(data, sr)
-                ctx['sorter'] = self.sorter_opt_get(data, sr)
 
                 if not self.check_source_notify(data, sr, ctx):
                     continue
@@ -252,11 +251,11 @@ class Ncm2Core(Ncm2Base):
         self._notified[name] = ctx
         return True
 
-    def complete(self, data, ctx, startccol, matches, refresh):
-        cur_ctx = data['context']
-        self.cache_cleanup_check(cur_ctx)
+    def complete(self, data, sctx, startccol, matches, refresh):
+        ctx = data['context']
+        self.cache_cleanup_check(ctx)
 
-        name = ctx['source']['name']
+        name = sctx['source']['name']
 
         sr = data['sources'].get(name, None)
         if not sr:
@@ -264,45 +263,44 @@ class Ncm2Core(Ncm2Base):
             return
 
         cache = self._matches.get(name, None)
-        if cache and cache['context']['reltime'] > ctx['reltime']:
+        if cache and cache['context']['reltime'] > sctx['reltime']:
             logger.debug('%s cache is newer, %s', name, cache)
             return
 
-        dated = ctx['dated']
+        dated = sctx['dated']
 
         # be careful when completion matches context is dated
         if dated:
-            if not self.is_kw_type(data, sr, ctx, cur_ctx):
+            if not self.is_kw_type(data, sr, sctx, ctx):
                 logger.info("[%s] dated is_kw_type fail, old[%s] cur[%s]",
-                            name, ctx['typed'], cur_ctx['typed'])
+                            name, sctx['typed'], ctx['typed'])
                 return
             else:
                 logger.info("[%s] dated is_kw_type ok, old[%s] cur[%s]",
-                            name, ctx['typed'], cur_ctx['typed'])
+                            name, sctx['typed'], ctx['typed'])
 
         # adjust for subscope
-        if ctx['lnum'] == 1:
-            startccol += ctx.get('scope_ccol', 1) - 1
+        if sctx['lnum'] == 1:
+            startccol += sctx.get('scope_ccol', 1) - 1
 
-        matches = self.matches_formalize(ctx, matches)
+        matches = self.matches_formalize(sctx, matches)
+
+        # filter before cache
+        old_le = len(matches)
+        matches = self.matches_filter_by_matcher(
+            data, sr, sctx, startccol, matches)
+        logger.debug('%s matches is filtered %s -> %s',
+                     name, old_le, len(matches))
 
         if not cache:
             self._matches[name] = {}
             cache = self._matches[name]
 
-        # filter before cache
-        old_le = len(matches)
-        base = ctx['base']
-        matcher = self.matcher_get(ctx['matcher'])
-        matches = [m for m in matches if matcher(base, m)]
-        logger.debug('%s matches is filtered %s -> %s',
-                     name, old_le, len(matches))
-
         cache['startccol'] = startccol
         cache['refresh'] = refresh
         cache['matches'] = matches
-        cache['context'] = ctx
-        cache['enable'] = not ctx.get('early_cache', False)
+        cache['context'] = sctx
+        cache['enable'] = not sctx.get('early_cache', False)
 
         self.matches_update_popup(data)
 
@@ -470,9 +468,6 @@ class Ncm2Core(Ncm2Base):
 
     def matches_update_popup(self, data):
         ctx = data['context']
-        typed = ctx['typed']
-
-        matches = []
 
         # sort by priority
         names = self._matches.keys()
@@ -501,8 +496,8 @@ class Ncm2Core(Ncm2Base):
                     continue
 
                 smat = copy.deepcopy(cache['matches'])
-                base = typed[sccol - 1:]
-                smat = self.matches_filter(data, sr, base, smat)
+                sctx = cache['context']
+                smat = self.matches_filter(data, sr, sctx, sccol, smat)
                 cache['filtered_matches'] = smat
 
                 if not smat:
@@ -525,13 +520,14 @@ class Ncm2Core(Ncm2Base):
         for name in names:
             cache = self._matches[name]
             sccol = cache['startccol']
-            if sccol < startccol:
-                startccol = sccol
             for m in cache['filtered_matches']:
                 ud = m['user_data']
-                if ud.get('startccol', startccol) < startccol:
-                    startccol = ud['startccol']
+                mccol = ud.get('startccol', sccol)
+                if mccol < startccol:
+                    startccol = mccol
 
+        typed = ctx['typed']
+        matches = []
         for name in names:
 
             try:
@@ -541,17 +537,16 @@ class Ncm2Core(Ncm2Base):
                 if not smat:
                     continue
 
+                sccol = cache['startccol']
                 for e in smat:
                     ud = e['user_data']
-                    sccol = cache['startccol']
-                    sccol = ud.get('startccol', sccol)
-                    prefix = ctx['typed'][startccol-1: sccol-1]
+                    mccol = ud.get('startccol', sccol)
+                    prefix = typed[startccol-1: mccol-1]
                     dw = self.strdisplaywidth(prefix)
                     space_pad = ' ' * dw
 
                     e['abbr'] = space_pad + e['abbr']
                     e['word'] = prefix + e['word']
-
                 matches += smat
 
             except Exception as inst:
@@ -569,49 +564,91 @@ class Ncm2Core(Ncm2Base):
     def get_sources_for_popup(self, data, names):
         return names
 
+    def matcher_opt_formalize(self, opt):
+        if type(opt) is str:
+            return dict(name=opt)
+        return copy.deepcopy(opt)
+
     def matcher_opt_get(self, data, sr):
+        gmopt = self.matcher_opt_formalize(data['matcher'])
+        smopt = {}
         if 'matcher' in sr:
-            return sr['matcher']
-        else:
-            return data['matcher']
+            smopt = self.matcher_opt_formalize(sr['matcher'])
+        gmopt.update(smopt)
+        return gmopt
+
+    def sorter_opt_formalize(self, opt):
+        if type(opt) is str:
+            return dict(name=opt)
+        return copy.deepcopy(opt)
 
     def sorter_opt_get(self, data, sr):
+        gsopt = self.sorter_opt_formalize(data['sorter'])
+        ssopt = {}
         if 'sorter' in sr:
-            return sr['sorter']
-        else:
-            return data['sorter']
+            ssopt = self.sorter_opt_formalize(opt)
+        gsopt.update(ssopt)
+        return gsopt
 
-    def filter_get(self, opts):
-        if type(opts) is str:
+    def sorter_get(self, opt):
+        name = opt['name']
+        modname = 'ncm2_sorter.' + name
+        mod = import_module(modname)
+        m = mod.Sorter(**opt)
+        return m
+
+    def filter_opt_formalize(self, opts):
+        opts = copy.deepcopy(opts)
+        if type(opts) is not list:
             opts = [opts]
-        from ncm2_filter.filter_chain import Filter
-        fl = Filter(*opts)
-        return lambda *args: fl.filter(*args)
+        ret = []
+        for opt in opts:
+            if type(opt) is str:
+                opt = dict(name=opt)
+            ret.append(opt)
+        return ret
 
     def filter_opt_get(self, data, sr):
-        if 'filter' in sr:
-            o = sr['filter']
-            return o if type(o) is list else [o]
-        o = data['filter']
-        return o if type(o) is list else [o]
+        opt = sr.get('filter', data['filter'])
+        return self.filter_opt_formalize(opt)
 
-    def matches_filter(self, data, sr, base, matches):
-        opt = self.matcher_opt_get(data, sr)
-        matcher = self.matcher_get(opt)
+    def filter_get(self, opts):
+        filts = []
+        for opt in opts:
+            name = opt['name']
+            modname = 'ncm2_filter.' + name
+            mod = import_module(modname)
+            f = mod.Filter(**opt)
+            filts.append(f)
+        def handler(data, sr, sctx, sccol, matches):
+            for f in filts:
+                matches = f(data, sr, sctx, sccol, matches)
+            return matches
+        return handler
 
+    def matches_filter_by_matcher(self, data, sr, sctx, sccol, matches):
+        ctx = data['context']
+        typed = ctx['typed']
+        matcher = self.matcher_get(sctx['matcher'])
         tmp = []
         for m in matches:
+            ud = m['user_data']
+            mccol = ud.get('startccol', sccol)
+            base = typed[mccol-1:]
             if matcher(base, m):
                 tmp.append(m)
-        matches = tmp
+        return tmp
 
-        opt = self.sorter_opt_get(data, sr)
-        sorter = self.sorter_get(opt)
+    def matches_filter(self, data, sr, sctx, sccol, matches):
+        matches = self.matches_filter_by_matcher(
+            data, sr, sctx, sccol, matches)
+
+        sorter = self.sorter_get(self.sorter_opt_get(data, sr))
         matches = sorter(matches)
 
         opt = self.filter_opt_get(data, sr)
         filt = self.filter_get(opt)
-        matches = filt(base, matches)
+        matches = filt(data, sr, sctx, sccol, matches)
 
         return matches
 

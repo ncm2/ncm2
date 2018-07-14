@@ -1,38 +1,29 @@
 # -*- coding: utf-8 -*-
 
 
-class Matcher:
+def Matcher(case='smartcase', key='abbr', **kargs):
 
-    def __init__(self, c='smartcase', key='abbr'):
-        self.key = key
-        if c == 'smartcase':
-            self.match = self.match_smart_case
-        elif c == 'icase':
-            self.match = self.match_icase
-        else:
-            self.match = self.match_case
-
-    def match_case(self, b, m):
+    def match_case(b, m):
         lb = len(b)
-        w = m[self.key][ : lb]
+        w = m[key][ : lb]
         if b != w:
             return False
-        m['user_data']['match_key'] = self.key
+        m['user_data']['match_key'] = key
         m['user_data']['match_highlight'] = [[0, lb]]
         return True
 
-    def match_icase(self, b, m):
+    def match_icase(b, m):
         lb = len(b)
-        w = m[self.key][ : lb]
+        w = m[key][ : lb]
         if b.lower() != w.lower():
             return False
-        m['user_data']['match_key'] = self.key
+        m['user_data']['match_key'] = key
         m['user_data']['match_highlight'] = [[0, lb]]
         return True
 
-    def match_smart_case(self, b, m):
+    def match_smart_case(b, m):
         lb = len(b)
-        w = m[self.key][ : lb]
+        w = m[key][ : lb]
 
         if lb != len(w):
             return False
@@ -47,6 +38,13 @@ class Matcher:
             else:
                 return False
 
-        m['user_data']['match_key'] = self.key
+        m['user_data']['match_key'] = key
         m['user_data']['match_highlight'] = [[0, lb]]
         return True
+
+    if case == 'smartcase':
+        return match_smart_case
+    elif case == 'icase':
+        return match_icase
+    else:
+        return match_case
