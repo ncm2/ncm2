@@ -47,17 +47,27 @@ def getLogger(name):
     logger.setLevel(get_loglevel())
     return logger
 
+def matcher_get(opt):
+    name = opt['name']
+    modname = 'ncm2_matcher.' + name
+    mod = import_module(modname)
+    m = mod.Matcher(**opt)
+    return m
+
+def matcher_opt_formalize(opt):
+    if type(opt) is str:
+        return dict(name=opt)
+    return deepcopy(opt)
 
 class Ncm2Base:
     def __init__(self, nvim):
         self.nvim = nvim
 
+    def matcher_opt_formalize(self, opt):
+        return matcher_opt_formalize(opt)
+
     def matcher_get(self, opt):
-        name = opt['name']
-        modname = 'ncm2_matcher.' + name
-        mod = import_module(modname)
-        m = mod.Matcher(**opt)
-        return m
+        return matcher_get(opt)
 
     def match_formalize(self, ctx, item):
         e = {}
