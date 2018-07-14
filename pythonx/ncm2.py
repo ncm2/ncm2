@@ -61,7 +61,7 @@ class Ncm2Base:
 
     def match_formalize(self, ctx, item):
         e = {}
-        if type(item) == type(''):
+        if type(item) is str:
             e['word'] = item
         else:
             e = deepcopy(item)
@@ -69,10 +69,12 @@ class Ncm2Base:
         e['icase'] = 1
         if 'menu' not in e or type(e['menu']) != str:
             e['menu'] = ''
-        if 'info' not in e or type(e['menu']) != str:
+        if 'info' not in e or type(e['info']) != str:
             e['info'] = ''
         if 'abbr' not in e or type(e['abbr']) != str:
             e['abbr'] = e['word']
+        if 'kind' not in e or type(e['kind']) != str:
+            e['kind'] = ''
 
         # LanguageClient-neovim sends json-encoded user_data
         if type(e.get('user_data', None)) is str:
@@ -83,6 +85,7 @@ class Ncm2Base:
 
         if 'user_data' not in e or type(e['user_data']) != dict:
             e['user_data'] = {}
+
         ud = e['user_data']
         ud['source'] = ctx['source']['name']
         ud['ncm2'] = 1
