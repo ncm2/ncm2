@@ -80,3 +80,16 @@ README. Note that vim8 support is simply a bonus. It's not the goal of ncm2.
     Plug 'ncm2/ncm2-path'
     Plug 'ncm2/ncm2-jedi'
 ```
+
+## By Me A Coffee.
+
+This project is always gonna be FOSS. While it still takes me [lots of
+effert](https://github.com/ncm2) to create & tune things amazing.
+
+Feel free to buy me a coffe if you love this project.
+
+Send [to roxma with paypal](https://www.paypal.me/roxma)
+
+Or send to roxma with WeChat:
+
+![WeChat Pay](https://user-images.githubusercontent.com/4538941/42722403-edfffb9a-877d-11e8-9fd9-615aeba0c3dd.png)
