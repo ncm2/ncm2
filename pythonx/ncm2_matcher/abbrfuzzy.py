@@ -17,10 +17,10 @@ def get_abbrev(s):
             if c.isdecimal() and not cp.isdecimal():
                 res.append(i)
             continue
-        elif c.isupper():
+        elif not cp.isalpha():
             res.append(i)
             continue
-        elif not cp.isalpha():
+        elif c.isupper() and not cp.isupper():
             res.append(i)
             continue
         else:
