@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import re
 import vim
 from ncm2 import Ncm2Base, getLogger
@@ -8,6 +7,7 @@ import json
 import glob
 from os import path, environ
 from importlib import import_module
+from copy import deepcopy
 
 # don't import this module by other processes
 assert environ['NVIM_YARP_MODULE'] == 'ncm2_core'
@@ -149,7 +149,7 @@ class Ncm2Core(Ncm2Base):
         for ctx_idx, tmp_ctx in enumerate(contexts):
             for name, sr in data['sources'].items():
 
-                ctx = copy.deepcopy(tmp_ctx)
+                ctx = deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
                 ctx['source'] = sr
                 ctx['matcher'] = self.matcher_opt_get(data, sr)
@@ -175,7 +175,7 @@ class Ncm2Core(Ncm2Base):
         for ctx_idx, tmp_ctx in enumerate(contexts):
             for name, sr in data['sources'].items():
 
-                ctx = copy.deepcopy(tmp_ctx)
+                ctx = deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
                 ctx['source'] = sr
 
@@ -305,8 +305,8 @@ class Ncm2Core(Ncm2Base):
         self.matches_update_popup(data)
 
     def is_kw_type(self, data, sr, ctx1, ctx2):
-        ctx1 = copy.deepcopy(ctx1)
-        ctx2 = copy.deepcopy(ctx2)
+        ctx1 = deepcopy(ctx1)
+        ctx2 = deepcopy(ctx2)
 
         if not self.source_check_patterns(data, sr, ctx1):
             logger.debug('old_ctx source_check_patterns failed')
@@ -359,7 +359,7 @@ class Ncm2Core(Ncm2Base):
                     res = sd.detect(lnum, ccol, scope_src)
                     if not res:
                         continue
-                    sub = copy.deepcopy(ctx)
+                    sub = deepcopy(ctx)
                     sub.update(res)
 
                     # adjust offset to global based and add the new context
@@ -495,7 +495,7 @@ class Ncm2Core(Ncm2Base):
                     logger.warn('%s invalid startccol %s', name, sccol)
                     continue
 
-                smat = copy.deepcopy(cache['matches'])
+                smat = deepcopy(cache['matches'])
                 sctx = cache['context']
                 smat = self.matches_filter(data, sr, sctx, sccol, smat)
                 cache['filtered_matches'] = smat
@@ -563,11 +563,6 @@ class Ncm2Core(Ncm2Base):
     def get_sources_for_popup(self, data, names):
         return names
 
-    def matcher_opt_formalize(self, opt):
-        if type(opt) is str:
-            return dict(name=opt)
-        return copy.deepcopy(opt)
-
     def matcher_opt_get(self, data, sr):
         gmopt = self.matcher_opt_formalize(data['matcher'])
         smopt = {}
@@ -579,7 +574,7 @@ class Ncm2Core(Ncm2Base):
     def sorter_opt_formalize(self, opt):
         if type(opt) is str:
             return dict(name=opt)
-        return copy.deepcopy(opt)
+        return deepcopy(opt)
 
     def sorter_opt_get(self, data, sr):
         gsopt = self.sorter_opt_formalize(data['sorter'])
@@ -597,7 +592,7 @@ class Ncm2Core(Ncm2Base):
         return m
 
     def filter_opt_formalize(self, opts):
-        opts = copy.deepcopy(opts)
+        opts = deepcopy(opts)
         if type(opts) is not list:
             opts = [opts]
         ret = []
