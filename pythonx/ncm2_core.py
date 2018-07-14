@@ -500,12 +500,11 @@ class Ncm2Core(Ncm2Base):
                 smat = self.matches_filter(data, sr, sctx, sccol, smat)
                 cache['filtered_matches'] = smat
 
-                if not smat:
-                    logger.debug('%s empty matches after filtering', name)
-                    continue
-
                 logger.debug('%s matches is filtered %s -> %s',
                              name, len(cache['matches']), len(smat))
+
+                if not smat:
+                    continue
 
                 names_with_matches.append(name)
 

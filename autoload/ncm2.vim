@@ -13,8 +13,8 @@ call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
 call s:opt('ncm2#popup_delay', 100)
 call s:opt('ncm2#complete_length', [[1,4],[7,3]])
-call s:opt('ncm2#matcher', 'prefix')
-call s:opt('ncm2#sorter', 'swapcase_word')
+call s:opt('ncm2#matcher', 'abbrfuzzy')
+call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
 
 let g:ncm2#core_data = {}
@@ -62,7 +62,7 @@ func! ncm2#enable_for_buffer()
         au BufEnter,CursorHold <buffer> call s:warmup()
         au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
         if has("patch-8.0.1493")
-            au CompleteDone <buffer> call s:skip_if_non_ncm2_completed()
+            " au CompleteDone <buffer> call s:skip_if_non_ncm2_completed()
         endif
     augroup END
 
