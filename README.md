@@ -92,4 +92,4 @@ Send [to roxma with paypal](https://www.paypal.me/roxma)
 
 Or send to roxma with WeChat:
 
-![WeChat Pay](https://user-images.githubusercontent.com/4538941/42722403-edfffb9a-877d-11e8-9fd9-615aeba0c3dd.png)
+![WeChat Pay](https://user-images.githubusercontent.com/4538941/42722498-8fbcf644-877f-11e8-9a7c-6015e83a8b75.png)
