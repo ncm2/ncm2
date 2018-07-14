@@ -31,17 +31,17 @@ README. Note that vim8 support is simply a bonus. It's not the goal of ncm2.
     " ncm2 requires nvim-yarp
     Plug 'roxma/nvim-yarp'
 
-    " enable ncm2 for all buffer
+    " enable ncm2 for all buffers
     autocmd BufEnter * call ncm2#enable_for_buffer()
 
-    " note that must keep noinsert in completeopt, the others is optional
+    " note that you must keep noinsert in completeopt, the others are optional
     set completeopt=noinsert,menuone,noselect
 ```
 
 ## Optional vimrc tips
 
 ```vim
-    " supress the annoying 'match x of y', 'The only match' and 'Pattern not
+    " suppress the annoying 'match x of y', 'The only match' and 'Pattern not
     " found' messages
     set shortmess+=c
 
@@ -81,12 +81,12 @@ README. Note that vim8 support is simply a bonus. It's not the goal of ncm2.
     Plug 'ncm2/ncm2-jedi'
 ```
 
-## By Me A Coffee.
+## Buy Me A Coffee
 
 This project is always gonna be FOSS. While it still takes me [lots of
 effert](https://github.com/ncm2) to create & tune things amazing.
 
-Feel free to buy me a coffe if you love this project.
+Feel free to buy me a coffee if you love this project.
 
 Send [to roxma with paypal](https://www.paypal.me/roxma)
 
