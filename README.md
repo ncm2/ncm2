@@ -40,9 +40,7 @@ NCM2.**
     " enable ncm2 for all buffers
     autocmd BufEnter * call ncm2#enable_for_buffer()
 
-    " note that you must keep `noinsert` in completeopt, you must not use
-    " `longest`. The others are optional. Read `:help completeopt` for
-    " more info
+    " :help Ncm2PopupOpen for more information
     set completeopt=noinsert,menuone,noselect
 ```
 
