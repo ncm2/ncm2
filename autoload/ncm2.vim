@@ -436,9 +436,13 @@ func! ncm2#_load_python(py)
 endfunc
 
 func! ncm2#_au_plugin()
-    au User Ncm2Plugin silent
-    doau User Ncm2Plugin
-    au! User Ncm2Plugin
+    try
+        au User Ncm2Plugin silent
+        doau User Ncm2Plugin
+        au! User Ncm2Plugin
+    catch
+        call s:core.error(v:exception)
+    endtry
 endfunc
 
 func! s:feedkeys(key, ...)
