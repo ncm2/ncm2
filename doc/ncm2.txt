@@ -5,17 +5,15 @@ License: MIT
 
         A Slim, Fast and Hackable Completion Framework for Neovim~
 
-ncm2			            *nvim-completion-manager* *NCM2*
+ncm2			            *nvim-completion-manager* *NCM2* *ncm2*
 
 1. Introduction					    |NCM2-introduction|
 2. Install                          |NCM2-install|
 3. Vimrc Examples	                |NCM2-vimrc|
 4. Settings					        |NCM2-settings|
 5. API						        |NCM2-API|
-6. Why						        |NCM2-why|
-7. Minimal Source Examples			|NCM2-source-examples|
-8. Trouble shooting				    |NCM2-trouble-shooting|
-9. Known issues					    |NCM2-known-issues|
+6. Key Mappings                     |NCM2-key|
+7. Autocmds                         |NCM2-autocmd|
 
 ==============================================================================
 1. Introduction					    *NCM2-introduction*
@@ -64,7 +62,7 @@ Install using vim-plug:
     " enable ncm2 for all buffer
     autocmd BufEnter * call ncm2#enable_for_buffer()
 
-    " note that must keep noinsert in completeopt, the others is optional
+    " :help Ncm2PopupOpen for more information
     set completeopt=noinsert,menuone,noselect
 <
 Optional vimrc tips:
@@ -353,7 +351,31 @@ ncm2#enable_for_buffer()
 ncm2#disable_for_buffer()
 	Disable ncm2 for current buffer.
 
+
+==============================================================================
+6. Key Mappings                         *NCM2-key*
+
 						                *<Plug>(ncm2_manual_trigger)*
 <Plug>(ncm2_manual_trigger)
 			A key to trigger the completion manually. 
+
+
+==============================================================================
+7. Autocmds                             *NCM2-autcmd*
+
+                                        *Ncm2PopupOpen* *Ncm2PopupClose*
+Ncm2PopupOpen,Ncm2PopupClose
+    Note that when ncm2 is popping up suggestions automatically, you must keep
+    `noinsert` in |completeopt| and you must not use `longest`.
+
+    But it is inconvenient to use the smae |completeopt| to trigger neovim
+    builtin |ins-completion|. You need Ncm2PopupOpen and Ncm2PopupClose to
+    solve this issue.
+
+    Here's an example to use `completeopt=menuone` when ncm2 is not popping
+    up anying.
+>
+    au User Ncm2PopupOpen set completeopt=noinsert,menuone,noselect
+    au User Ncm2PopupClose set completeopt=menuone
+<
 
