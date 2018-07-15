@@ -38,6 +38,7 @@ class Ncm2Core(Ncm2Base):
         pats['vim'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)'
 
         self._word_patterns = pats
+        self._min_context_id = 0
 
         self.notify('ncm2#_core_started')
 
@@ -125,8 +126,10 @@ class Ncm2Core(Ncm2Base):
 
         self.notify('ncm2#_s', 'subscope_detectors', detectors_sync)
 
-    def on_complete(self, data, manual, failed_notifies=[]):
+    def on_complete_done(self, data, completed):
+        self._min_context_id = data['context']['context_id']
 
+    def on_notify_dated(self, data, _, failed_notifies=[]):
         for ele in failed_notifies:
             name = ele['name']
             ctx = ele['context']
@@ -134,6 +137,8 @@ class Ncm2Core(Ncm2Base):
             if name in notified and notified[name] == ctx:
                 logger.debug('%s notification is dated', name)
                 del notified[name]
+
+    def on_complete(self, data, manual, failed_notifies=[]):
 
         root_ctx = data['context']
         root_ctx['manual'] = manual
@@ -263,7 +268,7 @@ class Ncm2Core(Ncm2Base):
             return
 
         cache = self._matches.get(name, None)
-        if cache and cache['context']['reltime'] > sctx['reltime']:
+        if cache and cache['context']['context_id'] > sctx['context_id']:
             logger.debug('%s cache is newer, %s', name, cache)
             return
 
@@ -475,6 +480,7 @@ class Ncm2Core(Ncm2Base):
         names = sorted(names, key=lambda x: srcs[x]['priority'], reverse=True)
 
         ccol = ctx['ccol']
+        min_context_id = self._min_context_id
 
         # basic filtering for matches of each source
         names_with_matches = []
@@ -497,6 +503,12 @@ class Ncm2Core(Ncm2Base):
 
                 smat = deepcopy(cache['matches'])
                 sctx = cache['context']
+                context_id = sctx['context_id']
+                if min_context_id > context_id:
+                    logger.debug('%s ignored by context_id %s < min %s',
+                                 name, context_id, min_context_id)
+                    continue
+
                 smat = self.matches_filter(data, sr, sctx, sccol, smat)
                 cache['filtered_matches'] = smat
 
@@ -614,6 +626,7 @@ class Ncm2Core(Ncm2Base):
             mod = import_module(modname)
             f = mod.Filter(**opt)
             filts.append(f)
+
         def handler(data, sr, sctx, sccol, matches):
             for f in filts:
                 matches = f(data, sr, sctx, sccol, matches)
@@ -688,5 +701,7 @@ complete = ncm2_core.complete
 load_plugin = ncm2_core.load_plugin
 load_python = ncm2_core.load_python
 on_warmup = ncm2_core.on_warmup
+on_notify_dated = ncm2_core.on_notify_dated
+on_complete_done = ncm2_core.on_complete_done
 
 __all__ = events

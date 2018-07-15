@@ -345,10 +345,6 @@ ncm2#context()
 	base
             The string that starts from `startccol` ends before the cursor.
 
-						                 *ncm2#context_dated()*
-ncm2#context_dated({context})
-	Check if the {context} is dated.
-
 						                *ncm2#enable_for_buffer()*
 ncm2#enable_for_buffer()
 	Enable ncm2 for current buffer.

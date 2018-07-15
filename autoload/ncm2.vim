@@ -21,7 +21,7 @@ let g:ncm2#core_data = {}
 let g:ncm2#core_event = []
 
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<CR>
-inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_auto_trigger()<CR>
+inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_do_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
 
 " use silent mapping that doesn't slower the terminal ui
@@ -40,13 +40,15 @@ let s:startbcol = 1
 let s:lnum = 0
 let s:matches = []
 let s:subscope_detectors = {}
-let s:auto_complete_tick = []
+let s:auto_trigger_tick = []
+let s:skip_auto_complete_tick = []
 let s:context_tick_extra = 0
+let s:context_id = 0
 
 augroup ncm2_hooks
     au!
     au User Ncm2EnableForBuffer call s:warmup()
-    au User Ncm2CoreData silent 
+    au User Ncm2CoreData,Ncm2PopupClose,Ncm2PopupOpen silent 
     au OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
 augroup END
 
@@ -62,38 +64,11 @@ func! ncm2#enable_for_buffer()
         au BufEnter,CursorHold <buffer> call s:warmup()
         au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
         if has("patch-8.0.1493")
-            au CompleteDone <buffer> call s:skip_if_non_ncm2_completed()
+            au CompleteDone <buffer> call s:on_complete_done()
         endif
     augroup END
 
-    if g:ncm2#auto_popup && stridx(&completeopt, 'noinsert') == -1
-        call s:core.error("auto-popup requries `:set completeopt+=noinsert`")
-    endif
-    if g:ncm2#auto_popup && stridx(&completeopt, 'longest') != -1
-        call s:core.error("auto-popup requries `:set completeopt-=longest`")
-    endif
-
     doau User Ncm2EnableForBuffer
-endfunc
-
-func! s:skip_if_non_ncm2_completed()
-    let ud = {}
-    if empty(v:completed_item)
-        return
-    endif
-    silent! let ud = json_decode(v:completed_item.user_data)
-    if type(ud) != v:t_dict || get(ud, 'ncm2', 0) == 0
-        call s:feedkeys("\<Plug>(ncm2_skip_auto_trigger)", "im")
-    endif
-endfunc
-
-func! s:cache_cleanup()
-    let s:matches = []
-    let s:auto_complete_tick = []
-    let s:lnum = 0
-    let s:startbcol = 1
-    let s:context_tick_extra += 1
-    call s:try_rnotify('cache_cleanup')
 endfunc
 
 func! ncm2#disable_for_buffer()
@@ -101,6 +76,33 @@ func! ncm2#disable_for_buffer()
     augroup ncm2_buf_hooks
         au! * <buffer>
     augroup END
+endfunc
+
+func! s:on_complete_done()
+    if empty(v:completed_item)
+        return
+    endif
+    " The user has accepted the item, don't popup old s:matches again.
+    call s:feedkeys("\<Plug>(ncm2_skip_auto_trigger)", "im")
+    call s:try_rnotify('on_complete_done', v:completed_item)
+endfunc
+
+func! s:cache_cleanup()
+    call s:cache_matches_cleanup()
+    call s:try_rnotify('cache_cleanup')
+endfunc
+
+func! s:cache_matches_cleanup()
+    let s:matches = []
+    let s:lnum = 0
+    let s:startbcol = 1
+endfunc
+
+func! ncm2#context_tick()
+    " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
+    " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
+    " position to filter the requests.
+    return [getcurpos()[0:2], s:context_tick_extra]
 endfunc
 
 func! ncm2#context()
@@ -118,8 +120,8 @@ func! ncm2#context()
                 \ 'scope': &filetype,
                 \ 'filepath': expand('%:p'),
                 \ 'typed': strpart(getline('.'), 0, pos[2]-1),
-                \ 'reltime': reltimefloat(reltime()),
                 \ 'tick': ncm2#context_tick(),
+                \ 'context_id': s:new_context_id()
                 \ }
     if ctx.filepath == ''
         " FIXME this is necessary here, otherwise empty filepath is
@@ -127,10 +129,6 @@ func! ncm2#context()
         let ctx.filepath = ""
     endif
     return ctx
-endfunc
-
-func! ncm2#context_dated(ctx)
-    return ncm2#context_tick() != a:ctx.tick
 endfunc
 
 func! ncm2#register_source(sr)
@@ -169,7 +167,7 @@ func! ncm2#complete(ctx, startccol, matches, ...)
         let refresh = a:1
     endif
 
-    let dated = ncm2#context_dated(a:ctx)
+    let dated = ncm2#context_tick() != a:ctx.tick
     let a:ctx.dated = dated
 
     call s:try_rnotify('complete',
@@ -212,26 +210,31 @@ func! ncm2#_update_matches(ctx, startbcol, matches)
             \           a:startbcol,
             \           a:matches) })
     else
-        call s:update_matches(a:ctx, a:startbcol, a:matches)
+        call ncm2#_real_update_matches(a:ctx, a:startbcol, a:matches)
     endif
 endfunc
 
 func! s:popup_timed(ctx, startbcol, matches)
     let s:popup_timer = 0
-    call s:update_matches(a:ctx, a:startbcol, a:matches)
+    call ncm2#_real_update_matches(a:ctx, a:startbcol, a:matches)
 endfunc
 
-func! s:update_matches(ctx, startbcol, matches)
-    let shown = pumvisible()
-
-    " When the popup menu is expected to be displayed but it is not, I
-    " guess it probably has been closed by the user
-    if !shown && !empty(s:matches) && !empty(a:matches)
+func! ncm2#_real_update_matches(ctx, startbcol, matches)
+    if ncm2#context_tick() != a:ctx.tick
         return
     endif
 
-    if ncm2#context_dated(a:ctx)
-        return
+    " The popup is expected to be opened while it has been closed
+    if !empty(s:matches) && !pumvisible()
+        if empty(v:completed_item)
+            " the user closed the popup with <c-e>
+            " TODO suppress future completion unless another word started
+            call s:cache_matches_cleanup()
+            return
+        else
+            " this should have been handled in CompleteDone, but we have newer
+            " matches now. It's ok to proceed
+        endif
     endif
 
     let s:startbcol = a:startbcol
@@ -261,9 +264,24 @@ func! ncm2#_real_popup()
         if pumvisible()
             call s:feedkeys("\<c-e>", "ni")
         endif
+        doau User Ncm2PopupClose
         return ''
     endif
+
+    doau User Ncm2PopupOpen
     call complete(s:startbcol, s:matches)
+    return ''
+endfunc
+
+func! ncm2#skip_auto_trigger()
+    call s:cache_matches_cleanup()
+    " invalidate s:update_matches
+    " invalidate ncm2#_notify_sources
+    let s:context_tick_extra += 1
+    " skip auto ncm2#_on_complete
+    let s:skip_auto_complete_tick = ncm2#context_tick()
+    doau User Ncm2PopupClose
+    call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
     return ''
 endfunc
 
@@ -273,27 +291,12 @@ func! ncm2#auto_trigger()
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
 
-func! ncm2#skip_auto_trigger()
-    call s:cache_cleanup()
-    let s:auto_complete_tick = ncm2#context_tick()
-    call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
-    return ''
-endfunc
-
-func! ncm2#context_tick()
-    return [getcurpos()[0:2], s:context_tick_extra]
-endfunc
-
-func! ncm2#_auto_trigger()
-    " do not send duplicate auto trigger
-    " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
-    " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
-    " position to filter the requests.
+func! ncm2#_do_auto_trigger()
     let tick = ncm2#context_tick()
-    if tick == s:auto_complete_tick
+    if tick == s:auto_trigger_tick
         return ''
     endif
-    let s:auto_complete_tick = tick
+    let s:auto_trigger_tick = tick
 
     " refresh the popup menu to reduce popup flickering
     call s:feedkeys("\<Plug>(ncm2_complete_popup)")
@@ -325,6 +328,9 @@ func! ncm2#_on_complete(trigger_type)
         if g:ncm2#auto_popup == 0
             return ''
         endif
+        if s:skip_auto_complete_tick == ncm2#context_tick()
+            return ''
+        endif
     endif
 
     call s:try_rnotify('on_complete', l:manual)
@@ -332,8 +338,12 @@ func! ncm2#_on_complete(trigger_type)
 endfunc
 
 func! ncm2#_notify_sources(ctx, calls)
-    if ncm2#context_dated(a:ctx) && !get(a:ctx, 'manual', 0)
-        call s:try_rnotify('on_complete', 0, a:calls)
+    if ncm2#context_tick() != a:ctx.tick
+        call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
+        " we need skip check, and auto_popup check in ncm2#_on_complete
+        " we don't need duplicate check in ncm2#auto_trigger
+        call ncm2#_on_complete(get(a:ctx, 'manual', 0))
+        return
     endif
     for ele in a:calls
         let name = ele['name']
@@ -456,6 +466,11 @@ func! s:feedkeys(key, ...)
         let m = a:1
     endif
     call feedkeys(a:key, m)
+endfunc
+
+func! s:new_context_id()
+    let s:context_id += 1
+    return s:context_id
 endfunc
 
 func! ncm2#insert_mode_only_key(key)
