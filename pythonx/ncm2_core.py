@@ -45,7 +45,7 @@ class Ncm2Core(Ncm2Base):
     def notify(self, method: str, *args):
         self.nvim.call(method, *args, async_=True)
 
-    def word_pattern(self, ctx, sr):
+    def get_word_pattern(self, ctx, sr):
         pat = sr.get('word_pattern', None)
         scope = ctx.get('scope', ctx.get('filetype', '')).lower()
 
@@ -127,7 +127,49 @@ class Ncm2Core(Ncm2Base):
         self.notify('ncm2#_s', 'subscope_detectors', detectors_sync)
 
     def on_complete_done(self, data, completed):
+        logger.info('on_complete_done')
         self._min_context_id = data['context']['context_id']
+        try:
+            completed['user_data'] = json.loads(completed['user_data'])
+            ud = completed['user_data']
+            if not ud.get('ncm2', 0):
+                logger.debug('This is not completed by ncm2, ncm2==0, ud: %s', ud)
+                return
+        except Exception as ex:
+            logger.debug('This is not completed by ncm2, %s', ex)
+            return
+
+        name = ud['source']
+
+        if name not in data['sources']:
+            logger.debug('the source does not exists')
+            return
+
+        sr = data['sources'][name]
+
+        if 'on_completed' not in sr:
+            logger.debug('the source does not have on_completed handler, %s', sr)
+            return
+
+        root_ctx = data['context']
+        root_ctx['manual'] = 0
+
+        # regenerate contexts for this source
+        contexts = self.detect_subscopes(data)
+        for ctx in contexts:
+            ctx = deepcopy(ctx)
+            ctx['early_cache'] = False
+            ctx['source'] = sr
+            ctx['matcher'] = self.matcher_opt_get(data, sr)
+            if not self.source_check_scope(sr, ctx):
+                continue
+            self.source_check_patterns(data, sr, ctx)
+            self.notify('ncm2#_notify_completed',
+                        root_ctx,
+                        name,
+                        ctx,
+                        completed)
+            return
 
     def on_notify_dated(self, data, _, failed_notifies=[]):
         for ele in failed_notifies:
@@ -151,7 +193,7 @@ class Ncm2Core(Ncm2Base):
         notifies = []
 
         # get the sources that need to be notified
-        for ctx_idx, tmp_ctx in enumerate(contexts):
+        for tmp_ctx in contexts:
             for name, sr in data['sources'].items():
 
                 ctx = deepcopy(tmp_ctx)
@@ -313,12 +355,8 @@ class Ncm2Core(Ncm2Base):
         ctx1 = deepcopy(ctx1)
         ctx2 = deepcopy(ctx2)
 
-        if not self.source_check_patterns(data, sr, ctx1):
-            logger.debug('old_ctx source_check_patterns failed')
-            return False
-        if not self.source_check_patterns(data, sr, ctx2):
-            logger.debug('cur_ctx source_check_patterns failed')
-            return False
+        self.source_check_patterns(data, sr, ctx1)
+        self.source_check_patterns(data, sr, ctx2)
 
         logger.debug('old ctx [%s] cur ctx [%s]', ctx1, ctx2)
         # startccol is set in self.source_check_patterns
@@ -390,7 +428,7 @@ class Ncm2Core(Ncm2Base):
             pats = [pats]
 
         typed = ctx['typed']
-        word_pat = self.word_pattern(ctx, sr)
+        word_pat = self.get_word_pattern(ctx, sr)
 
         # remove the last word, check whether the special pattern matches
         # word_removed
@@ -407,7 +445,7 @@ class Ncm2Core(Ncm2Base):
             word_len = 0
 
         ctx['match_end'] = len(word_removed)
-        ctx['word_pattern'] = self.word_pattern(ctx, sr)
+        ctx['word_pattern'] = word_pat
 
         # check source extra patterns
         for pat in pats:

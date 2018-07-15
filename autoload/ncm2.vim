@@ -361,6 +361,16 @@ func! ncm2#_notify_sources(ctx, calls)
     endfor
 endfunc
 
+func! ncm2#_notify_completed(ctx, name, sctx, completed)
+    if ncm2#context_tick() != a:ctx.tick
+        let a:sctx.dated = 1
+    else
+        let a:sctx.dated = 0
+    endif
+    let sr = s:sources[a:name]
+    call call(sr.on_completed, [a:sctx, a:completed], sr)
+endfunc
+
 func! ncm2#_warmup_sources(ctx, calls)
     if bufnr('%') != a:ctx.bufnr
         return
@@ -403,7 +413,7 @@ func! ncm2#_core_data(event)
 
     " if subscope detector is available for this buffer, we need to send
     " the whole buffer for on_complete event
-    if (a:event == 'on_complete' || a:event == 'on_warmup') &&
+    if (a:event == 'on_complete' || a:event == 'on_warmup' || a:event == 'on_complete_done') &&
                 \ has_key(s:subscope_detectors, &filetype)
         let data.lines = getline(1, '$')
     endif
