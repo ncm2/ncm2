@@ -147,7 +147,7 @@ class Ncm2Core(Ncm2Base):
 
         sr = data['sources'][name]
 
-        if 'on_completed' not in sr:
+        if not sr.get('on_completed', None):
             logger.debug('the source does not have on_completed handler, %s', sr)
             return
 
