@@ -378,4 +378,11 @@ Ncm2PopupOpen,Ncm2PopupClose
     au User Ncm2PopupOpen set completeopt=noinsert,menuone,noselect
     au User Ncm2PopupClose set completeopt=menuone
 <
+                                        *Ncm2Plugin*
+Ncm2Plugin
+    This autocmd will be executed after ncm2 is loaded. It has two effects:
 
+    - Using Ncm2Plugin to execute code will get catch an error is ncm2 is
+      not installed.
+    - It should makt things easier if you need to tune the startup time of
+      your editor.
