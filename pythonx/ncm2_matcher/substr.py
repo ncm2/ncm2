@@ -44,6 +44,7 @@ def Matcher(case='smartcase', key='abbr', **kargs):
             return False
         e['user_data']['match_key'] = key
         e['user_data']['match_highlight'] = [[i, i + len(b)]]
+        return True
 
     def match_icase(b, e):
         w = e[key]
@@ -52,10 +53,11 @@ def Matcher(case='smartcase', key='abbr', **kargs):
             return False
         e['user_data']['match_key'] = key
         e['user_data']['match_highlight'] = [[i, i + len(b)]]
+        return True
 
     if case == 'smartcase':
         return match_smart_case
-    elif c == 'icase':
+    elif case == 'icase':
         return match_icase
     else:
         return match_case
