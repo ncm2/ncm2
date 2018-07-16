@@ -96,4 +96,4 @@ Send [to roxma with paypal](https://www.paypal.me/roxma)
 
 Or send to roxma with WeChat:
 
-![WeChat Pay](https://user-images.githubusercontent.com/4538941/42722498-8fbcf644-877f-11e8-9a7c-6015e83a8b75.png)
+<img src="https://user-images.githubusercontent.com/4538941/42804334-4dd4b8c6-89db-11e8-83cd-8ccfd9b25be9.jpg" height="400">
