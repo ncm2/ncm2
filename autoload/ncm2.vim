@@ -89,6 +89,8 @@ endfunc
 
 func! s:cache_cleanup()
     call s:cache_matches_cleanup()
+    let s:auto_trigger_tick  = []
+    let s:skip_auto_complete_tick = []
     call s:try_rnotify('cache_cleanup')
 endfunc
 
