@@ -91,7 +91,7 @@ def test():
     s = 'abbr_fuzzy_match'
     b = 'abbrfuzzy'
     test_abbrev(s)
-    print(fuzzy_match('abbrfuzzy', 'abbr_fuzzy_match', chcmp_smartcase))
+    print(fuzzy_match(b, s, chcmp_smartcase))
     print(max_common_prefix(b, s, chcmp_smartcase))
 
 if __name__  == '__main__':
