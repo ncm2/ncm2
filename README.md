@@ -22,7 +22,8 @@ extensions and languages support for NCM2.
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
 For vim8 user, read the [nvim-yarp](https://github.com/roxma/nvim-yarp)
-README. Note that vim8 support is simply a bonus. It's not the goal of NCM2.
+README. **Note that vim8 support is simply a bonus. It's not the goal of
+NCM2.**
 
 ## Install
 
