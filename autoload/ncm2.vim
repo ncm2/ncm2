@@ -83,7 +83,7 @@ func! s:on_complete_done()
         return
     endif
     " The user has accepted the item, don't popup old s:matches again.
-    call s:feedkeys("\<Plug>(ncm2_skip_auto_trigger)", "im")
+    call ncm2#skip_auto_trigger()
     call s:try_rnotify('on_complete_done', v:completed_item)
 endfunc
 
