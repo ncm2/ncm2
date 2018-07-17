@@ -368,7 +368,7 @@ Ncm2PopupOpen,Ncm2PopupClose
     Note that when ncm2 is popping up suggestions automatically, you must keep
     `noinsert` in |completeopt| and you must not use `longest`.
 
-    But it is inconvenient to use the smae |completeopt| to trigger neovim
+    But it is inconvenient to use the same |completeopt| to trigger neovim
     builtin |ins-completion|. You need Ncm2PopupOpen and Ncm2PopupClose to
     solve this issue.
 
