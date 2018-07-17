@@ -252,11 +252,37 @@ ncm2#register_source({source})
             |complete-item| instead of the default |abbr| field. set the
             matcher to `{'key': 'menu'}`
 
-    In order to understand how complete_length, complete_pattern, and
-    word_pattern works, you could try execute the following script in your
-    editor. Then try type something, try change some something, e.g. `let
-    g:test_source.complete_pattern = [':']` , observe when the menu gets
-    popped up as you type, and when the menu content changes.
+    Here are some examples, that should give you some hints on how
+    word_pattern, complete_pattern and complete_length work.
+>
+        complete_length: 3
+        complete_pattern: ['\.']
+        word_pattern: '\w+'
+
+            typing            : foo_service.request()
+            complete trigger  :   ^        ^
+            startccol         : x           x
+            base              : [.........] [.....]
+
+            typing            : fd.read()
+            complete trigger  :   ^
+            complete trigger  :    x
+            base              :    [..]
+
+        complete_length: -1
+        complete_pattern: ['/']
+        word_pattern: '\S+'
+
+            typing           : first/second/third
+            complete trigger :      ^      ^
+            startccol        : x
+            base             : [................]
+<
+    In case you don't enjoy the above boring text example, you could try the
+    following script in your editor. Then try type something, try change some
+    something, e.g. `let g:test_source.complete_pattern = [':']` . Try to
+    observe when the menu gets popped up as you type, and when the menu
+    content changes.
 >
     let g:test_source = {
                 \ 'name': 'foo',
