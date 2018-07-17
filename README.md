@@ -87,6 +87,11 @@ NCM2.**
     Plug 'ncm2/ncm2-jedi'
 ```
 
+## How Do I write Ncm2 Source?
+
+Read `:help ncm2#register_source` carefully. There's a small helpful
+interactive script in its documentation.
+
 ## Buy Me A Coffee :coffee:
 
 This project is always gonna be FOSS. While it still takes me [lots of

@@ -258,15 +258,18 @@ ncm2#register_source({source})
     g:test_source.complete_pattern = [':']` , observe when the menu gets
     popped up as you type, and when the menu content changes.
 >
-    let g:test_source = {
-                \ 'name': 'foo',
-                \ 'complete_length': 3,
-                \ 'complete_pattern': [ '\.'],
-                \ 'matcher': 'none',
-                \ 'on_complete': {c -> ncm2#complete(c, c.startccol, ['on_complete-' . b:changedtick])}
-                \ }
+let g:test_source = {
+            \ 'name': 'foo',
+            \ 'complete_length': 3,
+            \ 'complete_pattern': [ '\.'],
+            \ 'matcher': 'none',
+            \ 'on_complete': {c -> ncm2#complete(c,
+            \       c.startccol,
+            \       ['on_complete-' . b:changedtick . '-' . c.startccol]
+            \       )},
+            \ }
 
-    call ncm2#register_source(g:test_source)
+call ncm2#register_source(g:test_source)
 <
                                     *ncm2#complete()*
 ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
