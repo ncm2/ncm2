@@ -93,8 +93,8 @@ On important step is to understand how and when completion gets triggered.
 Read `:help ncm2#register_source` carefully. There's a small interactive
 script in the doc. It is helpful for both understanding and debugging.
 
-If you haven't decide what tool you should use for async support. Here's a
-few options available:
+In case you don't know what tool you should use for async support. Here are
+some options available:
 
 - `:help jobstart()`
 - [python remote plugin
