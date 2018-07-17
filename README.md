@@ -89,8 +89,19 @@ NCM2.**
 
 ## How Do I write Ncm2 Source?
 
-Read `:help ncm2#register_source` carefully. There's a small helpful
-interactive script in its documentation.
+On important step is to understand how and when completion gets triggered.
+Read `:help ncm2#register_source` carefully. There's a small interactive
+script in the doc. It is helpful for both understanding and debugging.
+
+If you haven't decide what tool you should use for async support. Here's a
+few options available:
+
+- `:help jobstart()`
+- [python remote plugin
+  example](https://github.com/jacobsimpson/nvim-example-python-plugin)
+- I myself prefer to use [nvim-yarp](https://github.com/roxma/nvim-yarp)
+    - Read [ncm2/ncm2-bufword](https://github.com/ncm2/ncm2-bufword) for
+        example
 
 ## Buy Me A Coffee :coffee:
 
