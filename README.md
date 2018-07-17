@@ -15,6 +15,10 @@ Main features:
 Read [our wiki page](https://github.com/ncm2/ncm2/wiki) for a list of
 extensions and languages support for NCM2.
 
+![peek 2018-07-17 18-15](https://user-images.githubusercontent.com/4538941/42811661-dbfb5ba2-89ed-11e8-81c4-3fb893d1af9c.gif)
+
+[View demo vimrc at #19](https://github.com/ncm2/ncm2/issues/19)
+
 ## Requirements
 
 - `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested
