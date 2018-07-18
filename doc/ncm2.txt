@@ -1,24 +1,24 @@
-*ncm2.txt*                              NCM2 documentation
+*ncm2.txt*                              Ncm2 Documentation
 
 Author: roxma <roxma@qq.com>
 License: MIT
 
         A Slim, Fast and Hackable Completion Framework for Neovim~
 
-ncm2			            *nvim-completion-manager* *NCM2* *ncm2*
+ncm2			                    *ncm2*
 
-1. Introduction					    |NCM2-introduction|
-2. Install                          |NCM2-install|
-3. Vimrc Examples	                |NCM2-vimrc|
-4. Settings					        |NCM2-settings|
-5. API						        |NCM2-API|
-6. Key Mappings                     |NCM2-key|
-7. Autocmds                         |NCM2-autocmd|
+1. Introduction					    |ncm2-introduction|
+2. Install                          |ncm2-install|
+3. Vimrc Examples	                |ncm2-vimrc|
+4. Settings					        |ncm2-settings|
+5. API						        |ncm2-API|
+6. Key Mappings                     |ncm2-key|
+7. Autocmds                         |ncm2-autocmd|
 
 ==============================================================================
-1. Introduction					    *NCM2-introduction*
+1. Introduction					    *ncm2-introduction*
 
-NCM2, formerly known as nvim-completion-manager, is a slim, fast and hackable
+ncm2, formerly known as nvim-completion-manager, is a slim, fast and hackable
 completion framework for neovim.
 
 Main features:
@@ -38,7 +38,7 @@ Here's a list of links where you can find extensions for ncm2.
 - [ncm2-utils](https://github.com/topics/ncm2-utils)
 
 ==============================================================================
-2. Install					        *NCM2-install*
+2. Install					        *ncm2-install*
 
 Requirements:
 
@@ -50,7 +50,7 @@ For neovim users:
 
 
 ==============================================================================
-3. Vimrc Examples			        *NCM2-vimrc*
+3. Vimrc Examples			        *ncm2-vimrc*
 
 Install using vim-plug:
 >
@@ -111,7 +111,7 @@ Optional vimrc tips:
     Plug 'ncm2/ncm2-jedi'
 <
 ==============================================================================
-4. Settings					    *NCM2-settings*
+4. Settings					    *ncm2-settings*
 
                                     *g:ncm2#complete_delay* 
 g:ncm2#complete_delay 
@@ -181,7 +181,7 @@ g:ncm2#complete_length
             others.
 
 ==============================================================================
-5. API						            *NCM2-API*
+5. API						            *ncm2-API*
 
 						            *ncm2#register_source()*
 ncm2#register_source({source})
@@ -191,19 +191,19 @@ ncm2#register_source({source})
 	name
 			Required, the unique name of the completion source.
 
-	mark				            *NCM2-mark*
+	mark				            *ncm2-mark*
             This field might be displayed in the popup item to indicate the
             completion source.
 
 	enable	Defaults to 1. If set to 0, it will only be triggered by
             `<Plug>(ncm2_manual_trigger)`
 
-	priority				        *NCM2-priority*
+	priority				        *ncm2-priority*
             Required, the priority is used to sort between other sources. A
             higher value indicates that the completion item of this source
             sorts before sources with lower priority value.  
 
-						            *NCM2-priority-values*
+						            *ncm2-priority-values*
 			Recommended priority definitions: 
             2	keyword from the otherfiles, from user's openning browsers,
                 etc.
@@ -215,7 +215,7 @@ ncm2#register_source({source})
 			9	smart programming language aware completion
 
 
-	scope				        	*NCM2-scope*
+	scope				        	*ncm2-scope*
             A |List| of scope. The source will be activated when the current
             editting scope (e.g. current 'filetype') is in the source's scope
             list. 
@@ -223,7 +223,7 @@ ncm2#register_source({source})
             completion source, like keyword from buffer, it will be activated
             for all buffers.
 
-	on_complete				        *NCM2-on_complete*
+	on_complete				        *ncm2-on_complete*
             Function name of the handler for the completion request.
 
 	auto_popup
@@ -231,21 +231,21 @@ ncm2#register_source({source})
             completion of this source.
 			Default: 1
 
-	word_pattern				    *NCM2-word_pattern*
-			The pattern used to calculate |NCM2-startcol|.
+	word_pattern				    *ncm2-word_pattern*
+			The pattern used to calculate |ncm2-startcol|.
 
-	complete_length		    	    *NCM2-complete_length*
+	complete_length		    	    *ncm2-complete_length*
             The minimum length of the matching word for auto triggering popup
             menu.
 
             If it contains a negative value, completion will only be triggered
             by complete_pattern.
 
-	complete_pattern			    *NCM2-complete_pattern*
+	complete_pattern			    *ncm2-complete_pattern*
             An extra |List| of PCRE patterns (python regex), besides
             complete_length, for auto triggering popup menu. 
 
-    matcher                         *NCM2-matcher*
+    matcher                         *ncm2-matcher*
             Set this field if you want customized matcher instead of the
             global |g:ncm2#matcher|.
             If you want the matcher to filter the menu field of the
@@ -297,12 +297,63 @@ ncm2#register_source({source})
 
     call ncm2#register_source(g:test_source)
 <
+
+                                    *ncm2-context*
+    The context passed to the on_complete handler contains usefule information
+    for completion source, as well as important information for ncm2 internal
+    synchronization. Some of the fields are described here:
+
+	bufnr
+			Same as `bufnr('%')`.
+
+	lnum
+			Same as `line('.')`.
+
+	ccol
+			Similar to `col('.')` but it's counted by characters.
+
+	filetype
+			Same as 'filetype' of the buffer.
+
+	typed
+			The typed text. For example:
+				`^foo bar|baz`
+
+			Where `^` indicates the start of line, and `|`
+			indicates cursor position. This field should be:
+			"foo bar"
+
+	filepath
+            The path of current editting file. Same as `expand('%:p')`
+
+	scope
+			Current editting scope. Usually it's the same of filetype.
+
+	startccol				            *ncm2-startccol*
+            Calaulated by ncm2 for convenience, usually you could simply pass
+            it as an argument to the |ncm2#complete()| function.
+
+	base
+            The string that starts from `startccol` ends before the cursor.
+
+                                    *ncm2#context_dated()*
+ncm2#context_dated({context})
+    Ncm2 keeps the latest context that is sent to the completion source for
+    completion. This function compares the argument with the latest context,
+    and returns 1 if it is not the latest context.
+
+    This function is useful if your completion worker is slow and finish
+    before ncm2 sends more new contexts for completion. You don't want to
+    calculate completion for every context recieved. Use this function to
+    check whether it is the latest one at the beginning of your background
+    job.
+
                                     *ncm2#complete()*
 ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
     Call this function to trigger the to feed completions to ncm2.
 
-    {context} is an arugment passed to the |NCM2-on_complete| handler. Don't
-    modify the contents. It is important for synchronization. 
+    {context} is an arugment passed to the |ncm2-on_complete| handler. Don't
+    modify the contents. It is important for synchronization.
 
     {startccol} is similar to the `startcol` argument of the |complete()|
     function. However, startccol is counted by characters instead of by bytes.
@@ -318,50 +369,6 @@ ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
 ncm2#disable_source({name})
     Disable the registered source.
 
-					            	*ncm2#context()*
-ncm2#context()
-    Get the current typing context. This function returns a |Dict|, some of
-    the fields are described here.
-
-    Note: Other undocumented fields are necessary for the framework to work,
-    do not change these values.
-
-	bufnr		
-			Same as `bufnr('%')`.
-
-	lnum		
-			Same as `line('.')`.
-
-	ccol		
-			Similar to `col('.')` but it's counted by characters.
-
-	filetype	
-			Same as 'filetype' of the buffer.
-
-	typed
-			The typed text. For example:
-				`^foo bar|baz`
-
-			Where `^` indicates the start of line, and `|`
-			indicates cursor position. This field should be:
-			"foo bar"
-
-	filepath
-            The path of current editting file. Same as `expand('%:p')`
-
-    When the context is passed to |NCM2-on_complete|, it has some extra
-    fields:
-
-	scope
-			Current editting scope.
-
-	startccol				            *NCM2-startccol*
-            Calaulated by NCM2 for convenience, usually you could simply pass
-            it as an argument to the |ncm2#complete()| function.
-
-	base
-            The string that starts from `startccol` ends before the cursor.
-
 						                *ncm2#enable_for_buffer()*
 ncm2#enable_for_buffer()
 	Enable ncm2 for current buffer.
@@ -372,7 +379,7 @@ ncm2#disable_for_buffer()
 
 
 ==============================================================================
-6. Key Mappings                         *NCM2-key*
+6. Key Mappings                         *ncm2-key*
 
 						                *<Plug>(ncm2_manual_trigger)*
 <Plug>(ncm2_manual_trigger)
@@ -380,7 +387,7 @@ ncm2#disable_for_buffer()
 
 
 ==============================================================================
-7. Autocmds                             *NCM2-autcmd*
+7. Autocmds                             *ncm2-autcmd*
 
                                         *Ncm2PopupOpen* *Ncm2PopupClose*
 Ncm2PopupOpen,Ncm2PopupClose

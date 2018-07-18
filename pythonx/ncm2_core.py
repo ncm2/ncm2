@@ -162,11 +162,14 @@ class Ncm2Core(Ncm2Base):
             if not self.source_check_scope(sr, ctx):
                 continue
             self.source_check_patterns(data, sr, ctx)
+            self._notified[name] = ctx
+            vim_cache = self.make_vim_notified_cache()
             self.notify('ncm2#_notify_completed',
                         root_ctx,
                         name,
                         ctx,
-                        completed)
+                        completed,
+                        vim_cache)
             return
 
     def on_notify_dated(self, data, _, failed_notifies=[]):
@@ -201,14 +204,21 @@ class Ncm2Core(Ncm2Base):
 
                 if not self.check_source_notify(data, sr, ctx):
                     continue
-
+                self._notified[name] = ctx
                 notifies.append(dict(name=name, context=ctx))
 
         if notifies:
-            self.notify('ncm2#_notify_sources', root_ctx, notifies)
+            vim_cache = self.make_vim_notified_cache()
+            self.notify('ncm2#_notify_complete', root_ctx, notifies, vim_cache)
         else:
-            logger.debug('ncm2#_notify_sources argument is empty %s', notifies)
+            logger.debug('notifies is empty %s', notifies)
+
         self.matches_update_popup(data)
+
+    def make_vim_notified_cache(self):
+        vim_cache_notified = {}
+        for name, ctx in self._notified.items():
+            vim_cache_notified[name] = ctx['context_id']
 
     def on_warmup(self, data):
         contexts = self.detect_subscopes(data)
@@ -293,7 +303,6 @@ class Ncm2Core(Ncm2Base):
         if need_refresh:
             # reduce further duplicate notification
             cache['refresh'] = 0
-        self._notified[name] = ctx
         return True
 
     def complete(self, data, sctx, startccol, matches, refresh):

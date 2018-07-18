@@ -45,6 +45,7 @@ let s:auto_trigger_tick = []
 let s:skip_auto_complete_tick = []
 let s:context_tick_extra = 0
 let s:context_id = 0
+let s:completion_notified = {}
 
 augroup ncm2_hooks
     au!
@@ -92,6 +93,7 @@ func! s:cache_cleanup()
     call s:cache_matches_cleanup()
     let s:auto_trigger_tick  = []
     let s:skip_auto_complete_tick = []
+    let s:completion_notified = {}
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -101,14 +103,15 @@ func! s:cache_matches_cleanup()
     let s:startbcol = 1
 endfunc
 
-func! ncm2#context_tick()
+func! s:context_tick()
     " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
     " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
     " position to filter the requests.
     return [getcurpos()[0:2], s:context_tick_extra]
 endfunc
 
-func! ncm2#context()
+func! s:context()
+    let s:context_id += 1
     let pos = getcurpos()
     let bcol = pos[2]
     let typed = strpart(getline('.'), 0, bcol-1)
@@ -123,8 +126,8 @@ func! ncm2#context()
                 \ 'scope': &filetype,
                 \ 'filepath': expand('%:p'),
                 \ 'typed': strpart(getline('.'), 0, pos[2]-1),
-                \ 'tick': ncm2#context_tick(),
-                \ 'context_id': s:new_context_id()
+                \ 'tick': s:context_tick(),
+                \ 'context_id': s:context_id
                 \ }
     if ctx.filepath == ''
         " FIXME this is necessary here, otherwise empty filepath is
@@ -170,7 +173,7 @@ func! ncm2#complete(ctx, startccol, matches, ...)
         let refresh = a:1
     endif
 
-    let dated = ncm2#context_tick() != a:ctx.tick
+    let dated = s:context_tick() != a:ctx.tick
     let a:ctx.dated = dated
 
     call s:try_rnotify('complete',
@@ -182,6 +185,10 @@ func! ncm2#complete(ctx, startccol, matches, ...)
     if dated && refresh
         call ncm2#_on_complete(2)
     endif
+endfunc
+
+func! ncm2#context_dated(ctx)
+    return a:ctx.conext_id != get(s:completion_notified, ctx.source.name, 0)
 endfunc
 
 func! ncm2#menu_selected()
@@ -223,7 +230,7 @@ func! s:popup_timed(ctx, startbcol, matches)
 endfunc
 
 func! ncm2#_real_update_matches(ctx, startbcol, matches)
-    if ncm2#context_tick() != a:ctx.tick
+    if s:context_tick() != a:ctx.tick
         return
     endif
 
@@ -279,10 +286,10 @@ endfunc
 func! ncm2#skip_auto_trigger()
     call s:cache_matches_cleanup()
     " invalidate s:update_matches
-    " invalidate ncm2#_notify_sources
+    " invalidate ncm2#_notify_complete
     let s:context_tick_extra += 1
     " skip auto ncm2#_on_complete
-    let s:skip_auto_complete_tick = ncm2#context_tick()
+    let s:skip_auto_complete_tick = s:context_tick()
     doau User Ncm2PopupClose
     call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
     return ''
@@ -295,7 +302,7 @@ func! ncm2#auto_trigger()
 endfunc
 
 func! ncm2#_do_auto_trigger()
-    let tick = ncm2#context_tick()
+    let tick = s:context_tick()
     if tick == s:auto_trigger_tick
         return ''
     endif
@@ -331,7 +338,7 @@ func! ncm2#_on_complete(trigger_type)
         if g:ncm2#auto_popup == 0
             return ''
         endif
-        if s:skip_auto_complete_tick == ncm2#context_tick()
+        if s:skip_auto_complete_tick == s:context_tick()
             return ''
         endif
     endif
@@ -340,14 +347,15 @@ func! ncm2#_on_complete(trigger_type)
     return ''
 endfunc
 
-func! ncm2#_notify_sources(ctx, calls)
-    if ncm2#context_tick() != a:ctx.tick
+func! ncm2#_notify_complete(ctx, calls, notified)
+    if s:context_tick() != a:ctx.tick
         call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
         " we need skip check, and auto_popup check in ncm2#_on_complete
         " we don't need duplicate check in ncm2#auto_trigger
         call ncm2#_on_complete(get(a:ctx, 'manual', 0))
         return
     endif
+    let s:completion_notified = a:notified
     for ele in a:calls
         let name = ele['name']
         try
@@ -364,8 +372,9 @@ func! ncm2#_notify_sources(ctx, calls)
     endfor
 endfunc
 
-func! ncm2#_notify_completed(ctx, name, sctx, completed)
-    if ncm2#context_tick() != a:ctx.tick
+func! ncm2#_notify_completed(ctx, name, sctx, completed, notified)
+    let s:completion_notified = a:notified
+    if s:context_tick() != a:ctx.tick
         let a:sctx.dated = 1
     else
         let a:sctx.dated = 0
@@ -408,7 +417,7 @@ func! ncm2#_core_data(event)
                 \ 'matcher': g:ncm2#matcher,
                 \ 'sorter': g:ncm2#sorter,
                 \ 'filter': g:ncm2#filter,
-                \ 'context': ncm2#context(),
+                \ 'context': s:context(),
                 \ 'sources': s:sources,
                 \ 'subscope_detectors': s:subscope_detectors,
                 \ 'lines': []
@@ -479,11 +488,6 @@ func! s:feedkeys(key, ...)
         let m = a:1
     endif
     call feedkeys(a:key, m)
-endfunc
-
-func! s:new_context_id()
-    let s:context_id += 1
-    return s:context_id
 endfunc
 
 func! ncm2#insert_mode_only_key(key)
