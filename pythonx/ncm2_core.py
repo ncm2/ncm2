@@ -222,9 +222,10 @@ class Ncm2Core(Ncm2Base):
         self.matches_update_popup(data)
 
     def make_vim_notified_cache(self):
-        vim_cache_notified = {}
+        cache = {}
         for name, ctx in self._notified.items():
-            vim_cache_notified[name] = ctx['context_id']
+            cache[name] = ctx['context_id']
+        return cache
 
     def on_warmup(self, data):
         contexts = self.detect_subscopes(data)

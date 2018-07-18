@@ -201,7 +201,7 @@ func! ncm2#complete(ctx, startccol, matches, ...)
 endfunc
 
 func! ncm2#context_dated(ctx)
-    return a:ctx.conext_id != get(s:completion_notified, ctx.source.name, 0)
+    return a:ctx.context_id != get(s:completion_notified, a:ctx.source.name, 0)
 endfunc
 
 func! ncm2#menu_selected()
