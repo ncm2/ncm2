@@ -147,6 +147,7 @@ func! ncm2#register_source(sr)
     endif
 
     let sr['enable'] = get(sr, 'enable', 1)
+    let sr['ready'] = get(sr, 'ready', 1)
     let sr['priority'] = get(sr, 'priority', 5)
     let sr['auto_popup'] = get(sr, 'auto_popup', 1)
     let sr['early_cache'] = get(sr, 'early_cache', 0)
@@ -165,6 +166,18 @@ func! ncm2#disable_source(name)
     catch
         call s:core.error(v:exception)
     endtry
+endfunc
+
+func! ncm2#set_ready(sr)
+    let sr = a:sr
+    if type(sr) == v:t_string
+        let sr = s:soruces[l:sr]
+    endif
+    let need_complete = get(sr, 'ready', 0) == 0
+    let sr.ready = 1
+    if need_complete
+        call ncm2#_on_complete(0)
+    endif
 endfunc
 
 func! ncm2#complete(ctx, startccol, matches, ...)

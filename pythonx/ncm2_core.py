@@ -250,6 +250,11 @@ class Ncm2Core(Ncm2Base):
         cache = self._matches.get(name, None)
 
         if not sr['enable']:
+            logger.debug('%s is not enabled', name)
+            return False
+
+        if not sr['ready']:
+            logger.debug('%s is not ready', name)
             return False
 
         if not self.source_check_scope(sr, ctx):
