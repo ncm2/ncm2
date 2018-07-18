@@ -48,6 +48,8 @@ def getLogger(name):
     logger.setLevel(get_loglevel())
     return logger
 
+logger = getLogger(__name__)
+
 def matcher_get(opt):
     name = opt['name']
     modname = 'ncm2_matcher.' + name
@@ -194,6 +196,16 @@ class Ncm2Base:
 class Ncm2Source(Ncm2Base):
     def __init__(self, nvim):
         Ncm2Base.__init__(self, nvim)
+
+        # add lazy_check_context to on_complete method
+        on_complete_impl = self.on_complete
+        def on_complete(context, *args):
+            if not self.lazy_check_context(context):
+                logger.info('on_complete lazy_check_context failed')
+                return
+            on_complete_impl(context, *args)
+        self.on_complete = on_complete
+        logger.debug('on_complete is wrapped')
 
     def complete(self, ctx, startccol, matches, refresh=False):
         self.nvim.call('ncm2#complete', ctx, startccol,
