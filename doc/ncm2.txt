@@ -384,5 +384,5 @@ Ncm2Plugin
 
     - Using Ncm2Plugin to execute code will get catch an error is ncm2 is
       not installed.
-    - It should makt things easier if you need to tune the startup time of
+    - It should make things easier if you need to tune the startup time of
       your editor.
