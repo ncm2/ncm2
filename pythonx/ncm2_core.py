@@ -40,8 +40,6 @@ class Ncm2Core(Ncm2Base):
         self._word_patterns = pats
         self._min_context_id = 0
 
-        self.notify('ncm2#_core_started')
-
     def notify(self, method: str, *args):
         self.nvim.call(method, *args, async_=True)
 

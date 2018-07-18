@@ -32,6 +32,7 @@ inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_real_popup()<CR>
 inoremap <silent> <Plug>(_ncm2_auto_trigger) <C-r>=ncm2#_on_complete(0)<CR>
 
 let s:core = yarp#py3('ncm2_core')
+let s:core.on_load = 'ncm2#_core_started'
 let s:sources = {}
 let s:popup_timer = 0
 let s:complete_timer = 0
