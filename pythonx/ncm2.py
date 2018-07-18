@@ -9,6 +9,7 @@ from os import path
 import unicodedata
 from copy import deepcopy
 import json
+import time
 
 __all__ = ['Ncm2Base', 'Ncm2Source', 'Popen']
 
@@ -59,9 +60,22 @@ def matcher_opt_formalize(opt):
         return dict(name=opt)
     return deepcopy(opt)
 
+def lazy_check_context(nvim, context):
+    if context.get('dated', 0):
+        return False
+    # only checks when we receives a context that seems old
+    now = time.time()
+    if now >= context['time'] + 0.5:
+        return not nvim.call('ncm2#context_dated', context)
+    else:
+        return True
+
 class Ncm2Base:
     def __init__(self, nvim):
         self.nvim = nvim
+
+    def lazy_check_context(self, context):
+        return lazy_check_context(self.nvim, context)
 
     def matcher_opt_formalize(self, opt):
         return matcher_opt_formalize(opt)

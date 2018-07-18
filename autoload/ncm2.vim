@@ -386,12 +386,11 @@ func! ncm2#_notify_complete(ctx, calls, notified)
 endfunc
 
 func! ncm2#_notify_completed(ctx, name, sctx, completed, notified)
-    let s:completion_notified = a:notified
     if s:context_tick() != a:ctx.tick
-        let a:sctx.dated = 1
-    else
-        let a:sctx.dated = 0
+        return
     endif
+    let s:completion_notified = a:notified
+    let a:sctx.dated = 0
     let sr = s:sources[a:name]
     call call(sr.on_completed, [a:sctx, a:completed], sr)
 endfunc

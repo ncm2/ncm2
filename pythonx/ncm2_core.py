@@ -8,6 +8,7 @@ import glob
 from os import path, environ
 from importlib import import_module
 from copy import deepcopy
+import time
 
 # don't import this module by other processes
 assert environ['NVIM_YARP_MODULE'] == 'ncm2_core'
@@ -163,6 +164,7 @@ class Ncm2Core(Ncm2Base):
                 continue
             self.source_check_patterns(data, sr, ctx)
             self._notified[name] = ctx
+            ctx['time'] = time.time()
             vim_cache = self.make_vim_notified_cache()
             self.notify('ncm2#_notify_completed',
                         root_ctx,
@@ -208,6 +210,10 @@ class Ncm2Core(Ncm2Base):
                 notifies.append(dict(name=name, context=ctx))
 
         if notifies:
+            cur_time = time.time()
+            for noti in notifies:
+                ctx = noti['context']
+                ctx['time'] = cur_time
             vim_cache = self.make_vim_notified_cache()
             self.notify('ncm2#_notify_complete', root_ctx, notifies, vim_cache)
         else:
