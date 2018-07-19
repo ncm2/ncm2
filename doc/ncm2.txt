@@ -375,7 +375,7 @@ ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
     set it to 1 if you want another on_complete notification as the the user
     types.
 
-						            *ncm2#disable_source()*
+						                *ncm2#disable_source()*
 ncm2#disable_source({name})
     Disable the registered source.
 
@@ -387,6 +387,21 @@ ncm2#enable_for_buffer()
 ncm2#disable_for_buffer()
 	Disable ncm2 for current buffer.
 
+                                        *ncm2#lock()* *ncm2#unlock()*
+ncm2#lock({name}) ncm2#lock({name})
+    Lock or unlock ncm2 when working with other plugins that may modify the
+    buffer in insert mode.
+
+    Here's an example working with vim-multiple-cursors.
+>
+    function! Multiple_cursors_before()
+        call ncm2#lock('vim-multiple-cursors')
+    endfunction
+
+    function! Multiple_cursors_after()
+        call ncm2#unlock('vim-multiple-cursors')
+    endfunction
+<
 
 ==============================================================================
 6. Key Mappings                         *ncm2-key*
