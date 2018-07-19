@@ -308,7 +308,9 @@ func! ncm2#skip_auto_trigger()
     " skip auto ncm2#_on_complete
     let s:skip_auto_complete_tick = s:context_tick()
     doau User Ncm2PopupClose
-    call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
+    if pumvisible()
+        call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
+    endif
     return ''
 endfunc
 
