@@ -125,9 +125,29 @@ class Ncm2Core(Ncm2Base):
 
         self.notify('ncm2#_s', 'subscope_detectors', detectors_sync)
 
+    def get_context(self, data, name):
+        if type(name) is str:
+            sr = data['sources'][name]
+        else:
+            sr = name
+            name = sr['name']
+        root_ctx = data['context']
+        contexts = self.detect_subscopes(data)
+        for ctx in contexts:
+            ctx = deepcopy(ctx)
+            ctx['source'] = sr
+            ctx['matcher'] = self.matcher_opt_get(data, sr)
+            if not self.source_check_scope(sr, ctx):
+                continue
+            self.source_check_patterns(data, sr, ctx)
+            ctx['time'] = time.time()
+            return ctx
+
     def on_complete_done(self, data, completed):
         logger.info('on_complete_done')
         self._min_context_id = data['context']['context_id']
+
+        # is completed item from ncm2
         try:
             completed['user_data'] = json.loads(completed['user_data'])
             ud = completed['user_data']
@@ -157,7 +177,6 @@ class Ncm2Core(Ncm2Base):
         contexts = self.detect_subscopes(data)
         for ctx in contexts:
             ctx = deepcopy(ctx)
-            ctx['early_cache'] = False
             ctx['source'] = sr
             ctx['matcher'] = self.matcher_opt_get(data, sr)
             if not self.source_check_scope(sr, ctx):
@@ -269,7 +288,7 @@ class Ncm2Core(Ncm2Base):
                 'source_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
             return False
 
-        manual = ctx['manual']
+        manual = ctx.get('manual', 0)
 
         if not sr['auto_popup'] and not manual:
             logger.debug('<%s> is not auto_popup', name)
@@ -760,5 +779,6 @@ load_python = ncm2_core.load_python
 on_warmup = ncm2_core.on_warmup
 on_notify_dated = ncm2_core.on_notify_dated
 on_complete_done = ncm2_core.on_complete_done
+get_context = ncm2_core.get_context
 
 __all__ = events

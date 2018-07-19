@@ -180,6 +180,10 @@ func! ncm2#set_ready(sr)
     endif
 endfunc
 
+func! ncm2#context(name)
+    return s:request('get_context', a:name)
+endfunc
+
 func! ncm2#complete(ctx, startccol, matches, ...)
     let refresh = 0
     if len(a:000)
@@ -437,8 +441,11 @@ func! ncm2#_core_data(event)
 
     " if subscope detector is available for this buffer, we need to send
     " the whole buffer for on_complete event
-    if (a:event == 'on_complete' || a:event == 'on_warmup' || a:event == 'on_complete_done') &&
-                \ has_key(s:subscope_detectors, &filetype)
+    if has_key(s:subscope_detectors, &filetype) &&
+                \ (a:event == 'on_complete' ||
+                \ a:event == 'get_context' ||
+                \ a:event == 'on_warmup' ||
+                \ a:event == 'on_complete_done')
         let data.lines = getline(1, '$')
     endif
 
@@ -453,6 +460,16 @@ func! s:try_rnotify(event, ...)
     let g:ncm2#core_data = {}
     let g:ncm2#core_event = []
     return call(s:core.try_notify, [a:event, data] + a:000, s:core)
+endfunc
+
+func! s:request(event, ...)
+    let g:ncm2#core_event = [a:event, a:000]
+    let g:ncm2#core_data = {}
+    doau User Ncm2CoreData
+    let data = ncm2#_core_data(a:event)
+    let g:ncm2#core_data = {}
+    let g:ncm2#core_event = []
+    return call(s:core.request, [a:event, data] + a:000, s:core)
 endfunc
 
 func! s:warmup()
