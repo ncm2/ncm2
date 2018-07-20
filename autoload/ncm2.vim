@@ -173,9 +173,10 @@ func! ncm2#set_ready(sr)
     if type(sr) == v:t_string
         let sr = s:soruces[l:sr]
     endif
-    let need_complete = get(sr, 'ready', 0) == 0
+    let changed_to_ready = get(sr, 'ready', 0) == 0
     let sr.ready = 1
-    if need_complete
+    if changed_to_ready
+        call s:warmup()
         call ncm2#_on_complete(0)
     endif
 endfunc
