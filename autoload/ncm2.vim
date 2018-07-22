@@ -11,7 +11,7 @@ endfunc
 
 call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
-call s:opt('ncm2#popup_delay', 100)
+call s:opt('ncm2#popup_delay', 20)
 call s:opt('ncm2#complete_length', [[1,4],[7,3]])
 call s:opt('ncm2#matcher', 'abbrfuzzy')
 call s:opt('ncm2#sorter', 'abbrfuzzy')
