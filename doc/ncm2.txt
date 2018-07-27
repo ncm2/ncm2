@@ -180,6 +180,11 @@ g:ncm2#complete_length
             better to use a smaller value to trigger the popup than
             others.
 
+                                    *g:ncm2#popup_limit*
+g:ncm2#popup_limit
+            If set, this option will be the default limit of completion items
+            that will popup for each completion source.
+
 ==============================================================================
 5. API						            *ncm2-API*
 
@@ -257,6 +262,10 @@ ncm2#register_source({source})
             If you want the matcher to filter the menu field of the
             |complete-item| instead of the default |abbr| field. set the
             matcher to `{'key': 'menu'}`
+
+    popup_limit
+            Limit the number of completion items that will popup.
+            Default: |g:ncm2#popup_limit|
 
     Here are some examples, that should give you some hints on how
     word_pattern, complete_pattern and complete_length work.

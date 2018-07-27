@@ -152,7 +152,8 @@ class Ncm2Core(Ncm2Base):
             completed['user_data'] = json.loads(completed['user_data'])
             ud = completed['user_data']
             if not ud.get('ncm2', 0):
-                logger.debug('This is not completed by ncm2, ncm2==0, ud: %s', ud)
+                logger.debug(
+                    'This is not completed by ncm2, ncm2==0, ud: %s', ud)
                 return
         except Exception as ex:
             logger.debug('This is not completed by ncm2, %s', ex)
@@ -167,7 +168,8 @@ class Ncm2Core(Ncm2Base):
         sr = data['sources'][name]
 
         if not sr.get('on_completed', None):
-            logger.debug('the source does not have on_completed handler, %s', sr)
+            logger.debug(
+                'the source does not have on_completed handler, %s', sr)
             return
 
         root_ctx = data['context']
@@ -602,12 +604,26 @@ class Ncm2Core(Ncm2Base):
         # additional filtering on inter-source level
         names = self.get_sources_for_popup(data, names_with_matches)
 
-        # merge results of sources
+        # merge results of sources, popup_limit
         startccol = ccol
         for name in names:
+            sr = srcs[name]
             cache = self._matches[name]
             sccol = cache['startccol']
-            for m in cache['filtered_matches']:
+            filtered_matches = cache['filtered_matches']
+
+            # popup_limit
+            popup_limit = sr.get('popup_limit', data['popup_limit'])
+            if popup_limit >= 0:
+                filtered_matches = filtered_matches[: popup_limit]
+                if len(filtered_matches) != len(cache['filtered_matches']):
+                    logger.debug('%s matches popup_limit %s -> %s',
+                                 name,
+                                 len(cache['filtered_matches']),
+                                 len(filtered_matches))
+                    cache['filtered_matches'] = filtered_matches
+
+            for m in filtered_matches:
                 ud = m['user_data']
                 mccol = ud.get('startccol', sccol)
                 if mccol < startccol:

@@ -16,6 +16,7 @@ call s:opt('ncm2#complete_length', [[1,4],[7,3]])
 call s:opt('ncm2#matcher', 'abbrfuzzy')
 call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
+call s:opt('ncm2#popup_limit', -1)
 
 let g:ncm2#core_data = {}
 let g:ncm2#core_event = []
@@ -436,6 +437,7 @@ func! ncm2#_core_data(event)
                 \ 'matcher': g:ncm2#matcher,
                 \ 'sorter': g:ncm2#sorter,
                 \ 'filter': g:ncm2#filter,
+                \ 'popup_limit': g:ncm2#popup_limit,
                 \ 'context': s:context(),
                 \ 'sources': s:sources,
                 \ 'subscope_detectors': s:subscope_detectors,
