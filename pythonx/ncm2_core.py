@@ -184,6 +184,7 @@ class Ncm2Core(Ncm2Base):
             self.source_check_patterns(data, sr, ctx)
             self._notified[name] = ctx
             ctx['time'] = time.time()
+            ctx['event'] = 'on_completed'
             self.notify('ncm2#_notify_completed',
                         root_ctx,
                         name,
@@ -569,6 +570,13 @@ class Ncm2Core(Ncm2Base):
 
                 smat = deepcopy(cache['matches'])
                 sctx = cache['context']
+
+                if data['skip_tick']:
+                    if sctx.get('event', '') != 'on_completed' or \
+                            sctx['tick'] != data['skip_tick']:
+                        logger.debug('%s matches ignored by skip_tick',
+                                     data['skip_tick'])
+                        continue
 
                 smat = self.matches_filter(data, sr, sctx, sccol, smat)
                 cache['filtered_matches'] = smat

@@ -43,7 +43,8 @@ let s:lnum = 0
 let s:matches = []
 let s:subscope_detectors = {}
 let s:auto_trigger_tick = []
-let s:skip_auto_complete_tick = []
+let s:skip_tick = []
+let s:skip_context_id = 0
 let s:context_tick_extra = 0
 let s:context_id = 0
 let s:completion_notified = {}
@@ -93,7 +94,7 @@ endfunc
 func! s:cache_cleanup()
     call s:cache_matches_cleanup()
     let s:auto_trigger_tick  = []
-    let s:skip_auto_complete_tick = []
+    let s:skip_tick = []
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -307,7 +308,7 @@ func! ncm2#skip_auto_trigger()
     " invalidate ncm2#_notify_complete
     let s:context_tick_extra += 1
     " skip auto ncm2#_on_complete
-    let s:skip_auto_complete_tick = s:context_tick()
+    let s:skip_tick = s:context_tick()
     doau User Ncm2PopupClose
     if pumvisible()
         call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
@@ -358,11 +359,13 @@ func! ncm2#_on_complete(trigger_type)
         if g:ncm2#auto_popup == 0
             return ''
         endif
-        if s:skip_auto_complete_tick == s:context_tick()
+        if s:skip_tick == s:context_tick()
             return ''
         endif
     endif
 
+    " skip_tick is dated, we don't need it anymore
+    let s:skip_tick = []
     call s:try_rnotify('on_complete', l:manual)
     return ''
 endfunc
@@ -432,6 +435,7 @@ func! ncm2#_core_data(event)
     " data sync between ncm2.vim and ncm2_core.py
     let data = extend(g:ncm2#core_data, {
                 \ 'auto_popup': g:ncm2#auto_popup,
+                \ 'skip_tick': s:skip_tick,
                 \ 'complete_length': g:ncm2#complete_length,
                 \ 'matcher': g:ncm2#matcher,
                 \ 'sorter': g:ncm2#sorter,
