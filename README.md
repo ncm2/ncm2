@@ -89,7 +89,7 @@ NCM2.**
 
 ## How Do I write Ncm2 Source?
 
-On important step is to understand how and when completion gets triggered.
+One important step is to understand how and when completion gets triggered.
 Read `:help ncm2#register_source` carefully. There's a small interactive
 script in the doc. It is helpful for both understanding and debugging.
 
