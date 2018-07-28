@@ -94,7 +94,6 @@ func! s:cache_cleanup()
     call s:cache_matches_cleanup()
     let s:auto_trigger_tick  = []
     let s:skip_auto_complete_tick = []
-    let s:completion_notified = {}
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -207,7 +206,7 @@ func! ncm2#complete(ctx, startccol, matches, ...)
 endfunc
 
 func! ncm2#context_dated(ctx)
-    return a:ctx.context_id != get(s:completion_notified, a:ctx.source.name, 0)
+    return a:ctx.context_id < get(s:completion_notified, a:ctx.source.name, 0)
 endfunc
 
 func! ncm2#menu_selected()
@@ -368,7 +367,7 @@ func! ncm2#_on_complete(trigger_type)
     return ''
 endfunc
 
-func! ncm2#_notify_complete(ctx, calls, notified)
+func! ncm2#_notify_complete(ctx, calls)
     if s:context_tick() != a:ctx.tick
         call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
         " we need skip check, and auto_popup check in ncm2#_on_complete
@@ -376,10 +375,10 @@ func! ncm2#_notify_complete(ctx, calls, notified)
         call ncm2#_on_complete(get(a:ctx, 'manual', 0))
         return
     endif
-    let s:completion_notified = a:notified
     for ele in a:calls
         let name = ele['name']
         try
+            let s:completion_notified[name] = a:ctx.context_id
             let sr = s:sources[name]
             let ctx = ele.context
             if type(sr.on_complete) == v:t_list
@@ -393,11 +392,11 @@ func! ncm2#_notify_complete(ctx, calls, notified)
     endfor
 endfunc
 
-func! ncm2#_notify_completed(ctx, name, sctx, completed, notified)
+func! ncm2#_notify_completed(ctx, name, sctx, completed)
     if s:context_tick() != a:ctx.tick
         return
     endif
-    let s:completion_notified = a:notified
+    let s:completion_notified[a:name] = a:sctx.context_id
     let a:sctx.dated = 0
     let sr = s:sources[a:name]
     call call(sr.on_completed, [a:sctx, a:completed], sr)

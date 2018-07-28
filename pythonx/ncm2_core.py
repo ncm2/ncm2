@@ -39,7 +39,6 @@ class Ncm2Core(Ncm2Base):
         pats['vim'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)'
 
         self._word_patterns = pats
-        self._min_context_id = 0
 
     def notify(self, method: str, *args):
         self.nvim.call(method, *args, async_=True)
@@ -145,7 +144,6 @@ class Ncm2Core(Ncm2Base):
 
     def on_complete_done(self, data, completed):
         logger.info('on_complete_done')
-        self._min_context_id = data['context']['context_id']
 
         # is completed item from ncm2
         try:
@@ -186,13 +184,11 @@ class Ncm2Core(Ncm2Base):
             self.source_check_patterns(data, sr, ctx)
             self._notified[name] = ctx
             ctx['time'] = time.time()
-            vim_cache = self.make_vim_notified_cache()
             self.notify('ncm2#_notify_completed',
                         root_ctx,
                         name,
                         ctx,
-                        completed,
-                        vim_cache)
+                        completed)
             return
 
     def on_notify_dated(self, data, _, failed_notifies=[]):
@@ -235,18 +231,11 @@ class Ncm2Core(Ncm2Base):
             for noti in notifies:
                 ctx = noti['context']
                 ctx['time'] = cur_time
-            vim_cache = self.make_vim_notified_cache()
-            self.notify('ncm2#_notify_complete', root_ctx, notifies, vim_cache)
+            self.notify('ncm2#_notify_complete', root_ctx, notifies)
         else:
             logger.debug('notifies is empty %s', notifies)
 
         self.matches_update_popup(data)
-
-    def make_vim_notified_cache(self):
-        cache = {}
-        for name, ctx in self._notified.items():
-            cache[name] = ctx['context_id']
-        return cache
 
     def on_warmup(self, data):
         contexts = self.detect_subscopes(data)
@@ -558,7 +547,6 @@ class Ncm2Core(Ncm2Base):
         names = sorted(names, key=lambda x: srcs[x]['priority'], reverse=True)
 
         ccol = ctx['ccol']
-        min_context_id = self._min_context_id
 
         # basic filtering for matches of each source
         names_with_matches = []
@@ -581,11 +569,6 @@ class Ncm2Core(Ncm2Base):
 
                 smat = deepcopy(cache['matches'])
                 sctx = cache['context']
-                context_id = sctx['context_id']
-                if min_context_id > context_id:
-                    logger.debug('%s ignored by context_id %s < min %s',
-                                 name, context_id, min_context_id)
-                    continue
 
                 smat = self.matches_filter(data, sr, sctx, sccol, smat)
                 cache['filtered_matches'] = smat
