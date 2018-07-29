@@ -384,9 +384,9 @@ ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
     set it to 1 if you want another on_complete notification as the the user
     types.
 
-						                *ncm2#disable_source()*
-ncm2#disable_source({name})
-    Disable the registered source.
+						                *ncm2#unregister_source()*
+ncm2#unregister_source()
+    Remove the source from ncm2 registry.
 
 						                *ncm2#enable_for_buffer()*
 ncm2#enable_for_buffer()

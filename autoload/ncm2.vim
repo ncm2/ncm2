@@ -161,12 +161,12 @@ func! ncm2#register_source(sr)
     call s:warmup()
 endfunc
 
-func! ncm2#disable_source(name)
-    try
-        let s:sources[a:name]['enable'] = 0
-    catch
-        call s:core.error(v:exception)
-    endtry
+func! ncm2#unregister_source(sr)
+    let name = a:sr
+    if type(a:sr) == v:t_dict
+        let name = a:sr.name
+    endif
+    unlet s:sources[name]
 endfunc
 
 func! ncm2#set_ready(sr)

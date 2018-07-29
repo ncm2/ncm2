@@ -159,11 +159,10 @@ class Ncm2Core(Ncm2Base):
 
         name = ud['source']
 
-        if name not in data['sources']:
-            logger.debug('the source does not exists')
+        sr = data['sources'].get(name, None)
+        if not sr:
+            logger.error('the source does not exist')
             return
-
-        sr = data['sources'][name]
 
         if not sr.get('on_completed', None):
             logger.debug(
@@ -336,7 +335,7 @@ class Ncm2Core(Ncm2Base):
 
         sr = data['sources'].get(name, None)
         if not sr:
-            logger.error("invalid completion source name [%s]", name)
+            logger.error("%s] source does not exist", name)
             return
 
         cache = self._matches.get(name, None)
@@ -554,7 +553,10 @@ class Ncm2Core(Ncm2Base):
         for name in names:
 
             try:
-                sr = srcs[name]
+                sr = srcs.get(name, None)
+                if not sr:
+                    logger.error('[%s] source does not exist', name)
+                    continue
 
                 cache = self._matches[name]
                 cache['filtered_matches'] = []
