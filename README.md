@@ -11,6 +11,8 @@ Main features:
    completion in html style/script tag.
 3. Function parameter expansion support using
    [ncm2-snippet](https://github.com/topics/ncm2-snippet) plugins.
+4. [Language server protocol plugin
+   integration](https://github.com/ncm2/ncm2/wiki).
 
 Read [our wiki page](https://github.com/ncm2/ncm2/wiki) for a list of
 extensions and languages support for NCM2.
