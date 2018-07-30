@@ -178,7 +178,7 @@ func! ncm2#set_ready(sr)
     let sr.ready = 1
     if changed_to_ready
         call s:warmup()
-        call ncm2#_on_complete(0)
+        call s:feedkeys('<Plug>(_ncm2_auto_trigger)')
     endif
 endfunc
 
