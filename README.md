@@ -104,16 +104,3 @@ some options available:
 - I myself prefer to use [nvim-yarp](https://github.com/roxma/nvim-yarp)
     - Read [ncm2/ncm2-bufword](https://github.com/ncm2/ncm2-bufword) for
         example
-
-## Buy Me A Coffee :coffee:
-
-This project is always gonna be FOSS. While it still takes me [lots of
-effert](https://github.com/ncm2) to create & tune things amazing.
-
-Feel free to buy me a coffee if you love this project.
-
-Send [to roxma with paypal](https://www.paypal.me/roxma)
-
-Or send to roxma with WeChat:
-
-<img src="https://user-images.githubusercontent.com/4538941/42804334-4dd4b8c6-89db-11e8-83cd-8ccfd9b25be9.jpg" height="400">
