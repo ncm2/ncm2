@@ -157,8 +157,13 @@ func! ncm2#register_source(sr)
         throw "ncm2#register_source on_complete is required"
     endif
 
+    call dictwatcheradd(sr, 'enable', 'ncm2#_on_enable')
+    call dictwatcheradd(sr, 'ready', 'ncm2#_on_ready')
+
     let s:sources[name] = sr
+
     call s:warmup()
+    call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
 endfunc
 
 func! ncm2#unregister_source(sr)
@@ -166,20 +171,31 @@ func! ncm2#unregister_source(sr)
     if type(a:sr) == v:t_dict
         let name = a:sr.name
     endif
+    let sr = s:sources[name]
+
+    call dictwatcherdel(sr, 'enable', 'ncm2#_on_enable')
+    call dictwatcherdel(sr, 'ready', 'ncm2#_on_ready')
+
     unlet s:sources[name]
 endfunc
 
-func! ncm2#set_ready(sr)
-    let sr = a:sr
-    if type(sr) == v:t_string
-        let sr = s:soruces[l:sr]
-    endif
-    let changed_to_ready = get(sr, 'ready', 0) == 0
-    let sr.ready = 1
-    if changed_to_ready
+func! ncm2#_on_enable(sr, ...)
+    if a:sr.enable
         call s:warmup()
         call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     endif
+endfunc
+
+func! ncm2#_on_ready(sr, ...)
+    if a:sr.ready
+        call s:warmup()
+        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    endif
+endfunc
+
+" deprecated
+func! ncm2#set_ready(sr)
+    let a:sr.ready = 1
 endfunc
 
 func! ncm2#context(name)

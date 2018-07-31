@@ -205,8 +205,8 @@ ncm2#register_source({source})
 
 	ready	Defaults to 1. If your completion engine is a standalone process,
             you could set this field to 0 on registration. After the process
-            has loaded, call |ncm2#set_ready()| to tell ncm2 that this source
-            is ready for completion.
+            has loaded, set this field to 1, so that ncm2 knows this source is
+            ready for completion.
             No that this field doesn't affect the `on_warmup` callback.
 
 	priority				        *ncm2-priority*
@@ -362,10 +362,6 @@ ncm2#context_dated({context})
     calculate completion for every context recieved. Use this function to
     check whether it is the latest one at the beginning of your background
     job.
-
-                                    *ncm2#set_ready()*
-ncm2#set_ready({source})
-    Tell ncm2 that this source is ready for completion.
 
                                     *ncm2#complete()*
 ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
