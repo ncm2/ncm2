@@ -64,6 +64,9 @@ def substr_fuzzy_match(b, s, abbrs, chcmp):
             highlights = substr_fuzzy_match(b[l:], s, sub_abbrs, chcmp)
             if highlights:
                 return [highlight] + highlights
+        if l == 1:
+            # no more fallback
+            return None
         end = pos
     return None
 
