@@ -11,6 +11,13 @@ def chcmp_case(a, b): return a == b
 def chcmp_icase(a, b): return a.lower() == b.lower()
 
 
+def fuzzy_match(b, s, chcmp):
+    if len(b) == 0:
+        return []
+    abbrs = get_abbrev(s)
+    return substr_fuzzy_match(b, s, abbrs, chcmp)
+
+
 def get_abbrev(s):
     res = []
     if len(s) == 0:
@@ -35,65 +42,29 @@ def get_abbrev(s):
     return res
 
 
-def fuzzy_match(b, s, chcmp):
-    if len(b) == 0:
-        return []
-
-    abbr = get_abbrev(s)
-    abbr.append(len(s))
-    sections = []
-    for i in range(len(abbr) - 1):
-        sections.append([abbr[i], abbr[i + 1]])
-
-    highlights = substr_fuzzy_match(sections, b, s, chcmp)
-    if not highlights:
-        return None
-
-    # merge some of the substr fuzzy match
-    i = 1
-    while i < len(highlights):
-        phl = highlights[i - 1]
-        blen = phl[1] - phl[0]
-        bstart = reduce(lambda x, y: x + y[1] - y[0], highlights[: i - 1], 0)
-        # print("bstart %s, blen %s" % (bstart, blen))
-        hl = highlights[i]
-        if str_match(b[bstart: bstart+blen], s[hl[0] - blen: hl[0]], chcmp):
-            # merge
-            highlights = highlights[: i-1] + \
-                [[hl[0] - blen, hl[1]]] + highlights[i + 1:]
-            i -= 1
-            continue
-        else:
-            i += 1
-
-    # TODO check for greater substr meatch in the rest ???
-
-    return highlights
+def abbrs_ge(abbrs, ge):
+    for i, e in enumerate(abbrs):
+        if e >= ge:
+            return abbrs[i:]
+    return []
 
 
-def str_match(b, s, chcmp):
-    if len(b) != len(s):
-        return False
-    for c1, c2 in zip(b, s):
-        if not chcmp(c1, c2):
-            return False
-    return True
-
-
-def substr_fuzzy_match(sections, b, s, chcmp):
-    highlights = []
-    last_end = 0
-    for sec in sections:
-        if sec[0] < last_end:
-            continue
-        pos, l = max_substr_match(b, s, sec, chcmp)
+def substr_fuzzy_match(b, s, abbrs, chcmp):
+    end = len(s)
+    start = abbrs[0]
+    while end > start:
+        pos, l = max_substr_match(b, s, [start, end], chcmp)
         if not l:
-            continue
-        last_end = pos + l
-        highlights.append([pos, last_end])
-        b = b[l:]
-        if not b:
-            return highlights
+            return None
+        highlight = [pos, pos + l]
+        if l == len(b):
+            return [highlight]
+        sub_abbrs = abbrs_ge(abbrs, pos + l)
+        if sub_abbrs:
+            highlights = substr_fuzzy_match(b[l:], s, sub_abbrs, chcmp)
+            if highlights:
+                return [highlight] + highlights
+        end = pos
     return None
 
 
@@ -139,23 +110,31 @@ def test_fuzzy_match(b, s, chcmp):
     res = get_abbrev(s)
     ls = [' '] * len(s)
     for i in res:
-        ls[i] = '^'
-    print('str  : ' + s)
+        ls[i] = '|'
     print('split: ' + ''.join(ls))
+    print('str  : ' + s)
 
     highlights = fuzzy_match(b, s, chcmp)
-    print('       ' + s)
     s2 = ' ' * len(s)
     if highlights:
         for hl in highlights:
             s2 = s2[: hl[0]] + ('^' * (hl[1] - hl[0])) + s2[hl[1]:]
+    else: 
+        s2 = '-' * len(s)
     print('match: ' + s2)
 
 
 if __name__ == '__main__':
     test_fuzzy_match('subfuzzy', 'substr_fuzzy_match', chcmp_smartcase)
     print('')
-    test_fuzzy_match('substrfuzzy', 'substr_substrfuzzy_match', chcmp_smartcase)
+    test_fuzzy_match(
+        'substrfuzzy', 'substr_substrfuzzy_match', chcmp_smartcase)
     print('')
     test_fuzzy_match('sfum', 'substr_substrfuzzy_match', chcmp_smartcase)
+    print('')
+    test_fuzzy_match('sfuym', 'substr_substrfuzzy_match', chcmp_smartcase)
+    print('')
+    test_fuzzy_match('abcfoo', 'abc_foo_abcf', chcmp_smartcase)
+    print('')
+    test_fuzzy_match('abcfoo', 'a_b_c_abc_abfoo', chcmp_smartcase)
     print('')
