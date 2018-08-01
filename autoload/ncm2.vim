@@ -162,7 +162,7 @@ func! ncm2#register_source(sr)
 
     let s:sources[name] = sr
 
-    call s:warmup()
+    call s:warmup(name)
     call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
 endfunc
 
@@ -181,14 +181,14 @@ endfunc
 
 func! ncm2#_on_enable(sr, ...)
     if a:sr.enable
-        call s:warmup()
+        call s:warmup(a:sr.name)
         call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     endif
 endfunc
 
 func! ncm2#_on_ready(sr, ...)
     if a:sr.ready
-        call s:warmup()
+        call s:warmup(a:sr.name)
         call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     endif
 endfunc
@@ -496,11 +496,11 @@ func! s:request(event, ...)
     return call(s:core.request, [a:event, data] + a:000, s:core)
 endfunc
 
-func! s:warmup()
+func! s:warmup(...)
     if !get(b:, 'ncm2_enable', 0)
         return
     endif
-    call s:try_rnotify('on_warmup')
+    call s:try_rnotify('on_warmup', a:000)
 endfunc
 
 func! ncm2#_core_started()
@@ -528,6 +528,11 @@ func! ncm2#_au_plugin()
     catch
         call s:core.error(v:exception)
     endtry
+
+    if has_key(s:subscope_detectors, &filetype)
+        call s:warmup()
+        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    endif
 endfunc
 
 func! s:feedkeys(key, ...)

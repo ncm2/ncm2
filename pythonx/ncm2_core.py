@@ -237,15 +237,15 @@ class Ncm2Core(Ncm2Base):
 
         self.matches_update_popup(data)
 
-    def on_warmup(self, data):
-        contexts = self.detect_subscopes(data)
-
-        # do notify_sources_to_refresh
+    def on_warmup(self, data, names):
         warmups = []
 
-        # get the sources that need to be notified
-        for ctx_idx, tmp_ctx in enumerate(contexts):
-            for name, sr in data['sources'].items():
+        if not names:
+            names = list(data['sources'].keys())
+
+        for ctx_idx, tmp_ctx in enumerate(self.detect_subscopes(data)):
+            for name in names:
+                sr = data['sources'][name]
 
                 ctx = deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
