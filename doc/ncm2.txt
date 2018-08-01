@@ -436,9 +436,13 @@ Ncm2PopupOpen,Ncm2PopupClose
 <
                                         *Ncm2Plugin*
 Ncm2Plugin
-    This autocmd will be executed after ncm2 is loaded. It has two effects:
+    This autocmd is triggered after ncm2 is loaded. It has two effects:
 
     - Using Ncm2Plugin to execute code will get catch an error is ncm2 is
       not installed.
     - It should make things easier if you need to tune the startup time of
       your editor.
+
+                                        *Ncm2RegisterSource*
+Ncm2RegisterSource
+    This autocmd is triggered at the end of |ncm2#register_source()|.

@@ -51,7 +51,7 @@ let s:completion_notified = {}
 
 augroup ncm2_hooks
     au!
-    au User Ncm2EnableForBuffer call s:warmup()
+    au User Ncm2EnableForBuffer,Ncm2RegisterSource call s:warmup()
     au User Ncm2CoreData,Ncm2PopupClose,Ncm2PopupOpen silent 
     au OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
 augroup END
@@ -162,8 +162,7 @@ func! ncm2#register_source(sr)
 
     let s:sources[name] = sr
 
-    call s:warmup(name)
-    call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    doau User Ncm2RegisterSource
 endfunc
 
 func! ncm2#unregister_source(sr)
@@ -182,14 +181,12 @@ endfunc
 func! ncm2#_on_enable(sr, ...)
     if a:sr.enable
         call s:warmup(a:sr.name)
-        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     endif
 endfunc
 
 func! ncm2#_on_ready(sr, ...)
     if a:sr.ready
         call s:warmup(a:sr.name)
-        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     endif
 endfunc
 
@@ -501,6 +498,7 @@ func! s:warmup(...)
         return
     endif
     call s:try_rnotify('on_warmup', a:000)
+    call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
 endfunc
 
 func! ncm2#_core_started()
@@ -531,7 +529,6 @@ func! ncm2#_au_plugin()
 
     if has_key(s:subscope_detectors, &filetype)
         call s:warmup()
-        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
     endif
 endfunc
 
