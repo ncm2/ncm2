@@ -552,47 +552,43 @@ class Ncm2Core(Ncm2Base):
         names_with_matches = []
         for name in names:
 
-            try:
-                sr = srcs.get(name, None)
-                if not sr:
-                    logger.error('[%s] source does not exist', name)
+            sr = srcs.get(name, None)
+            if not sr:
+                logger.error('[%s] source does not exist', name)
+                continue
+
+            cache = self._matches[name]
+            cache['filtered_matches'] = []
+
+            if not cache['enable']:
+                logger.debug('<%s> is disabled', name)
+                continue
+
+            sccol = cache['startccol']
+            if sccol > ccol or sccol == 0:
+                logger.warn('%s invalid startccol %s', name, sccol)
+                continue
+
+            smat = deepcopy(cache['matches'])
+            sctx = cache['context']
+
+            if data['skip_tick']:
+                if sctx.get('event', '') != 'on_completed' or \
+                        sctx['tick'] != data['skip_tick']:
+                    logger.debug('%s matches ignored by skip_tick',
+                                 data['skip_tick'])
                     continue
 
-                cache = self._matches[name]
-                cache['filtered_matches'] = []
+            smat = self.matches_filter(data, sr, sctx, sccol, smat)
+            cache['filtered_matches'] = smat
 
-                if not cache['enable']:
-                    logger.debug('<%s> is disabled', name)
-                    continue
+            logger.debug('%s matches is filtered %s -> %s',
+                         name, len(cache['matches']), len(smat))
 
-                sccol = cache['startccol']
-                if sccol > ccol or sccol == 0:
-                    logger.warn('%s invalid startccol %s', name, sccol)
-                    continue
+            if not smat:
+                continue
 
-                smat = deepcopy(cache['matches'])
-                sctx = cache['context']
-
-                if data['skip_tick']:
-                    if sctx.get('event', '') != 'on_completed' or \
-                            sctx['tick'] != data['skip_tick']:
-                        logger.debug('%s matches ignored by skip_tick',
-                                     data['skip_tick'])
-                        continue
-
-                smat = self.matches_filter(data, sr, sctx, sccol, smat)
-                cache['filtered_matches'] = smat
-
-                logger.debug('%s matches is filtered %s -> %s',
-                             name, len(cache['matches']), len(smat))
-
-                if not smat:
-                    continue
-
-                names_with_matches.append(name)
-
-            except Exception as inst:
-                logger.exception('%s matches_update_popup exception', inst)
+            names_with_matches.append(name)
 
         # additional filtering on inter-source level
         names = self.get_sources_for_popup(data, names_with_matches)
