@@ -158,10 +158,11 @@ func! ncm2#register_source(sr)
         throw "ncm2#register_source on_complete is required"
     endif
 
-    call dictwatcheradd(sr, 'enable', 'ncm2#_on_enable')
-    call dictwatcheradd(sr, 'ready', 'ncm2#_on_ready')
-
     let s:sources[name] = sr
+
+    " NOTE: not available on vim 8
+    silent! call dictwatcheradd(sr, 'enable', 'ncm2#_on_enable')
+    silent! call dictwatcheradd(sr, 'ready', 'ncm2#_on_ready')
 
     call s:override_source(sr)
     doau User Ncm2RegisterSource
@@ -198,8 +199,8 @@ func! ncm2#unregister_source(sr)
     endif
     let sr = s:sources[name]
 
-    call dictwatcherdel(sr, 'enable', 'ncm2#_on_enable')
-    call dictwatcherdel(sr, 'ready', 'ncm2#_on_ready')
+    silent! call dictwatcherdel(sr, 'enable', 'ncm2#_on_enable')
+    silent! call dictwatcherdel(sr, 'ready', 'ncm2#_on_ready')
 
     unlet s:sources[name]
 endfunc
