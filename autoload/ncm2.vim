@@ -525,7 +525,9 @@ func! s:warmup(...)
         return
     endif
     call s:try_rnotify('on_warmup', a:000)
-    call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    " the FZF terminal window somehow gets empty without timer_start
+    " https://github.com/ncm2/ncm2/issues/50
+    call timer_start(0, {_->s:feedkeys("\<Plug>(_ncm2_auto_trigger)")})
 endfunc
 
 func! ncm2#_core_started()
