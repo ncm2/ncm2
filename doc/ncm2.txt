@@ -353,15 +353,20 @@ ncm2#register_source({source})
 
                                     *ncm2#context_dated()*
 ncm2#context_dated({context})
-    Ncm2 keeps the latest context that is sent to the completion source for
-    completion. This function compares the argument with the latest context,
-    and returns 1 if it is not the latest context.
+    Ncm2 remembers the latest context sent to each completion source. This
+    function compares the argument with the latest context, and returns 1 if
+    it is not the latest context.
 
     This function is useful if your completion worker is slow and finish
     before ncm2 sends more new contexts for completion. You don't want to
     calculate completion for every context recieved. Use this function to
     check whether it is the latest one at the beginning of your background
     job.
+
+    Another use case of the function is that, you could check the context
+    periodicly after the completion has started. So that you could cancel the
+    completion as soon as possible if the user has left the completion
+    context.
 
                                     *ncm2#complete()*
 ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
