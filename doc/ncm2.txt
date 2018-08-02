@@ -453,7 +453,3 @@ Ncm2Plugin
       not installed.
     - It should make things easier if you need to tune the startup time of
       your editor.
-
-                                        *Ncm2RegisterSource*
-Ncm2RegisterSource
-    This autocmd is triggered at the end of |ncm2#register_source()|.

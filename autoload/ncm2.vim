@@ -52,7 +52,7 @@ let s:completion_notified = {}
 
 augroup ncm2_hooks
     au!
-    au User Ncm2EnableForBuffer,Ncm2RegisterSource call s:warmup()
+    au User Ncm2EnableForBuffer call s:warmup()
     au User Ncm2CoreData,Ncm2PopupClose,Ncm2PopupOpen silent 
     au OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
 augroup END
@@ -166,7 +166,7 @@ func! ncm2#register_source(sr)
     endif
 
     call s:override_source(sr)
-    doau User Ncm2RegisterSource
+    call s:warmup(name)
 endfunc
 
 func! ncm2#override_source(name, v)
