@@ -160,9 +160,10 @@ func! ncm2#register_source(sr)
 
     let s:sources[name] = sr
 
-    " NOTE: not available on vim 8
-    silent! call dictwatcheradd(sr, 'enable', 'ncm2#_on_enable')
-    silent! call dictwatcheradd(sr, 'ready', 'ncm2#_on_ready')
+    if has('nvim')
+        call dictwatcheradd(sr, 'enable', 'ncm2#_on_enable')
+        call dictwatcheradd(sr, 'ready', 'ncm2#_on_ready')
+    endif
 
     call s:override_source(sr)
     doau User Ncm2RegisterSource
@@ -199,8 +200,10 @@ func! ncm2#unregister_source(sr)
     endif
     let sr = s:sources[name]
 
-    silent! call dictwatcherdel(sr, 'enable', 'ncm2#_on_enable')
-    silent! call dictwatcherdel(sr, 'ready', 'ncm2#_on_ready')
+    if has('nvim')
+        call dictwatcherdel(sr, 'enable', 'ncm2#_on_enable')
+        call dictwatcherdel(sr, 'ready', 'ncm2#_on_ready')
+    endif
 
     unlet s:sources[name]
 endfunc
