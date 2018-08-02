@@ -35,6 +35,7 @@ inoremap <silent> <Plug>(_ncm2_auto_trigger) <C-r>=ncm2#_on_complete(0)<CR>
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
 let s:sources = {}
+let s:sources_override = {}
 let s:popup_timer = 0
 let s:complete_timer = 0
 let s:lock = {}
@@ -162,7 +163,32 @@ func! ncm2#register_source(sr)
 
     let s:sources[name] = sr
 
+    call s:override_source(sr)
     doau User Ncm2RegisterSource
+endfunc
+
+func! ncm2#override_source(name, v)
+    if empty(a:v)
+        if has_key(s:sources_override, a:name)
+            unlet s:sources_override[a:name]
+        endif
+        return
+    endif
+    let s:sources_override[a:name] = a:v
+    if has_key(s:sources, a:name)
+        call s:override_source(s:sources[a:name])
+    endif
+endfunc
+
+func! s:override_source(sr)
+    if !has_key(s:sources_override, a:sr.name)
+        return
+    endif
+    if type(s:sources_override[a:sr.name]) == v:t_dict
+        call extend(a:sr, s:sources_override[a:sr.name])
+    else
+        call s:sources_override[a:sr.name](a:sr)
+    endif
 endfunc
 
 func! ncm2#unregister_source(sr)
