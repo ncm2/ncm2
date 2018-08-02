@@ -266,7 +266,9 @@ endfunc
 
 func! ncm2#unlock(name)
     unlet s:lock[a:name]
-    call ncm2#auto_trigger()
+    if mode() == 'i'
+        call ncm2#auto_trigger()
+    endif
 endfunc
 
 func! ncm2#_update_matches(ctx, startbcol, matches)
@@ -360,7 +362,7 @@ func! ncm2#skip_auto_trigger()
 endfunc
 
 func! ncm2#auto_trigger()
-    " Use feedkeys, to makesure that the auto complete check works for au
+    " Use feedkeys, to make sure that the auto complete check works for au
     " InsertEnter, it is not yet in insert mode at the time.
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
 endfunc
@@ -393,7 +395,9 @@ func! s:complete_timer_handler()
         return
     endif
     let s:complete_timer = 0
-    call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    if mode() == 'i'
+        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    endif
 endfunc
 
 func! ncm2#_on_complete(trigger_type)
@@ -528,9 +532,11 @@ func! s:warmup(...)
         return
     endif
     call s:try_rnotify('on_warmup', a:000)
-    " the FZF terminal window somehow gets empty without timer_start
+    " the FZF terminal window somehow gets empty without this check
     " https://github.com/ncm2/ncm2/issues/50
-    call timer_start(0, {_->s:feedkeys("\<Plug>(_ncm2_auto_trigger)")})
+    if mode() == 'i'
+        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+    endif
 endfunc
 
 func! ncm2#_core_started()
