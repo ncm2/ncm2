@@ -586,7 +586,9 @@ endfunc
 func! ncm2#insert_mode_only_key(key)
     exe 'map' a:key '<nop>'
     exe 'cmap' a:key '<nop>'
-    exe 'tmap' a:key '<nop>'
+    if exists(':tmap')
+        exe 'tmap' a:key '<nop>'
+    endif
 endfunc
 
 call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')
