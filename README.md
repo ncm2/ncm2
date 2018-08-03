@@ -15,7 +15,7 @@ Main features:
    integration](https://github.com/ncm2/ncm2/wiki).
 
 Read [our wiki page](https://github.com/ncm2/ncm2/wiki) for a list of
-extensions and languages support for NCM2.
+extensions and programming languages support for NCM2.
 
 ![peek 2018-07-17 18-15](https://user-images.githubusercontent.com/4538941/42811661-dbfb5ba2-89ed-11e8-81c4-3fb893d1af9c.gif)
 
@@ -36,14 +36,19 @@ NCM2.**
 ```vim
     " assuming your using vim-plug: https://github.com/junegunn/vim-plug
     Plug 'ncm2/ncm2'
-    " ncm2 requires nvim-yarp
     Plug 'roxma/nvim-yarp'
 
     " enable ncm2 for all buffers
     autocmd BufEnter * call ncm2#enable_for_buffer()
 
-    " :help Ncm2PopupOpen for more information
+    " IMPORTANTE: :help Ncm2PopupOpen for more information
     set completeopt=noinsert,menuone,noselect
+
+    " OPTIONAL: some completion sources
+    Plug 'ncm2/ncm2-bufword'
+    Plug 'ncm2/ncm2-tmux'
+    Plug 'ncm2/ncm2-path'
+    Plug 'ncm2/ncm2-jedi'
 ```
 
 ## Optional Vimrc Tips
@@ -81,12 +86,6 @@ NCM2.**
             \ 'complete_pattern': ':\s*',
             \ 'on_complete': ['ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
             \ })
-
-    " some completion sources
-    Plug 'ncm2/ncm2-bufword'
-    Plug 'ncm2/ncm2-tmux'
-    Plug 'ncm2/ncm2-path'
-    Plug 'ncm2/ncm2-jedi'
 ```
 
 ## How Do I write Ncm2 Source?

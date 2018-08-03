@@ -26,16 +26,11 @@ Main features:
 1. Fast and asynchronous completion support, with vimscript friendly API.
 2. Smart on files with different languages, for example, css/javascript
    completion in html style/script tag.
-3. Function parameter expansion support using ncm2-plugin.
+3. Function parameter expansion support using ncm2-snippet plugins.
+4. Language server protocol plugin integrations.
 
-Here's a list of links where you can find extensions for ncm2.
-
-- [wiki](https://github.com/ncm2/ncm2/wiki)
-- [ncm2-plugin](https://github.com/topics/ncm2-plugin)
-- [ncm2-source](https://github.com/topics/ncm2-source)
-- [ncm2-subscope](https://github.com/topics/ncm2-subscope)
-- [ncm2-snippet](https://github.com/topics/ncm2-snippet)
-- [ncm2-utils](https://github.com/topics/ncm2-utils)
+Read our [wiki-page](https://github.com/ncm2/ncm2/wiki) for a list of
+extensions and programming languages support for NCM2.
 
 ==============================================================================
 2. Install					        *ncm2-install*
@@ -48,6 +43,9 @@ For neovim users:
 - `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested.
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
+For vim8 user, read the [nvim-yarp](https://github.com/roxma/nvim-yarp)
+README. NOTE that vim8 support is simply a bonus. It's not the goal of
+NCM2.
 
 ==============================================================================
 3. Vimrc Examples			        *ncm2-vimrc*
@@ -56,14 +54,19 @@ Install using vim-plug:
 >
     " assuming your using vim-plug: https://github.com/junegunn/vim-plug
     Plug 'ncm2/ncm2'
-    " ncm2 requires nvim-yarp
     Plug 'roxma/nvim-yarp'
 
     " enable ncm2 for all buffer
     autocmd BufEnter * call ncm2#enable_for_buffer()
 
-    " :help Ncm2PopupOpen for more information
+    " IMPORTANTE: :help Ncm2PopupOpen for more information
     set completeopt=noinsert,menuone,noselect
+
+    " OPTIONAL: some completion sources
+    Plug 'ncm2/ncm2-bufword'
+    Plug 'ncm2/ncm2-tmux'
+    Plug 'ncm2/ncm2-path'
+    Plug 'ncm2/ncm2-jedi'
 <
 Optional vimrc tips:
 >
@@ -103,12 +106,6 @@ Optional vimrc tips:
             \ 'complete_pattern': ':\s*',
             \ 'on_complete': ['ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
             \ })
-
-    " some completion sources
-    Plug 'ncm2/ncm2-bufword'
-    Plug 'ncm2/ncm2-tmux'
-    Plug 'ncm2/ncm2-path'
-    Plug 'ncm2/ncm2-jedi'
 <
 ==============================================================================
 4. Settings					    *ncm2-settings*
