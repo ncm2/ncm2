@@ -67,14 +67,13 @@ class Ncm2Core(Ncm2Base):
                 logger.info('send vimscript plugin %s', vs)
                 self.notify('ncm2#_load_vimscript', vs)
 
-            # travel around to get multiple exceptions displayed by yarp
-            # ncm_core -> ncm2#_load_python -> self.load_python
             for py in glob.iglob(path.join(d, 'ncm2-plugin/*.py')):
                 if py in self._loaded_plugins:
                     continue
                 self._loaded_plugins[py] = True
                 logger.info('send python plugin %s', py)
-                self.notify('ncm2#_load_python', py)
+                # async_call to get multiple exceptions properly printed
+                self.nvim.async_call(lambda: self.load_python({}, py))
 
             dts = glob.glob(path.join(d, 'pythonx/ncm2_subscope_detector/*.py')) + \
                 glob.glob(path.join(d, 'python3/ncm2_subscope_detector/*.py'))

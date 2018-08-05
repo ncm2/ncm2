@@ -54,7 +54,7 @@ augroup ncm2_hooks
     au!
     au User Ncm2EnableForBuffer call s:warmup()
     au User Ncm2CoreData,Ncm2PopupClose,Ncm2PopupOpen silent 
-    au OptionSet runtimepath call s:try_rnotify('load_plugin', &rtp)
+    au FileType * call s:try_rnotify('load_plugin', &rtp)
 augroup END
 
 func! ncm2#enable_for_buffer()
@@ -550,10 +550,6 @@ func! ncm2#_load_vimscript(s)
     catch
         call s:core.error(a:s . ': ' . v:exception)
     endtry
-endfunc
-
-func! ncm2#_load_python(py)
-    call s:try_rnotify('load_python', a:py)
 endfunc
 
 func! ncm2#_au_plugin()
