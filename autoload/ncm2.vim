@@ -11,7 +11,7 @@ endfunc
 
 call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
-call s:opt('ncm2#popup_delay', 20)
+call s:opt('ncm2#popup_delay', 60)
 call s:opt('ncm2#complete_length', [[1,3],[7,2]])
 call s:opt('ncm2#matcher', 'abbrfuzzy')
 call s:opt('ncm2#sorter', 'abbrfuzzy')
@@ -37,6 +37,8 @@ let s:core.on_load = 'ncm2#_core_started'
 let s:sources = {}
 let s:sources_override = {}
 let s:popup_timer = 0
+let s:popup_timer_args = []
+let s:popup_timer_tick = []
 let s:complete_timer = 0
 let s:lock = {}
 let s:startbcol = 1
@@ -272,25 +274,25 @@ func! ncm2#unlock(name)
 endfunc
 
 func! ncm2#_update_matches(ctx, startbcol, matches)
-    if s:popup_timer
-        call timer_stop(s:popup_timer)
-        let s:popup_timer = 0
-    endif
-    if g:ncm2#popup_delay && !pumvisible()
-        let s:popup_timer = timer_start(
-            \ g:ncm2#popup_delay,
-            \ {_ -> s:popup_timed(
-            \           a:ctx,
-            \           a:startbcol,
-            \           a:matches) })
+    if g:ncm2#popup_delay
+        let s:popup_timer_args = [a:ctx, a:startbcol, a:matches]
+        if s:popup_timer
+            if s:popup_timer_tick == a:ctx.tick
+                return
+            endif
+            let s:popup_timer_tick = a:ctx.tick
+            call timer_stop(s:popup_timer)
+        endif
+        let s:popup_timer = timer_start(g:ncm2#popup_delay,
+                    \ funcref('s:popup_timed'))
     else
         call ncm2#_real_update_matches(a:ctx, a:startbcol, a:matches)
     endif
 endfunc
 
-func! s:popup_timed(ctx, startbcol, matches)
+func! s:popup_timed(_)
     let s:popup_timer = 0
-    call ncm2#_real_update_matches(a:ctx, a:startbcol, a:matches)
+    call call('ncm2#_real_update_matches', s:popup_timer_args)
 endfunc
 
 func! ncm2#_real_update_matches(ctx, startbcol, matches)

@@ -119,10 +119,10 @@ g:ncm2#complete_delay
 
                                     *g:ncm2#popup_delay*
 g:ncm2#popup_delay
-            Adds a delay before the popup menu actually popups up. This
-            reduces popup menu flickering when multiple sources is
-            updating the popup menu in a short interval.
-			Default: 100
+            Adds a delay before the popup menu gets updated for current
+            typing. It will reduce the popup menu flickering when multiple
+            sources is updating the popup menu in a short interval.
+			Default: 60
 
                                     *g:ncm2#matcher*
 g:ncm2#matcher
