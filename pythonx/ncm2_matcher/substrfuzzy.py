@@ -53,7 +53,10 @@ def abbrs_ge(abbrs, ge):
 
 def substr_fuzzy_match(b, s, abbrs, chcmp):
     end = len(s)
-    start = abbrs[0]
+    if len(abbrs):
+        start = abbrs[0]
+    else:
+        return None
     while end > start:
         pos, l = max_substr_match(b, s, [start, end], chcmp)
         if not l:
