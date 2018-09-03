@@ -14,6 +14,8 @@ def chcmp_icase(a, b): return a.lower() == b.lower()
 def fuzzy_match(b, s, chcmp):
     if len(b) == 0:
         return []
+    if len(s) == 0:
+        return None
     abbrs = get_abbrev(s)
     return substr_fuzzy_match(b, s, abbrs, chcmp)
 
