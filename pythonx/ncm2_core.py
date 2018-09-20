@@ -672,7 +672,7 @@ class Ncm2Core(Ncm2Base):
         gsopt = self.sorter_opt_formalize(data['sorter'])
         ssopt = {}
         if 'sorter' in sr:
-            ssopt = self.sorter_opt_formalize(opt)
+            ssopt = self.sorter_opt_formalize(sr['sorter'])
         gsopt.update(ssopt)
         return gsopt
 
