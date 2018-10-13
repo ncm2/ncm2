@@ -165,13 +165,13 @@ g:ncm2#auto_popup
 g:ncm2#complete_length
 			The default value for |ncm2-complete_length|.
 
-			Default: `[[1,4],[7,3]]`
+			Default: `[[1,3],[7,2]]`
             Format: a |List| as [[ min priority, min len ],...], or
             single integer value.
 
             The default value means that sources with priority between 1
-            and 6 will have the value of 4, and sources with priority >=
-            7 will have the value of 3.  
+            and 6 will have the value of 3, and sources with priority >=
+            7 will have the value of 2.  
 
             Priority >= 7 is more semantic completion source, So it's
             better to use a smaller value to trigger the popup than
