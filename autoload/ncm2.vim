@@ -364,6 +364,9 @@ func! ncm2#skip_auto_trigger()
 endfunc
 
 func! ncm2#auto_trigger()
+    if &paste
+        return
+    endif
     " Use feedkeys, to make sure that the auto complete check works for au
     " InsertEnter, it is not yet in insert mode at the time.
     call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
