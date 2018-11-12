@@ -30,7 +30,6 @@ inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
 " > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
 " > after CTRL-O or with an expression mapping.
 inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_real_popup()<CR>
-inoremap <silent> <Plug>(_ncm2_auto_trigger) <C-r>=ncm2#_on_complete(0)<CR>
 
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
@@ -364,9 +363,9 @@ func! ncm2#skip_auto_trigger()
 endfunc
 
 func! ncm2#auto_trigger()
-    " Use feedkeys, to make sure that the auto complete check works for au
-    " InsertEnter, it is not yet in insert mode at the time.
-    call s:feedkeys("\<Plug>(ncm2_auto_trigger)")
+    " The task will be invoked when vim is waiting for input. This works for
+    " Insertenter, it is not yet in insert mode at the time
+    call s:ins_task('ncm2#_do_auto_trigger')
 endfunc
 
 func! ncm2#_do_auto_trigger()
@@ -380,7 +379,7 @@ func! ncm2#_do_auto_trigger()
     call s:feedkeys("\<Plug>(ncm2_complete_popup)")
 
     if g:ncm2#complete_delay == 0
-        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
+        call ncm2#_on_complete(0)
     else
         if s:complete_timer
             call timer_stop(s:complete_timer)
@@ -393,13 +392,11 @@ func! ncm2#_do_auto_trigger()
 endfunc
 
 func! s:complete_timer_handler()
-    if &paste
+    let s:complete_timer = 0
+    if s:should_skip()
         return
     endif
-    let s:complete_timer = 0
-    if mode() == 'i'
-        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
-    endif
+    call ncm2#_on_complete(0)
 endfunc
 
 func! ncm2#_on_complete(trigger_type)
@@ -536,9 +533,7 @@ func! s:warmup(...)
     call s:try_rnotify('on_warmup', a:000)
     " the FZF terminal window somehow gets empty without this check
     " https://github.com/ncm2/ncm2/issues/50
-    if mode() == 'i'
-        call s:feedkeys("\<Plug>(_ncm2_auto_trigger)")
-    endif
+    call s:ins_task('ncm2#_on_complete', 0)
 endfunc
 
 func! ncm2#_core_started()
@@ -569,9 +564,7 @@ func! ncm2#_au_plugin()
 endfunc
 
 func! s:feedkeys(key, ...)
-    if !get(b:,'ncm2_enable',0) ||
-                \ &paste != 0 ||
-                \ !empty(s:lock)
+    if s:should_skip()
         return
     endif
     let m = 'm'
@@ -589,8 +582,24 @@ func! ncm2#insert_mode_only_key(key)
     endif
 endfunc
 
+func! s:should_skip()
+    return !get(b:,'ncm2_enable',0) || &paste || !empty(s:lock) || mode()!='i'
+endfunc
+
+func! s:ins_task(fn, ...)
+    " only invoked when waiting for input
+    let args = a:000
+    call timer_start(0, function('ncm2#_do_ins_task', [a:fn, args]))
+endfunc
+
+func! ncm2#_do_ins_task(fn, args, timer)
+    if s:should_skip()
+        return
+    endif
+    call call(a:fn, a:args)
+endfunc
+
 call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_manual_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_complete_popup)')
-call ncm2#insert_mode_only_key('<Plug>(_ncm2_auto_trigger)')
