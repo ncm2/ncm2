@@ -210,6 +210,7 @@ class Ncm2Core(Ncm2Base):
 
         # do notify_sources_to_refresh
         notifies = []
+        warmups = []
 
         # get the sources that need to be notified
         for tmp_ctx in contexts:
@@ -222,8 +223,17 @@ class Ncm2Core(Ncm2Base):
 
                 if not self.check_source_notify(data, sr, ctx):
                     continue
+
+                if not sr['ready']:
+                    logger.debug('%s is not ready', name)
+                    warmups.append(dict(name=name, context=ctx))
+                    continue
+
                 self._notified[name] = ctx
                 notifies.append(dict(name=name, context=ctx))
+
+        if warmups:
+            self.notify('ncm2#_warmup_sources', data['context'], warmups)
 
         if notifies:
             cur_time = time.time()
@@ -267,10 +277,6 @@ class Ncm2Core(Ncm2Base):
 
         if not sr['enable']:
             logger.debug('%s is not enabled', name)
-            return False
-
-        if not sr['ready']:
-            logger.debug('%s is not ready', name)
             return False
 
         if not self.source_check_scope(sr, ctx):
