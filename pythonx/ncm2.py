@@ -2,7 +2,7 @@ import sys
 import os
 from importlib import import_module
 import logging
-from neovim import attach, setup_logging
+from pynvim import attach, setup_logging
 import platform
 from subprocess import Popen
 from os import path
