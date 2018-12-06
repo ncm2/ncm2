@@ -25,12 +25,6 @@ inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_do_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
 
-" use silent mapping that doesn't slower the terminal ui
-" Note: `:help complete()` says:
-" > You need to use a mapping with CTRL-R = |i_CTRL-R|.  It does not work
-" > after CTRL-O or with an expression mapping.
-inoremap <silent> <Plug>(ncm2_complete_popup) <C-r>=ncm2#_real_popup()<CR>
-
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
 let s:sources = {}
@@ -316,10 +310,14 @@ func! ncm2#_real_update_matches(ctx, startbcol, matches)
     let s:matches = a:matches
     let s:lnum = a:ctx.lnum
 
-    call s:feedkeys("\<Plug>(ncm2_complete_popup)")
+    call timer_start(0 , 'ncm2#_real_popup')
 endfunc
 
-func! ncm2#_real_popup()
+func! ncm2#_real_popup(...)
+    if s:should_skip()
+        return
+    endif
+
     let pos = getcurpos()
     if s:lnum != pos[1]
         let s:lnum = pos[1]
@@ -357,7 +355,7 @@ func! ncm2#skip_auto_trigger()
     let s:skip_tick = s:context_tick()
     doau <nomodeline> User Ncm2PopupClose
     if pumvisible()
-        call s:feedkeys("\<Plug>(ncm2_complete_popup)", 'im')
+        call timer_start(0 , 'ncm2#_real_popup')
     endif
     return ''
 endfunc
@@ -376,7 +374,7 @@ func! ncm2#_do_auto_trigger()
     let s:auto_trigger_tick = tick
 
     " refresh the popup menu to reduce popup flickering
-    call s:feedkeys("\<Plug>(ncm2_complete_popup)")
+    call timer_start(0 , 'ncm2#_real_popup')
 
     if g:ncm2#complete_delay == 0
         call ncm2#_on_complete(0)
@@ -602,4 +600,3 @@ endfunc
 call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_manual_trigger)')
-call ncm2#insert_mode_only_key('<Plug>(ncm2_complete_popup)')
