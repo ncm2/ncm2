@@ -310,14 +310,10 @@ func! ncm2#_real_update_matches(ctx, startbcol, matches)
     let s:matches = a:matches
     let s:lnum = a:ctx.lnum
 
-    call timer_start(0 , 'ncm2#_real_popup')
+    call s:ins_task('ncm2#_real_popup')
 endfunc
 
 func! ncm2#_real_popup(...)
-    if s:should_skip()
-        return
-    endif
-
     let pos = getcurpos()
     if s:lnum != pos[1]
         let s:lnum = pos[1]
@@ -355,7 +351,7 @@ func! ncm2#skip_auto_trigger()
     let s:skip_tick = s:context_tick()
     doau <nomodeline> User Ncm2PopupClose
     if pumvisible()
-        call timer_start(0 , 'ncm2#_real_popup')
+        call s:ins_task('ncm2#_real_popup')
     endif
     return ''
 endfunc
@@ -374,7 +370,7 @@ func! ncm2#_do_auto_trigger()
     let s:auto_trigger_tick = tick
 
     " refresh the popup menu to reduce popup flickering
-    call timer_start(0 , 'ncm2#_real_popup')
+    call s:ins_task('ncm2#_real_popup')
 
     if g:ncm2#complete_delay == 0
         call ncm2#_on_complete(0)
@@ -587,10 +583,10 @@ endfunc
 func! s:ins_task(fn, ...)
     " only invoked when waiting for input
     let args = a:000
-    call timer_start(0, function('ncm2#_do_ins_task', [a:fn, args]))
+    call timer_start(0, function('s:do_ins_task', [a:fn, args]))
 endfunc
 
-func! ncm2#_do_ins_task(fn, args, timer)
+func! s:do_ins_task(fn, args, timer)
     if s:should_skip()
         return
     endif
