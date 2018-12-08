@@ -9,6 +9,7 @@ from os import path, environ
 from importlib import import_module
 from copy import deepcopy
 import time
+from functools import partial
 
 # don't import this module by other processes
 assert environ['NVIM_YARP_MODULE'] == 'ncm2_core'
@@ -73,7 +74,7 @@ class Ncm2Core(Ncm2Base):
                 self._loaded_plugins[py] = True
                 logger.info('send python plugin %s', py)
                 # async_call to get multiple exceptions properly printed
-                self.nvim.async_call(lambda: self.load_python({}, py))
+                self.nvim.async_call(partial(self.load_python, _, py))
 
             dts = glob.glob(path.join(d, 'pythonx/ncm2_subscope_detector/*.py')) + \
                 glob.glob(path.join(d, 'python3/ncm2_subscope_detector/*.py'))
@@ -82,6 +83,7 @@ class Ncm2Core(Ncm2Base):
         self.notify('ncm2#_au_plugin')
 
     def load_python(self, _, py):
+        logger.info('load_python %s', py)
         with open(py, "rb") as f:
             src = f.read()
             exec(compile(src, py, 'exec'), {}, {})
