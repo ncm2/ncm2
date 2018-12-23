@@ -103,3 +103,7 @@ some options available:
 - I myself prefer to use [nvim-yarp](https://github.com/roxma/nvim-yarp)
     - Read [ncm2/ncm2-bufword](https://github.com/ncm2/ncm2-bufword) for
         example
+
+## Debugging
+
+Refer to the [debugging section of nvim-yarp](https://github.com/roxma/nvim-yarp#debugging)
