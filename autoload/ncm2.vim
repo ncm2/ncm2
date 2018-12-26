@@ -24,6 +24,7 @@ let g:ncm2#core_event = []
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_do_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
+inoremap <silent> <Plug>(ncm2_c_e) <C-E>
 
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
@@ -335,7 +336,7 @@ func! ncm2#_real_popup(...)
         " this enables the vanilla <c-n> and <c-p> keys behavior when
         " there's no popup
         if pumvisible()
-            call s:feedkeys("\<c-e>", "ni")
+            call feedkeys("\<Plug>(ncm2_c_e)", "mi")
         endif
         doau <nomodeline> User Ncm2PopupClose
         return ''
@@ -555,17 +556,6 @@ func! ncm2#_au_plugin()
     endif
 endfunc
 
-func! s:feedkeys(key, ...)
-    if s:should_skip()
-        return
-    endif
-    let m = 'm'
-    if len(a:000)
-        let m = a:1
-    endif
-    call feedkeys(a:key, m)
-endfunc
-
 func! ncm2#insert_mode_only_key(key)
     exe 'map' a:key '<nop>'
     exe 'cmap' a:key '<nop>'
@@ -594,3 +584,4 @@ endfunc
 call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_manual_trigger)')
+call ncm2#insert_mode_only_key('<Plug>(ncm2_c_e)')
