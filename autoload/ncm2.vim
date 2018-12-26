@@ -64,11 +64,11 @@ func! ncm2#enable_for_buffer()
         au Insertenter,InsertLeave <buffer> call s:cache_cleanup()
         au BufEnter <buffer> call s:warmup()
         if exists('##TextChangedP')
-            au TextChangedI <buffer> call ncm2#auto_trigger()
-            au InsertCharPre,InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
-        else
             au TextChangedI,TextChangedP <buffer> call ncm2#auto_trigger()
             au InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
+        else
+            au TextChangedI <buffer> call ncm2#auto_trigger()
+            au InsertCharPre,InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
         endif
         au CompleteDone <buffer> call s:on_complete_done()
     augroup END
