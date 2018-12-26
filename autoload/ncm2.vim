@@ -62,10 +62,14 @@ func! ncm2#enable_for_buffer()
         au! * <buffer>
         au Insertenter,InsertLeave <buffer> call s:cache_cleanup()
         au BufEnter <buffer> call s:warmup()
-        au InsertEnter,InsertCharPre,TextChangedI <buffer> call ncm2#auto_trigger()
-        if has("patch-8.0.1493")
-            au CompleteDone <buffer> call s:on_complete_done()
+        if exists('##TextChangedP')
+            au TextChangedI <buffer> call ncm2#auto_trigger()
+            au InsertCharPre,InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
+        else
+            au TextChangedI,TextChangedP <buffer> call ncm2#auto_trigger()
+            au InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
         endif
+        au CompleteDone <buffer> call s:on_complete_done()
     augroup END
 
     doau <nomodeline> User Ncm2EnableForBuffer
@@ -79,7 +83,7 @@ func! ncm2#disable_for_buffer()
 endfunc
 
 func! s:on_complete_done()
-    if empty(v:completed_item)
+    if empty(v:completed_item) || !has_key(v:completed_item, 'user_data')
         return
     endif
     " The user has accepted the item, don't popup old s:matches again.
@@ -310,7 +314,7 @@ func! ncm2#_real_update_matches(ctx, startbcol, matches)
     let s:matches = a:matches
     let s:lnum = a:ctx.lnum
 
-    call s:ins_task('ncm2#_real_popup')
+    call ncm2#imode_task('ncm2#_real_popup')
 endfunc
 
 func! ncm2#_real_popup(...)
@@ -351,18 +355,12 @@ func! ncm2#skip_auto_trigger()
     let s:skip_tick = s:context_tick()
     doau <nomodeline> User Ncm2PopupClose
     if pumvisible()
-        call s:ins_task('ncm2#_real_popup')
+        call ncm2#imode_task('ncm2#_real_popup')
     endif
     return ''
 endfunc
 
 func! ncm2#auto_trigger()
-    " The task will be invoked when vim is waiting for input. This works for
-    " Insertenter, it is not yet in insert mode at the time
-    call s:ins_task('ncm2#_do_auto_trigger')
-endfunc
-
-func! ncm2#_do_auto_trigger()
     let tick = s:context_tick()
     if tick == s:auto_trigger_tick
         return ''
@@ -370,7 +368,7 @@ func! ncm2#_do_auto_trigger()
     let s:auto_trigger_tick = tick
 
     " refresh the popup menu to reduce popup flickering
-    call s:ins_task('ncm2#_real_popup')
+    call ncm2#imode_task('ncm2#_real_popup')
 
     if g:ncm2#complete_delay == 0
         call ncm2#_on_complete(0)
@@ -527,7 +525,7 @@ func! s:warmup(...)
     call s:try_rnotify('on_warmup', a:000)
     " the FZF terminal window somehow gets empty without this check
     " https://github.com/ncm2/ncm2/issues/50
-    call s:ins_task('ncm2#_on_complete', 0)
+    call ncm2#imode_task('ncm2#_on_complete', 0)
 endfunc
 
 func! ncm2#_core_started()
@@ -580,13 +578,13 @@ func! s:should_skip()
     return !get(b:,'ncm2_enable',0) || &paste || !empty(s:lock) || mode()!='i'
 endfunc
 
-func! s:ins_task(fn, ...)
-    " only invoked when waiting for input
+" insert mode task, only invoked when waiting for input
+func! ncm2#imode_task(fn, ...)
     let args = a:000
-    call timer_start(0, function('s:do_ins_task', [a:fn, args]))
+    call timer_start(0, function('s:do_imode_task', [a:fn, args]))
 endfunc
 
-func! s:do_ins_task(fn, args, timer)
+func! s:do_imode_task(fn, args, timer)
     if s:should_skip()
         return
     endif
