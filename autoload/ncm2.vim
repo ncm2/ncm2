@@ -18,9 +18,6 @@ call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
 call s:opt('ncm2#popup_limit', -1)
 
-let g:ncm2#core_data = {}
-let g:ncm2#core_event = []
-
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_do_auto_trigger()<CR>
 inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
@@ -49,7 +46,6 @@ let s:completion_notified = {}
 augroup ncm2_hooks
     au!
     au User Ncm2EnableForBuffer call s:warmup()
-    au User Ncm2CoreData,Ncm2PopupClose,Ncm2PopupOpen silent 
     au FileType * call s:try_rnotify('load_plugin', &rtp)
 augroup END
 
@@ -338,11 +334,11 @@ func! ncm2#_real_popup(...)
         if pumvisible()
             call feedkeys("\<Plug>(ncm2_c_e)", "mi")
         endif
-        doau <nomodeline> User Ncm2PopupClose
+        silent doau <nomodeline> User Ncm2PopupClose
         return ''
     endif
 
-    doau <nomodeline> User Ncm2PopupOpen
+    silent doau <nomodeline> User Ncm2PopupOpen
     call complete(s:startbcol, s:matches)
     return ''
 endfunc
@@ -354,7 +350,7 @@ func! ncm2#skip_auto_trigger()
     let s:context_tick_extra += 1
     " skip auto ncm2#_on_complete
     let s:skip_tick = s:context_tick()
-    doau <nomodeline> User Ncm2PopupClose
+    silent doau <nomodeline> User Ncm2PopupClose
     if pumvisible()
         call ncm2#imode_task('ncm2#_real_popup')
     endif
@@ -472,7 +468,7 @@ endfunc
 
 func! ncm2#_core_data(event)
     " data sync between ncm2.vim and ncm2_core.py
-    let data = extend(g:ncm2#core_data, {
+    let data = { 'event': a:event,
                 \ 'auto_popup': g:ncm2#auto_popup,
                 \ 'skip_tick': s:skip_tick,
                 \ 'complete_length': g:ncm2#complete_length,
@@ -484,7 +480,7 @@ func! ncm2#_core_data(event)
                 \ 'sources': s:sources,
                 \ 'subscope_detectors': s:subscope_detectors,
                 \ 'lines': []
-                \ }, 'force')
+                \ }
 
     " if subscope detector is available for this buffer, we need to send
     " the whole buffer for on_complete event
@@ -500,23 +496,19 @@ func! ncm2#_core_data(event)
 endfunc
 
 func! s:try_rnotify(event, ...)
-    let g:ncm2#core_event = [a:event, a:000]
-    let g:ncm2#core_data = {}
-    doau <nomodeline> User Ncm2CoreData
-    let data = ncm2#_core_data(a:event)
-    let g:ncm2#core_data = {}
-    let g:ncm2#core_event = []
-    return call(s:core.try_notify, [a:event, data] + a:000, s:core)
+    let g:ncm2#core_data = ncm2#_core_data(a:event)
+    silent execute 'doau <nomodeline> User Ncm2CoreData_' . a:event
+    let args = [a:event, g:ncm2#core_data] + a:000
+    unlet g:ncm2#core_data
+    return call(s:core.try_notify, args, s:core)
 endfunc
 
 func! s:request(event, ...)
-    let g:ncm2#core_event = [a:event, a:000]
-    let g:ncm2#core_data = {}
-    doau <nomodeline> User Ncm2CoreData
-    let data = ncm2#_core_data(a:event)
-    let g:ncm2#core_data = {}
-    let g:ncm2#core_event = []
-    return call(s:core.request, [a:event, data] + a:000, s:core)
+    let g:ncm2#core_data = ncm2#_core_data(a:event)
+    silent execute 'doau <nomodeline> User Ncm2CoreData_' . a:event
+    let args = [a:event, g:ncm2#core_data] + a:000
+    unlet g:ncm2#core_data
+    return call(s:core.request, args, s:core)
 endfunc
 
 func! s:warmup(...)
