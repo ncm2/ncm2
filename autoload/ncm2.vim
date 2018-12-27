@@ -467,7 +467,7 @@ func! ncm2#_s(name, ...)
     return get(s:, a:name)
 endfunc
 
-func! ncm2#_core_data(event)
+func! s:coredata(event)
     " data sync between ncm2.vim and ncm2_core.py
     let data = { 'event': a:event,
                 \ 'auto_popup': g:ncm2#auto_popup,
@@ -479,6 +479,8 @@ func! ncm2#_core_data(event)
                 \ 'popup_limit': g:ncm2#popup_limit,
                 \ 'context': s:context(),
                 \ 'sources': s:sources,
+                \ 'whitelist_for_buffer': ncm2#whitelist_for_buffer(),
+                \ 'blacklist_for_buffer': ncm2#blacklist_for_buffer(),
                 \ 'subscope_detectors': s:subscope_detectors,
                 \ 'lines': []
                 \ }
@@ -530,12 +532,12 @@ func! s:do_coredata_hook(event, data)
 endfunc
 
 func! s:try_rnotify(event, ...)
-    let args = [a:event, ncm2#_core_data(a:event)] + a:000
+    let args = [a:event, s:coredata(a:event)] + a:000
     return call(s:core.try_notify, args, s:core)
 endfunc
 
 func! s:request(event, ...)
-    let args = [a:event, ncm2#_core_data(a:event)] + a:000
+    let args = [a:event, s:coredata(a:event)] + a:000
     return call(s:core.request, args, s:core)
 endfunc
 
@@ -602,6 +604,22 @@ func! s:do_imode_task(fn, args, timer)
         return
     endif
     call call(a:fn, a:args)
+endfunc
+
+func! ncm2#whitelist_for_buffer(...)
+    let b:ncm2_whitelist = get(b:, 'ncm2_whitelist', [])
+    if a:0
+        let b:ncm2_whitelist = type(a:1) == v:t_string ? a:000 : a:1
+    endif
+    return b:ncm2_whitelist
+endfunc
+
+func! ncm2#blacklist_for_buffer(...)
+    let b:ncm2_blacklist = get(b:, 'ncm2_blacklist', [])
+    if a:0
+        let b:ncm2_blacklist = type(a:1) == v:t_string ? a:000 : a:1
+    endif
+    return b:ncm2_blacklist
 endfunc
 
 call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')

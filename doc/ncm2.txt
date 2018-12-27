@@ -420,6 +420,23 @@ ncm2#lock({name}) ncm2#lock({name})
         call ncm2#unlock('vim-multiple-cursors')
     endfunction
 <
+                                        *ncm2#whitelist_for_buffer()*
+ncm2#whitelist_for_buffer([{list}])
+    If {list} is available, set completion source whitelist for current
+    buffer. If the list is not empty, only the completion sources in the list
+    are allowed to work for current buffer.
+
+    Returns the current completion source whitelist.
+
+                                        *ncm2#blacklist_for_buffer()*
+ncm2#blacklist_for_buffer([{list}])
+    If {list} is available, set completion source blacklist for current
+    buffer. If the list is not empty, source completion sources in the list
+    are not allowed to work for current buffer. If
+    |ncm2#whitelist_for_buffer()| is not empty, then the blacklist has no
+    effect.
+
+    Returns the current completion source blacklist.
 
 ==============================================================================
 6. Key Mappings                         *ncm2-key*

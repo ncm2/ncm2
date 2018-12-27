@@ -7,7 +7,7 @@ import json
 import glob
 from os import path, environ
 from importlib import import_module
-from copy import deepcopy
+from copy import deepcopy, copy
 import time
 from functools import partial
 
@@ -56,6 +56,27 @@ class Ncm2Core(Ncm2Base):
 
         pats = self._word_patterns
         return pats.get(scope, pats['*'])
+
+    def get_filtered_sources(self, data):
+        sources = data['sources']
+
+        whitelist = data['whitelist_for_buffer']
+        if whitelist:
+            filtered = {}
+            for name in whitelist:
+                if name in sources:
+                    filtered[name] = sources[name]
+            return filtered
+
+        blacklist = data['blacklist_for_buffer']
+        if blacklist:
+            filtered = copy(sources)
+            for name in blacklist:
+                if name in filtered:
+                    del filtered[name]
+            return filtered
+
+        return sources
 
     def load_plugin(self, _, rtp: str):
         self.update_rtp(rtp)
@@ -216,8 +237,9 @@ class Ncm2Core(Ncm2Base):
         warmups = []
 
         # get the sources that need to be notified
+        sources = self.get_filtered_sources(data)
         for tmp_ctx in contexts:
-            for name, sr in data['sources'].items():
+            for name, sr in sources.items():
 
                 ctx = deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
@@ -252,12 +274,14 @@ class Ncm2Core(Ncm2Base):
     def on_warmup(self, data, names):
         warmups = []
 
+        sources = self.get_filtered_sources(data)
+
         if not names:
-            names = list(data['sources'].keys())
+            names = list(sources.keys())
 
         for ctx_idx, tmp_ctx in enumerate(self.detect_subscopes(data)):
             for name in names:
-                sr = data['sources'][name]
+                sr = sources[name]
 
                 ctx = deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
@@ -341,9 +365,10 @@ class Ncm2Core(Ncm2Base):
 
         name = sctx['source']['name']
 
-        sr = data['sources'].get(name, None)
+        sources = self.get_filtered_sources(data)
+        sr = sources.get(name, None)
         if not sr:
-            logger.error("%s] source does not exist", name)
+            logger.error('%s source does not exist or filtered by white/black list', name)
             return
 
         cache = self._matches.get(name, None)
@@ -551,7 +576,7 @@ class Ncm2Core(Ncm2Base):
 
         # sort by priority
         names = self._matches.keys()
-        srcs = data['sources']
+        srcs = self.get_filtered_sources(data)
         names = sorted(names, key=lambda x: srcs[x]['priority'], reverse=True)
 
         ccol = ctx['ccol']
@@ -562,7 +587,7 @@ class Ncm2Core(Ncm2Base):
 
             sr = srcs.get(name, None)
             if not sr:
-                logger.error('[%s] source does not exist', name)
+                logger.error('[%s] source does not exist or filtered by white/black list', name)
                 continue
 
             cache = self._matches[name]
