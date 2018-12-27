@@ -231,6 +231,12 @@ ncm2#register_source({source})
             completion source, like keyword from buffer, it will be activated
             for all buffers.
 
+                                    *ncm2-scope_blacklist*
+    scope_blacklist
+            A list of scopes that the source is not allowed to work on.
+            This field has no effect if |ncm2-scope| field of the source is
+            defined.
+
 	on_complete				        *ncm2-on_complete*
             Function name of the handler for the completion request.
 
@@ -310,7 +316,8 @@ ncm2#register_source({source})
     call ncm2#register_source(g:test_source)
 <
 
-                                    *ncm2-context*
+                                    *ncm2#context()*
+ncm2#context({name})
     The context passed to the on_complete handler contains usefule information
     for completion source, as well as important information for ncm2 internal
     synchronization. Some of the fields are described here:

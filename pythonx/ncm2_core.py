@@ -159,7 +159,7 @@ class Ncm2Core(Ncm2Base):
             ctx = deepcopy(ctx)
             ctx['source'] = sr
             ctx['matcher'] = self.matcher_opt_get(data, sr)
-            if not self.source_check_scope(sr, ctx):
+            if not self.source_check_scope(sr, ctx, contexts):
                 continue
             self.source_check_patterns(data, sr, ctx)
             ctx['time'] = time.time()
@@ -201,7 +201,7 @@ class Ncm2Core(Ncm2Base):
             ctx = deepcopy(ctx)
             ctx['source'] = sr
             ctx['matcher'] = self.matcher_opt_get(data, sr)
-            if not self.source_check_scope(sr, ctx):
+            if not self.source_check_scope(sr, ctx, contexts):
                 continue
             self.source_check_patterns(data, sr, ctx)
             self._notified[name] = ctx
@@ -246,7 +246,7 @@ class Ncm2Core(Ncm2Base):
                 ctx['source'] = sr
                 ctx['matcher'] = self.matcher_opt_get(data, sr)
 
-                if not self.check_source_notify(data, sr, ctx):
+                if not self.check_source_notify(data, sr, ctx, contexts):
                     continue
 
                 if not sr['ready']:
@@ -279,7 +279,8 @@ class Ncm2Core(Ncm2Base):
         if not names:
             names = list(sources.keys())
 
-        for ctx_idx, tmp_ctx in enumerate(self.detect_subscopes(data)):
+        contexts = self.detect_subscopes(data)
+        for ctx_idx, tmp_ctx in enumerate(contexts):
             for name in names:
                 sr = sources[name]
 
@@ -290,14 +291,14 @@ class Ncm2Core(Ncm2Base):
                 if not sr['enable']:
                     continue
 
-                if not self.source_check_scope(sr, ctx):
+                if not self.source_check_scope(sr, ctx, contexts):
                     continue
 
                 warmups.append(dict(name=name, context=ctx))
 
         self.notify('ncm2#_warmup_sources', data['context'], warmups)
 
-    def check_source_notify(self, data, sr, ctx):
+    def check_source_notify(self, data, sr, ctx, contexts):
         name = sr['name']
 
         cache = self._matches.get(name, None)
@@ -306,7 +307,7 @@ class Ncm2Core(Ncm2Base):
             logger.debug('%s is not enabled', name)
             return False
 
-        if not self.source_check_scope(sr, ctx):
+        if not self.source_check_scope(sr, ctx, contexts):
             logger.debug(
                 'source_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
             return False
@@ -549,7 +550,7 @@ class Ncm2Core(Ncm2Base):
                 mxpri = e[0]
         return val
 
-    def source_check_scope(self, sr, ctx):
+    def source_check_scope(self, sr, ctx, contexts):
         scope = sr.get('scope', None)
         cur_scope = ctx['scope']
         ctx['scope_match'] = ''
@@ -558,6 +559,12 @@ class Ncm2Core(Ncm2Base):
             # scope setting is None, means that this is a general purpose
             # completion source, only complete for the root scope
             if is_root:
+                # if scope blacklist is defined, return false if a match of the
+                # context is found
+                for item in sr.get('scope_blacklist', []):
+                    for c in contexts:
+                        if c['scope'] == item:
+                            return False
                 return True
             else:
                 return False
