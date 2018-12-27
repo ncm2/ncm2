@@ -42,6 +42,7 @@ let s:skip_context_id = 0
 let s:context_tick_extra = 0
 let s:context_id = 0
 let s:completion_notified = {}
+let s:coredata_hooks = {}
 
 augroup ncm2_hooks
     au!
@@ -481,33 +482,60 @@ func! ncm2#_core_data(event)
                 \ 'subscope_detectors': s:subscope_detectors,
                 \ 'lines': []
                 \ }
+    return s:do_coredata_hook(a:event, data)
+endfunc
 
-    " if subscope detector is available for this buffer, we need to send
-    " the whole buffer for on_complete event
-    if has_key(s:subscope_detectors, &filetype) &&
-                \ (a:event == 'on_complete' ||
-                \ a:event == 'get_context' ||
-                \ a:event == 'on_warmup' ||
-                \ a:event == 'on_complete_done')
-        let data.lines = getline(1, '$')
+func! ncm2#_hook_for_subscope_detectors()
+    if !get(b:, 'ncm2_enable', 0) || !has_key(s:subscope_detectors, &filetype)
+        let Hook = v:null
+    else
+        let Hook = {d -> extend(d, {"lines":getline(1, '$')}, "force")}
     endif
+    let events = ['on_complete', 'get_context', 'on_warmup', 'on_complete_done']
+    call ncm2#hook_coredata(0, events, 'subscope_detectors', Hook)
+endfunc
 
+func! s:b_coredata_hooks()
+    if has_key(b:, 'ncm2_coredata_hooks')
+        return b:ncm2_coredata_hooks
+    else
+        let b:ncm2_coredata_hooks = {}
+        return b:ncm2_coredata_hooks
+    endif
+endfunc
+
+func! ncm2#hook_coredata(is_global, events, groupid, Hook)
+    let hooks = a:is_global ? s:coredata_hooks : s:b_coredata_hooks()
+    let events = type(a:events) == v:t_string ? [a:events] : a:events
+    for event in events
+        let hooks[event] = get(hooks, event, {})
+        if a:Hook is v:null
+            if has_key(hooks[event], a:groupid)
+                unlet hooks[event][a:groupid]
+            endif
+        else
+            let hooks[event][a:groupid] = a:Hook
+        endif
+    endfor
+endfunc
+
+func! s:do_coredata_hook(event, data)
+    let [event, data] = [a:event, a:data]
+    let hooks = values(get(s:coredata_hooks, event, {})) +
+                \ values(get(s:b_coredata_hooks(), event, {}))
+    for Hook in hooks
+        let data = Hook(data)
+    endfor
     return data
 endfunc
 
 func! s:try_rnotify(event, ...)
-    let g:ncm2#core_data = ncm2#_core_data(a:event)
-    silent execute 'doau <nomodeline> User Ncm2CoreData_' . a:event
-    let args = [a:event, g:ncm2#core_data] + a:000
-    unlet g:ncm2#core_data
+    let args = [a:event, ncm2#_core_data(a:event)] + a:000
     return call(s:core.try_notify, args, s:core)
 endfunc
 
 func! s:request(event, ...)
-    let g:ncm2#core_data = ncm2#_core_data(a:event)
-    silent execute 'doau <nomodeline> User Ncm2CoreData_' . a:event
-    let args = [a:event, g:ncm2#core_data] + a:000
-    unlet g:ncm2#core_data
+    let args = [a:event, ncm2#_core_data(a:event)] + a:000
     return call(s:core.request, args, s:core)
 endfunc
 
@@ -515,6 +543,9 @@ func! s:warmup(...)
     if !get(b:, 'ncm2_enable', 0)
         return
     endif
+
+    call ncm2#_hook_for_subscope_detectors()
+
     call s:try_rnotify('on_warmup', a:000)
     " the FZF terminal window somehow gets empty without this check
     " https://github.com/ncm2/ncm2/issues/50

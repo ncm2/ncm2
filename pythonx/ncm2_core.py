@@ -124,6 +124,7 @@ class Ncm2Core(Ncm2Base):
             detectors_sync[scope] = 1
 
         self.notify('ncm2#_s', 'subscope_detectors', detectors_sync)
+        self.notify('ncm2#_hook_for_subscope_detectors')
 
     def get_context(self, data, name):
         if type(name) is str:
