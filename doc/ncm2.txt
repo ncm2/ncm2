@@ -151,12 +151,14 @@ g:ncm2#filter
             Filter the completion items. Could be a string/dict, or a list of
             strings/dicts. Filters are chained to filter the matches.
             Available filters:
+
             "same_word"
                 Filter out the items which have the same word as your typing.
+
             "substitute"
                 For example:
                 >
-                let g:ncm2#filter = {'name':'substitute',
+                {'name':'substitute',
                     \ 'pattern': '[\(\s].*$',
                     \ 'replace': '',
                     \ 'key': 'word'}
@@ -166,6 +168,18 @@ g:ncm2#filter
                 into 
                 `{"word": "print", "abbr": "print(str)"}`
 
+                refer to |complete-items| for more information on "word" field.
+
+            "set_dup"
+                For example:
+>
+                call ncm2#override_source('bufword', {
+                    \ 'filter': {
+                    \   'name': 'set_dup',
+                    \   'value': 0}})
+<
+                changes the completion items of source "bufword" from
+                `{"word": "foo"}` into `{"word": "foo", "dup": 0}`
 
                                     *g:ncm2#auto_popup*
 g:ncm2#auto_popup
