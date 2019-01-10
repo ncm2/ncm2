@@ -91,8 +91,8 @@ NCM2.**
 ## How Do I write Ncm2 Source?
 
 One important step is to understand how and when completion gets triggered.
-Read `:help ncm2#register_source` carefully. There's a small interactive
-script in the doc. It is helpful for both understanding and debugging.
+Read `:help ncm2#register_source` carefully, or `:help
+ncm2#register_source-example` for quick start.
 
 In case you don't know what tool you should use for async support. Here are
 some options available:
