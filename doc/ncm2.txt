@@ -191,18 +191,24 @@ g:ncm2#auto_popup
                                     *g:ncm2#complete_length*
 g:ncm2#complete_length
             The default value for |ncm2-complete_length|.
-
             Default: `[[1,3],[7,2]]`
-            Format: a |List| as [[ min priority, min len ],...], or
-            single integer value.
+            Format: an integer, or a |List| as `[[ min_prio, min_len ],...]`
+            The default value means that sources with priority between 1 and 6
+            will have the value of 3, and sources with priority >= 7 will have
+            the value of 2.  
+            Priority >= 7 is more semantic completion source, So it's better
+            to use a smaller value to trigger the popup than others.
 
-            The default value means that sources with priority between 1
-            and 6 will have the value of 3, and sources with priority >=
-            7 will have the value of 2.  
+                                    *g:ncm2#manual_complete_length*
+g:ncm2#manual_complete_length
+            Same as |g:ncm2#complete_length| except that it is used for
+            |<Plug>(ncm2_manual_trigger)|.
+            Note that during manual completion, ncm2 looks for the
+            complete_length with the following order:
+            1. The source's custom manual_complete_length
+            2. The source's custom complete_length,
+            3. g:ncm2#manual_complete_length.
 
-            Priority >= 7 is more semantic completion source, So it's
-            better to use a smaller value to trigger the popup than
-            others.
 
                                     *g:ncm2#popup_limit*
 g:ncm2#popup_limit

@@ -57,26 +57,31 @@ class Ncm2Core(Ncm2Base):
         pats = self._word_patterns
         return pats.get(scope, pats['*'])
 
-    def get_filtered_sources(self, data):
+    def get_filtered_sources(self, data, names=None):
         sources = data['sources']
+
+        if not names:
+            names = sources
 
         whitelist = data['whitelist_for_buffer']
         if whitelist:
             filtered = {}
             for name in whitelist:
-                if name in sources:
+                if name in sources and name in names:
                     filtered[name] = sources[name]
             return filtered
 
-        blacklist = data['blacklist_for_buffer']
-        if blacklist:
-            filtered = copy(sources)
-            for name in blacklist:
-                if name in filtered:
-                    del filtered[name]
-            return filtered
+        blacklist = data.get('blacklist_for_buffer', [])
+        filtered = copy(sources)
+        for name in blacklist:
+            if name in filtered:
+                del filtered[name]
 
-        return sources
+        filtered2 = {}
+        for name in filtered.keys():
+            if name in names:
+                filtered2[name] = sources[name]
+        return filtered2
 
     def load_plugin(self, _, rtp: str):
         self.update_rtp(rtp)
@@ -161,7 +166,7 @@ class Ncm2Core(Ncm2Base):
             ctx['matcher'] = self.matcher_opt_get(data, sr)
             if not self.source_check_scope(sr, ctx, contexts):
                 continue
-            self.source_check_patterns(data, sr, ctx)
+            self.check_patterns(data, sr, ctx)
             ctx['time'] = time.time()
             return ctx
 
@@ -203,8 +208,7 @@ class Ncm2Core(Ncm2Base):
             ctx['matcher'] = self.matcher_opt_get(data, sr)
             if not self.source_check_scope(sr, ctx, contexts):
                 continue
-            self.source_check_patterns(data, sr, ctx)
-            self._notified[name] = ctx
+            self.check_patterns(data, sr, ctx)
             ctx['time'] = time.time()
             ctx['event'] = 'on_completed'
             self.notify('ncm2#_notify_completed',
@@ -221,14 +225,21 @@ class Ncm2Core(Ncm2Base):
             notified = self._notified
             if name in notified and notified[name] == ctx:
                 logger.debug('%s notification is dated', name)
-                del notified[name]
+                if name in notified:
+                    notified[name]['refresh'] = True
 
-    def on_complete(self, data, manual, failed_notifies=[]):
+        names = [e['name'] for e in failed_notifies]
+        self.do_on_complete(data, 0, names)
 
+    def do_on_complete(self, data, manual=0, names=None):
         root_ctx = data['context']
         root_ctx['manual'] = manual
 
         self.cache_cleanup_check(root_ctx)
+
+        if not manual and data['skip_tick'] == root_ctx['tick']:
+            logger.debug('do_on_complete ignored by skip_tick')
+            return
 
         contexts = self.detect_subscopes(data)
 
@@ -237,7 +248,8 @@ class Ncm2Core(Ncm2Base):
         warmups = []
 
         # get the sources that need to be notified
-        sources = self.get_filtered_sources(data)
+        sources = self.get_filtered_sources(data, names)
+
         for tmp_ctx in contexts:
             for name, sr in sources.items():
 
@@ -254,7 +266,7 @@ class Ncm2Core(Ncm2Base):
                     warmups.append(dict(name=name, context=ctx))
                     continue
 
-                self._notified[name] = ctx
+                self._notified[name] = dict(refresh=False, context=ctx)
                 notifies.append(dict(name=name, context=ctx))
 
         if warmups:
@@ -267,17 +279,20 @@ class Ncm2Core(Ncm2Base):
                 ctx['time'] = cur_time
             self.notify('ncm2#_notify_complete', root_ctx, notifies)
         else:
-            logger.debug('notifies is empty %s', notifies)
+            logger.debug('notifies is empty')
+
+    def on_complete(self, data, manual):
+
+        self.do_on_complete(data, manual)
 
         self.matches_update_popup(data)
 
     def on_warmup(self, data, names):
         warmups = []
 
-        sources = self.get_filtered_sources(data)
+        sources = self.get_filtered_sources(data, names)
 
-        if not names:
-            names = list(sources.keys())
+        names = names or list(sources.keys())
 
         contexts = self.detect_subscopes(data)
         for ctx_idx, tmp_ctx in enumerate(contexts):
@@ -298,10 +313,13 @@ class Ncm2Core(Ncm2Base):
 
         self.notify('ncm2#_warmup_sources', data['context'], warmups)
 
+        self.do_on_complete(data, 0, names)
+
     def check_source_notify(self, data, sr, ctx, contexts):
         name = sr['name']
 
         cache = self._matches.get(name, None)
+        noti = self._notified.get(name, None)
 
         if not sr['enable']:
             logger.debug('%s is not enabled', name)
@@ -312,52 +330,78 @@ class Ncm2Core(Ncm2Base):
                 'source_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
             return False
 
-        manual = ctx.get('manual', 0)
+        pattern_ok = self.check_patterns(data, sr, ctx)
 
-        if not sr['auto_popup'] and not manual:
+        cache_is_kw_typing = False
+        cache_is_manual = False
+        if cache:
+            cctx = cache['context']
+            cache_is_kw_typing = self.is_kw_typing(data, sr, cctx, ctx)
+            if cctx['startccol'] == ctx['startccol']:
+                cache_is_manual = cctx.get('manual', 0)
+
+        noti_is_kw_typing = False
+        noti_is_manual = False
+        if noti:
+            nctx = noti['context']
+            noti_is_kw_typing = self.is_kw_typing(data, sr, nctx, ctx)
+            if nctx['startccol'] == ctx['startccol']:
+                noti_is_manual = nctx.get('manual', 0)
+
+        req_is_manual = ctx.get('manual', 0)
+        manual = ctx.get('manual', 0) or cache_is_manual or noti_is_manual
+        ctx['manual'] = manual
+
+        if not (data['auto_popup'] and sr['auto_popup']) and not manual:
             logger.debug('<%s> is not auto_popup', name)
             return False
 
-        # check patterns
-        if not self.source_check_patterns(data, sr, ctx):
-            if sr['early_cache'] and len(ctx['base']):
-                ctx['early_cache'] = True
-            else:
-                logger.debug(
-                    'source_check_patterns failed ignore <%s> base %s', name, ctx['base'])
-                if cache:
-                    cache['enable'] = False
-                return False
+        cmplen_ok = False
+        cmplen = self.source_get_complete_len(data, sr, manual)
+        if cmplen is None or cmplen < 0 or len(ctx['base']) < cmplen:
+            cmplen_ok = False
         else:
-            # enable cached
+            cmplen_ok = True
+
+        # check patterns
+        if not pattern_ok and not cmplen_ok:
             if cache:
-                logger.debug('<%s> enable cache', name)
-                cache['enable'] = True
+                logger.debug('%s cctx - %s, ctx - %s, manual %s cctx [%s] ctx [%s]', name, cctx['startccol'], ctx['startccol'], manual, cctx['base'], ctx['base'])
+            if cache and cctx['startccol'] == ctx['startccol'] and \
+                len(cctx['base']) > len(ctx['base']):
+                    # disable cache when enough chars are deleted
+                    cache['enable'] = False
+                    cctx['manual'] = 0
+                    if noti:
+                        nctx['manual'] = 0
+
+            # auto complete with early_cache and len(ctx['base']) > 0
+            if manual or not sr['early_cache'] or not len(ctx['base']):
+                logger.debug('<%s> pattern and len not ok, no early cache [%s]',
+                        name, ctx['base'])
+                return False
+
+            ctx['early_cache'] = True
+        elif cache:
+            logger.debug('<%s> enable cache', name)
+            cache['enable'] = True
 
         need_refresh = False
+        if cache:
+            need_refresh = cache['refresh']
+            if need_refresh or req_is_manual:
+                # reduce further duplicate notification
+                cache['refresh'] = 0
+            elif cache_is_kw_typing:
+                logger.debug('<%s> was cached, context: %s matches: %s',
+                             name, cctx, cache['matches'])
+                return False
 
-        if not manual:
-
-            # if there's valid cache
-            if cache:
-                need_refresh = cache['refresh']
-                cc = cache['context']
-                if not need_refresh and self.is_kw_type(data, sr, cc, ctx):
-                    logger.debug('<%s> was cached, context: %s matches: %s',
-                                 name, cc, cache['matches'])
-                    return False
-
-            # we only notify once for each word
-            noti = self._notified.get(name, None)
-            if noti and not need_refresh:
-                if self.is_kw_type(data, sr, noti, ctx):
-                    logger.debug(
-                        '<%s> has been notified, cache %s', name, cache)
-                    return False
-
-        if need_refresh:
-            # reduce further duplicate notification
-            cache['refresh'] = 0
+        # we only notify once for each word
+        if noti_is_kw_typing and not req_is_manual and not need_refresh and \
+                not noti['refresh']:
+            logger.debug('<%s> has been notified, cache %s', name, cache)
+            return False
         return True
 
     def complete(self, data, sctx, startccol, matches, refresh):
@@ -368,8 +412,8 @@ class Ncm2Core(Ncm2Base):
 
         sources = self.get_filtered_sources(data)
         sr = sources.get(name, None)
-        if not sr:
-            logger.error('%s source does not exist or filtered by white/black list', name)
+        if not sr or not sr.get('enable', 1):
+            logger.error('%s not found or filtered or disabled', name)
             return
 
         cache = self._matches.get(name, None)
@@ -377,16 +421,14 @@ class Ncm2Core(Ncm2Base):
             logger.debug('%s cache is newer, %s', name, cache)
             return
 
-        dated = sctx['dated']
-
         # be careful when completion matches context is dated
-        if dated:
-            if not self.is_kw_type(data, sr, sctx, ctx):
-                logger.info("[%s] dated is_kw_type fail, old[%s] cur[%s]",
+        if sctx['tick'] != ctx['tick']:
+            if not self.is_kw_typing(data, sr, sctx, ctx):
+                logger.info("[%s] dated is_kw_typing fail, old[%s] cur[%s]",
                             name, sctx['typed'], ctx['typed'])
                 return
             else:
-                logger.info("[%s] dated is_kw_type ok, old[%s] cur[%s]",
+                logger.info("[%s] dated is_kw_typing ok, old[%s] cur[%s]",
                             name, sctx['typed'], ctx['typed'])
 
         # adjust for subscope
@@ -395,16 +437,7 @@ class Ncm2Core(Ncm2Base):
 
         matches = self.matches_formalize(sctx, matches)
 
-        # filter before cache
-        old_le = len(matches)
-        matches = self.matches_filter_by_matcher(
-            data, sr, sctx, startccol, matches)
-        logger.debug('%s matches is filtered %s -> %s',
-                     name, old_le, len(matches))
-
-        if not cache:
-            self._matches[name] = {}
-            cache = self._matches[name]
+        cache = {}
 
         cache['startccol'] = startccol
         cache['refresh'] = refresh
@@ -412,19 +445,22 @@ class Ncm2Core(Ncm2Base):
         cache['context'] = sctx
         cache['enable'] = not sctx.get('early_cache', False)
 
+        self._matches[name] = cache
+
         self.matches_update_popup(data)
 
-    def is_kw_type(self, data, sr, ctx1, ctx2):
+    def is_kw_typing(self, data, sr, ctx1, ctx2):
         ctx1 = deepcopy(ctx1)
         ctx2 = deepcopy(ctx2)
 
-        self.source_check_patterns(data, sr, ctx1)
-        self.source_check_patterns(data, sr, ctx2)
+        if 'startccol' not in ctx1:
+            self.check_word_pattern(data, sr, ctx1)
+        if 'startccol' not in ctx2:
+            self.check_word_pattern(data, sr, ctx2)
 
         logger.debug('old ctx [%s] cur ctx [%s]', ctx1, ctx2)
-        # startccol is set in self.source_check_patterns
-        c1s, c1e, c1b = ctx1['startccol'], ctx1['match_end'], ctx1['base']
-        c2s, c2e, c2b = ctx2['startccol'], ctx1['match_end'], ctx2['base']
+        c1s, c1b = ctx1['startccol'], ctx1['base']
+        c2s, c2b = ctx2['startccol'], ctx2['base']
         return c1s == c2s and c1b == c2b[:len(c1b)]
 
     # InsertEnter, InsertLeave, or lnum changed
@@ -485,11 +521,7 @@ class Ncm2Core(Ncm2Base):
 
         return ctx_list
 
-    def source_check_patterns(self, data, sr, ctx):
-        pats = sr.get('complete_pattern', [])
-        if type(pats) == str:
-            pats = [pats]
-
+    def check_word_pattern(self, data, sr, ctx):
         typed = ctx['typed']
         word_pat = self.get_word_pattern(ctx, sr)
 
@@ -500,15 +532,21 @@ class Ncm2Core(Ncm2Base):
             ctx['base'] = end_word_matched.group()
             ctx['startccol'] = ctx['ccol'] - len(ctx['base'])
             word_removed = typed[:end_word_matched.start()]
-            word_len = len(ctx['base'])
         else:
             ctx['base'] = ''
             ctx['startccol'] = ctx['ccol']
             word_removed = typed
-            word_len = 0
 
         ctx['match_end'] = len(word_removed)
         ctx['word_pattern'] = word_pat
+
+    def check_patterns(self, data, sr, ctx):
+        self.check_word_pattern(data, sr, ctx)
+
+        typed = ctx['typed']
+        pats = sr.get('complete_pattern', [])
+        if type(pats) == str:
+            pats = [pats]
 
         # check source extra patterns
         for pat in pats:
@@ -518,24 +556,25 @@ class Ncm2Core(Ncm2Base):
                 pat = '.*' + pat
 
             matched = re.search(pat, typed)
-            if matched and matched.end() >= len(typed) - word_len:
+            if matched and matched.end() >= len(typed) - len(ctx['base']):
                 ctx['match_end'] = matched.end()
                 return True
 
-        cmplen = self.source_get_complete_len(data, sr)
-        if cmplen is None:
-            return False
+        return False
 
-        if cmplen < 0:
-            return False
+    def source_get_complete_len(self, data, sr, manual):
+        if manual:
+            name = 'manual_complete_length'
+        else:
+            name = 'complete_length'
 
-        return word_len >= cmplen
+        if name in sr:
+            return sr[name]
 
-    def source_get_complete_len(self, data, sr):
-        if 'complete_length' in sr:
+        if manual and 'complete_length' in sr:
             return sr['complete_length']
 
-        cmplen = data['complete_length']
+        cmplen = data[name]
         if type(cmplen) == int:
             return cmplen
 
@@ -593,8 +632,8 @@ class Ncm2Core(Ncm2Base):
         for name in names:
 
             sr = srcs.get(name, None)
-            if not sr:
-                logger.error('[%s] source does not exist or filtered by white/black list', name)
+            if not sr or not sr.get('enable', 1):
+                logger.error('%s not found or filtered or disabled', name)
                 continue
 
             cache = self._matches[name]
@@ -609,21 +648,29 @@ class Ncm2Core(Ncm2Base):
                 logger.warn('%s invalid startccol %s', name, sccol)
                 continue
 
-            smat = deepcopy(cache['matches'])
+            if 'prev_context' in cache and self.is_kw_typing(data, sr, cache['prev_context'], ctx):
+                smat = cache['prev_matches']
+            else:
+                smat = deepcopy(cache['matches'])
+            smat_len0 = len(smat)
+
             sctx = cache['context']
 
-            if data['skip_tick']:
-                if sctx.get('event', '') != 'on_completed' or \
-                        sctx['tick'] != data['skip_tick']:
+            if data['skip_tick'] and sctx['tick'][1] < data['skip_tick'][1]:
+                    # tick s:context_tick_extra < skip_tick s:context_tick_extra
                     logger.debug('%s matches ignored by skip_tick',
                                  data['skip_tick'])
                     continue
 
+            smat = self.matches_filter_by_matcher(data, sr, sctx, sccol, smat)
+            cache['prev_context'] = ctx
+            cache['prev_matches'] = deepcopy(smat)
+
             smat = self.matches_filter(data, sr, sctx, sccol, smat)
             cache['filtered_matches'] = smat
 
-            logger.debug('%s matches is filtered %s -> %s',
-                         name, len(cache['matches']), len(smat))
+            logger.debug('%s matches is filtered %s -> %s -> %s',
+                         name, len(cache['matches']), smat_len0, len(smat))
 
             if not smat:
                 continue
@@ -768,9 +815,6 @@ class Ncm2Core(Ncm2Base):
         return tmp
 
     def matches_filter(self, data, sr, sctx, sccol, matches):
-        matches = self.matches_filter_by_matcher(
-            data, sr, sctx, sccol, matches)
-
         sorter = self.sorter_get(self.sorter_opt_get(data, sr))
         matches = sorter(matches)
 
@@ -797,7 +841,10 @@ class Ncm2Core(Ncm2Base):
     def matches_do_popup(self, ctx, startccol, matches):
         # json_encode user_data
         for m in matches:
-            m['user_data'] = json.dumps(m['user_data'])
+            # user_data might be string by some custom filter
+            ud = m['user_data']
+            if type(ud) is dict:
+                m['user_data'] = json.dumps(ud)
 
         popup = [ctx['tick'], startccol, matches]
         if self._last_popup == popup:
@@ -817,6 +864,7 @@ events = ['on_complete', 'cache_cleanup',
           'complete', 'load_plugin', 'load_python', 'on_warmup', 'ncm2_core']
 
 on_complete = ncm2_core.on_complete
+matches_update_popup = ncm2_core.matches_update_popup
 cache_cleanup = ncm2_core.cache_cleanup
 complete = ncm2_core.complete
 load_plugin = ncm2_core.load_plugin

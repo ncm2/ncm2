@@ -13,24 +13,26 @@ call s:opt('ncm2#auto_popup', 1)
 call s:opt('ncm2#complete_delay', 0)
 call s:opt('ncm2#popup_delay', 60)
 call s:opt('ncm2#complete_length', [[1,3],[7,2]])
+call s:opt('ncm2#manual_complete_length', g:ncm2#complete_length)
 call s:opt('ncm2#matcher', 'abbrfuzzy')
 call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
 call s:opt('ncm2#popup_limit', -1)
 
-inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <C-r>=ncm2#skip_auto_trigger()<CR>
-inoremap <silent> <Plug>(ncm2_auto_trigger) <C-r>=ncm2#_do_auto_trigger()<CR>
-inoremap <silent> <Plug>(ncm2_manual_trigger) <C-r>=ncm2#_on_complete(1)<CR>
-inoremap <silent> <Plug>(ncm2_c_e) <C-E>
+inoremap <silent> <Plug>(ncm2_auto_trigger)      <c-r>=ncm2#auto_trigger()<cr>
+inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <c-r>=ncm2#skip_auto_trigger()<cr>
+inoremap <silent> <Plug>(ncm2_manual_trigger)    <c-r>=ncm2#manual_trigger()<cr>
+
+inoremap <Plug>(ncm2_c_e) <C-E>
 
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
 let s:sources = {}
 let s:sources_override = {}
+let s:complete_timer = 0
 let s:popup_timer = 0
 let s:popup_timer_args = []
 let s:popup_timer_tick = []
-let s:complete_timer = 0
 let s:lock = {}
 let s:startbcol = 1
 let s:lnum = 0
@@ -46,7 +48,7 @@ let s:coredata_hooks = {}
 
 augroup ncm2_hooks
     au!
-    au User Ncm2EnableForBuffer call s:warmup()
+    au User Ncm2EnableForBuffer call s:on_warmup()
     au FileType * call s:try_rnotify('load_plugin', &rtp)
 augroup END
 
@@ -58,8 +60,8 @@ func! ncm2#enable_for_buffer()
 
     augroup ncm2_buf_hooks
         au! * <buffer>
-        au Insertenter,InsertLeave <buffer> call s:cache_cleanup()
-        au BufEnter <buffer> call s:warmup()
+        au InsertEnter,InsertLeave <buffer> call s:cache_cleanup()
+        au BufEnter <buffer> call s:on_warmup()
         if exists('##TextChangedP')
             au TextChangedI,TextChangedP <buffer> call ncm2#auto_trigger()
             au InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
@@ -114,8 +116,7 @@ func! s:context()
     let pos = getcurpos()
     let bcol = pos[2]
     let typed = strpart(getline('.'), 0, bcol-1)
-    let ctx = {
-                \ 'bufnr': bufnr('%'),
+    let ctx = {   'bufnr': bufnr('%'),
                 \ 'curpos': pos,
                 \ 'changedtick': b:changedtick,
                 \ 'lnum': pos[1],
@@ -126,12 +127,13 @@ func! s:context()
                 \ 'filepath': expand('%:p'),
                 \ 'typed': strpart(getline('.'), 0, pos[2]-1),
                 \ 'tick': s:context_tick(),
-                \ 'context_id': s:context_id
+                \ 'context_id': s:context_id,
+                \ 'mode': mode()
                 \ }
     if ctx.filepath == ''
         " FIXME this is necessary here, otherwise empty filepath is
         " somehow converted to None in vim8's python binding.
-        let ctx.filepath = ""
+        let ctx.filepath = ''
     endif
     return ctx
 endfunc
@@ -163,7 +165,7 @@ func! ncm2#register_source(sr)
     endif
 
     call s:override_source(sr)
-    call s:warmup(name)
+    call s:on_warmup(name)
 endfunc
 
 func! ncm2#override_source(name, v)
@@ -207,13 +209,13 @@ endfunc
 
 func! ncm2#_on_enable(sr, ...)
     if a:sr.enable
-        call s:warmup(a:sr.name)
+        call s:on_warmup(a:sr.name)
     endif
 endfunc
 
 func! ncm2#_on_ready(sr, ...)
     if a:sr.ready
-        call s:warmup(a:sr.name)
+        call s:on_warmup(a:sr.name)
     endif
 endfunc
 
@@ -227,23 +229,12 @@ func! ncm2#context(name)
 endfunc
 
 func! ncm2#complete(ctx, startccol, matches, ...)
-    let refresh = 0
-    if len(a:000)
-        let refresh = a:1
-    endif
-
-    let dated = s:context_tick() != a:ctx.tick
-    let a:ctx.dated = dated
-
+    let refresh = get(a:000, 0, 0)
     call s:try_rnotify('complete',
             \   a:ctx,
             \   a:startccol,
             \   a:matches,
             \   refresh)
-
-    if dated && refresh
-        call ncm2#_on_complete(2)
-    endif
 endfunc
 
 func! ncm2#context_dated(ctx)
@@ -346,10 +337,10 @@ endfunc
 
 func! ncm2#skip_auto_trigger()
     call s:cache_matches_cleanup()
-    " invalidate s:update_matches
+    " invalidate ncm2#_update_matches
     " invalidate ncm2#_notify_complete
     let s:context_tick_extra += 1
-    " skip auto ncm2#_on_complete
+    " skip auto ncm2#do_auto_trigger
     let s:skip_tick = s:context_tick()
     silent doau <nomodeline> User Ncm2PopupClose
     if pumvisible()
@@ -369,49 +360,37 @@ func! ncm2#auto_trigger()
     call ncm2#imode_task('ncm2#_real_popup')
 
     if g:ncm2#complete_delay == 0
-        call ncm2#_on_complete(0)
+        call ncm2#do_auto_trigger()
     else
         if s:complete_timer
             call timer_stop(s:complete_timer)
         endif
-        let s:complete_timer = timer_start(
-            \ g:ncm2#complete_delay,
-            \ {_ -> s:complete_timer_handler() })
+        let s:complete_timer = timer_start(g:ncm2#complete_delay,
+                \ 'ncm2#_complete_timer_handler')
     endif
     return ''
 endfunc
 
-func! s:complete_timer_handler()
+func! ncm2#_complete_timer_handler(...)
     let s:complete_timer = 0
+    call ncm2#do_auto_trigger()
+endfunc
+
+func! ncm2#do_auto_trigger()
     if s:should_skip()
         return
     endif
-    call ncm2#_on_complete(0)
+    call s:try_rnotify('on_complete', 0)
 endfunc
 
-func! ncm2#_on_complete(trigger_type)
-    let l:manual = a:trigger_type == 1
-    if l:manual == 0
-        if g:ncm2#auto_popup == 0
-            return ''
-        endif
-        if s:skip_tick == s:context_tick()
-            return ''
-        endif
-    endif
-
-    " skip_tick is dated, we don't need it anymore
-    let s:skip_tick = []
-    call s:try_rnotify('on_complete', l:manual)
+func! ncm2#manual_trigger()
+    call s:try_rnotify('on_complete', 1)
     return ''
 endfunc
 
 func! ncm2#_notify_complete(ctx, calls)
     if s:context_tick() != a:ctx.tick
         call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
-        " we need skip check, and auto_popup check in ncm2#_on_complete
-        " we don't need duplicate check in ncm2#auto_trigger
-        call ncm2#_on_complete(get(a:ctx, 'manual', 0))
         return
     endif
     for ele in a:calls
@@ -432,9 +411,6 @@ func! ncm2#_notify_complete(ctx, calls)
 endfunc
 
 func! ncm2#_notify_completed(ctx, name, sctx, completed)
-    if s:context_tick() != a:ctx.tick
-        return
-    endif
     let s:completion_notified[a:name] = a:sctx.context_id
     let a:sctx.dated = 0
     let sr = s:sources[a:name]
@@ -473,6 +449,7 @@ func! s:coredata(event)
                 \ 'auto_popup': g:ncm2#auto_popup,
                 \ 'skip_tick': s:skip_tick,
                 \ 'complete_length': g:ncm2#complete_length,
+                \ 'manual_complete_length': g:ncm2#manual_complete_length,
                 \ 'matcher': g:ncm2#matcher,
                 \ 'sorter': g:ncm2#sorter,
                 \ 'filter': g:ncm2#filter,
@@ -541,7 +518,7 @@ func! s:request(event, ...)
     return call(s:core.request, args, s:core)
 endfunc
 
-func! s:warmup(...)
+func! s:on_warmup(...)
     if !get(b:, 'ncm2_enable', 0)
         return
     endif
@@ -549,14 +526,11 @@ func! s:warmup(...)
     call ncm2#_hook_for_subscope_detectors()
 
     call s:try_rnotify('on_warmup', a:000)
-    " the FZF terminal window somehow gets empty without this check
-    " https://github.com/ncm2/ncm2/issues/50
-    call ncm2#imode_task('ncm2#_on_complete', 0)
 endfunc
 
 func! ncm2#_core_started()
     call s:try_rnotify('load_plugin', &rtp)
-    call s:warmup()
+    call s:on_warmup()
 endfunc
 
 func! ncm2#_load_vimscript(s)
@@ -577,7 +551,7 @@ func! ncm2#_au_plugin()
     endtry
 
     if has_key(s:subscope_detectors, &filetype)
-        call s:warmup()
+        call s:on_warmup()
     endif
 endfunc
 
