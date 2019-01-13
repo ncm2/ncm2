@@ -332,19 +332,23 @@ class Ncm2Core(Ncm2Base):
 
         pattern_ok = self.check_patterns(data, sr, ctx)
 
-        cache_is_kw_typing = False
+        cache_still_apply = False
         cache_is_manual = False
         if cache:
             cctx = cache['context']
             cache_is_kw_typing = self.is_kw_typing(data, sr, cctx, ctx)
+            # match_end could by updated in check_patterns
+            cache_still_apply = cache_is_kw_typing and cctx['match_end'] == ctx['match_end']
             if cctx['startccol'] == ctx['startccol']:
                 cache_is_manual = cctx.get('manual', 0)
 
-        noti_is_kw_typing = False
+        noti_still_apply = False
         noti_is_manual = False
         if noti:
             nctx = noti['context']
             noti_is_kw_typing = self.is_kw_typing(data, sr, nctx, ctx)
+            # match_end could by updated in check_patterns
+            noti_still_apply = noti_is_kw_typing and nctx['match_end'] == ctx['match_end']
             if nctx['startccol'] == ctx['startccol']:
                 noti_is_manual = nctx.get('manual', 0)
 
@@ -392,13 +396,13 @@ class Ncm2Core(Ncm2Base):
             if need_refresh or req_is_manual:
                 # reduce further duplicate notification
                 cache['refresh'] = 0
-            elif cache_is_kw_typing:
+            elif cache_still_apply:
                 logger.debug('<%s> was cached, context: %s matches: %s',
                              name, cctx, cache['matches'])
                 return False
 
         # we only notify once for each word
-        if noti_is_kw_typing and not req_is_manual and not need_refresh and \
+        if noti_still_apply and not req_is_manual and not need_refresh and \
                 not noti['refresh']:
             logger.debug('<%s> has been notified, cache %s', name, cache)
             return False
