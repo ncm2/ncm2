@@ -652,13 +652,16 @@ class Ncm2Core(Ncm2Base):
                 logger.warn('%s invalid startccol %s', name, sccol)
                 continue
 
-            if 'prev_context' in cache and self.is_kw_typing(data, sr, cache['prev_context'], ctx):
+            sctx = cache['context']
+
+            if 'prev_context' in cache \
+                    and self.is_kw_typing(data, sr, cache['prev_context'], ctx) \
+                    and sctx.get('inc_match', 1):
                 smat = cache['prev_matches']
             else:
                 smat = deepcopy(cache['matches'])
-            smat_len0 = len(smat)
 
-            sctx = cache['context']
+            smat_len0 = len(smat)
 
             if data['skip_tick'] and sctx['tick'][1] < data['skip_tick'][1]:
                     # tick s:context_tick_extra < skip_tick s:context_tick_extra
@@ -748,12 +751,11 @@ class Ncm2Core(Ncm2Base):
         return names
 
     def matcher_opt_get(self, data, sr):
-        gmopt = self.matcher_opt_formalize(data['matcher'])
-        smopt = {}
+        opt = self.matcher_opt_formalize(data['matcher'])
         if 'matcher' in sr:
-            smopt = self.matcher_opt_formalize(sr['matcher'])
-        gmopt.update(smopt)
-        return gmopt
+            sopt = self.matcher_opt_formalize(sr['matcher'])
+            opt.update(sopt)
+        return opt
 
     def sorter_opt_formalize(self, opt):
         if type(opt) is str:
@@ -808,7 +810,7 @@ class Ncm2Core(Ncm2Base):
     def matches_filter_by_matcher(self, data, sr, sctx, sccol, matches):
         ctx = data['context']
         typed = ctx['typed']
-        matcher = self.matcher_get(sctx['matcher'])
+        matcher = self.matcher_get(sctx)
         tmp = []
         for m in matches:
             ud = m['user_data']

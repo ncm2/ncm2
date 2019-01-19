@@ -49,11 +49,20 @@ def getLogger(name):
 
 logger = getLogger(__name__)
 
-def matcher_get(opt):
+def matcher_get(context):
+    if 'matcher' in context:
+        opt = context['matcher']
+    else:
+        # FIXME This is only for backword compability
+        opt = context
+        context = {}
     name = opt['name']
     modname = 'ncm2_matcher.' + name
     mod = import_module(modname)
-    m = mod.Matcher(**opt)
+    # Some matchers, e.g. equal matcher, need to disable the incremental
+    # match feature. It needs a way to set inc_match=0. This is why we need
+    # to pass context to the matcher.
+    m = mod.Matcher(context=context, **opt)
     return m
 
 def matcher_opt_formalize(opt):
@@ -61,28 +70,15 @@ def matcher_opt_formalize(opt):
         return dict(name=opt)
     return deepcopy(opt)
 
-def lazy_check_context(nvim, context):
-    if context.get('dated', 0):
-        return False
-    # only checks when we receives a context that seems old
-    now = time.time()
-    if now >= context['time'] + 0.5:
-        return not nvim.call('ncm2#context_dated', context)
-    else:
-        return True
-
 class Ncm2Base:
     def __init__(self, nvim):
         self.nvim = nvim
 
-    def lazy_check_context(self, context):
-        return lazy_check_context(self.nvim, context)
-
     def matcher_opt_formalize(self, opt):
         return matcher_opt_formalize(opt)
 
-    def matcher_get(self, opt):
-        return matcher_get(opt)
+    def matcher_get(self, context):
+        return matcher_get(context)
 
     def match_formalize(self, ctx, item):
         e = {}
@@ -205,6 +201,16 @@ class Ncm2Source(Ncm2Base):
             on_complete_impl(context, *args)
         self.on_complete = on_complete
         logger.debug('on_complete is wrapped')
+
+    def lazy_check_context(self, context):
+        if context.get('dated', 0):
+            return False
+        # only checks when we receives a context that seems old
+        now = time.time()
+        if now >= context['time'] + 0.5:
+            return not self.nvim.call('ncm2#context_dated', context)
+        else:
+            return True
 
     def complete(self, ctx, startccol, matches, refresh=False):
         self.nvim.call('ncm2#complete', ctx, startccol,
