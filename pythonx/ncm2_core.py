@@ -237,10 +237,6 @@ class Ncm2Core(Ncm2Base):
 
         self.cache_cleanup_check(root_ctx)
 
-        if not manual and data['skip_tick'] == root_ctx['tick']:
-            logger.debug('do_on_complete ignored by skip_tick')
-            return
-
         contexts = self.detect_subscopes(data)
 
         # do notify_sources_to_refresh
@@ -462,7 +458,6 @@ class Ncm2Core(Ncm2Base):
         if 'startccol' not in ctx2:
             self.check_word_pattern(data, sr, ctx2)
 
-        logger.debug('old ctx [%s] cur ctx [%s]', ctx1, ctx2)
         c1s, c1b = ctx1['startccol'], ctx1['base']
         c2s, c2b = ctx2['startccol'], ctx2['base']
         return c1s == c2s and c1b == c2b[:len(c1b)]
@@ -662,12 +657,6 @@ class Ncm2Core(Ncm2Base):
                 smat = deepcopy(cache['matches'])
 
             smat_len0 = len(smat)
-
-            if data['skip_tick'] and sctx['tick'][1] < data['skip_tick'][1]:
-                    # tick s:context_tick_extra < skip_tick s:context_tick_extra
-                    logger.debug('%s matches ignored by skip_tick',
-                                 data['skip_tick'])
-                    continue
 
             smat = self.matches_filter_by_matcher(data, sr, sctx, sccol, smat)
             cache['prev_context'] = ctx

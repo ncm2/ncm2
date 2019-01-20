@@ -1,18 +1,21 @@
 from ncm2 import matcher_get, matcher_opt_formalize
-from copy import deepcopy
 
 def Matcher(**kargs):
-    opts = kargs['matchers']
     matchers = []
 
-    default_params = deepcopy(kargs)
+    opts = kargs['matchers']
+    context = kargs['context']
+
+    default_params = kargs.copy()
     del default_params['matchers']
+    del default_params['context']
+    del default_params['name']
 
     for opt in opts:
-        tmp = deepcopy(default_params)
+        tmp = default_params.copy()
         opt = matcher_opt_formalize(opt)
         tmp.update(opt)
-        matcher = matcher_get(tmp)
+        matcher = matcher_get(context, tmp)
         matchers.append(matcher)
 
     def match(b, m):

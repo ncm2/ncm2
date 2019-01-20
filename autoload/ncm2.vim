@@ -39,7 +39,6 @@ let s:lnum = 0
 let s:matches = []
 let s:subscope_detectors = {}
 let s:auto_trigger_tick = []
-let s:skip_tick = []
 let s:skip_context_id = 0
 let s:context_tick_extra = 0
 let s:context_id = 0
@@ -86,15 +85,12 @@ func! s:on_complete_done()
     if empty(v:completed_item) || !has_key(v:completed_item, 'user_data')
         return
     endif
-    " The user has accepted the item, don't popup old s:matches again.
-    call ncm2#skip_auto_trigger()
     call s:try_rnotify('on_complete_done', v:completed_item)
 endfunc
 
 func! s:cache_cleanup()
     call s:cache_matches_cleanup()
     let s:auto_trigger_tick  = []
-    let s:skip_tick = []
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -248,7 +244,6 @@ func! ncm2#menu_selected()
 endfunc
 
 func! ncm2#lock(name)
-    call ncm2#skip_auto_trigger()
     let s:lock[a:name] = 1
 endfunc
 
@@ -336,16 +331,7 @@ func! ncm2#_real_popup(...)
 endfunc
 
 func! ncm2#skip_auto_trigger()
-    call s:cache_matches_cleanup()
-    " invalidate ncm2#_update_matches
-    " invalidate ncm2#_notify_complete
-    let s:context_tick_extra += 1
-    " skip auto ncm2#do_auto_trigger
-    let s:skip_tick = s:context_tick()
-    silent doau <nomodeline> User Ncm2PopupClose
-    if pumvisible()
-        call ncm2#imode_task('ncm2#_real_popup')
-    endif
+    " deprecated
     return ''
 endfunc
 
@@ -447,7 +433,6 @@ func! s:coredata(event)
     " data sync between ncm2.vim and ncm2_core.py
     let data = { 'event': a:event,
                 \ 'auto_popup': g:ncm2#auto_popup,
-                \ 'skip_tick': s:skip_tick,
                 \ 'complete_length': g:ncm2#complete_length,
                 \ 'manual_complete_length': g:ncm2#manual_complete_length,
                 \ 'matcher': g:ncm2#matcher,
