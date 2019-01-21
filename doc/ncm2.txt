@@ -212,7 +212,12 @@ g:ncm2#manual_complete_length
                                     *g:ncm2#popup_limit*
 g:ncm2#popup_limit
             If set, this option will be the default limit of completion items
-            that will popup for each completion source.
+            that will be shown for each completion source.
+
+                                    *g:ncm2#total_popup_limit*
+g:ncm2#total_popup_limit
+            If set, this option will be the limit of total completion items
+            that will be shown by ncm2.
 
 ==============================================================================
 5. API                              *ncm2-API*

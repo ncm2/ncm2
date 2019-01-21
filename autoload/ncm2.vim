@@ -18,6 +18,7 @@ call s:opt('ncm2#matcher', 'abbrfuzzy')
 call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
 call s:opt('ncm2#popup_limit', -1)
+call s:opt('ncm2#total_popup_limit', -1)
 
 inoremap <silent> <Plug>(ncm2_auto_trigger)      <c-r>=ncm2#auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <c-r>=ncm2#skip_auto_trigger()<cr>
@@ -439,6 +440,7 @@ func! s:coredata(event)
                 \ 'sorter': g:ncm2#sorter,
                 \ 'filter': g:ncm2#filter,
                 \ 'popup_limit': g:ncm2#popup_limit,
+                \ 'total_popup_limit': g:ncm2#total_popup_limit,
                 \ 'context': s:context(),
                 \ 'sources': s:sources,
                 \ 'whitelist_for_buffer': ncm2#whitelist_for_buffer(),

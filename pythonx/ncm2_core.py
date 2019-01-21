@@ -734,6 +734,9 @@ class Ncm2Core(Ncm2Base):
 
         matches = self.matches_decorate(data, matches)
 
+        if data['total_popup_limit'] != -1:
+            matches = matches[0: data['total_popup_limit']]
+
         self.matches_do_popup(ctx, startccol, matches)
 
     def get_sources_for_popup(self, data, names):
