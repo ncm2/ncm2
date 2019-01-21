@@ -39,8 +39,10 @@ Requirements:
 
 For neovim users:
 
-- `:echo has("python3")` prints 1.
 - `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested.
+- `:echo has("python3")` prints 1. This is usually set by
+    `python3 -m pip install pynvim` in shell and
+  `let g:python3_host_prog=/path/to/python/executable/` in vimrc.
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
 For vim8 user, read the [nvim-yarp](https://github.com/roxma/nvim-yarp)
@@ -97,7 +99,7 @@ Optional vimrc tips:
     "               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
     au User Ncm2Plugin call ncm2#register_source({
             \ 'name' : 'css',
-            \ 'priority': 9, 
+            \ 'priority': 9,
             \ 'subscope_enable': 1,
             \ 'scope': ['css','scss'],
             \ 'mark': 'css',
@@ -109,8 +111,8 @@ Optional vimrc tips:
 ==============================================================================
 4. Settings                         *ncm2-settings*
 
-                                    *g:ncm2#complete_delay* 
-g:ncm2#complete_delay 
+                                    *g:ncm2#complete_delay*
+g:ncm2#complete_delay
             Wait for an interval, in milliseconds, before starting to
             compute completions. This is useful when dealing with slow,
             sync completion source.
@@ -166,7 +168,7 @@ g:ncm2#filter
                                 \ 'key': 'word'}
 <                            changes the completion item from
                                 `{"word": "print(str)", "abbr": "print(str)"}`
-                            into 
+                            into
                                 `{"word": "print", "abbr": "print(str)"}`
             "set_dup"       For example: >
                                 call ncm2#override_source('bufword', {
@@ -174,9 +176,9 @@ g:ncm2#filter
                                     \   'name': 'set_dup',
                                     \   'value': 0}})
 <                            changes the completion items of source "bufword"
-                            from 
-                                `{"word": "foo"}` 
-                            into 
+                            from
+                                `{"word": "foo"}`
+                            into
                                 `{"word": "foo", "dup": 0}`
                             refer to |complete-items| for more information on "dup" field.
 
@@ -194,7 +196,7 @@ g:ncm2#complete_length
             Format: an integer, or a |List| as `[[ min_prio, min_len ],...]`
             The default value means that sources with priority between 1 and 6
             will have the value of 3, and sources with priority >= 7 will have
-            the value of 2.  
+            the value of 2.
             Priority >= 7 is more semantic completion source, So it's better
             to use a smaller value to trigger the popup than others.
 
@@ -244,7 +246,7 @@ ncm2#register_source({source})
                         The priority is used to sort between other sources.  A
                         higher value indicates the completion items are shown
                         ahead of thoses of lower priority sources.
-                        Recommended priority definitions: 
+                        Recommended priority definitions:
                         2   keyword from the otherfiles, from user's openning
                             browsers, etc.
                         4   keyword from openning buffers
@@ -257,7 +259,7 @@ ncm2#register_source({source})
                         A |List| of scope. The source will be activated when
                         the current editting scope (e.g. current 'filetype')
                         is in the source's scope
-                        list. 
+                        list.
                         If this field is not set, it means this is a general
                         purpose completion source, like keyword from buffer,
                         it will be activated for all buffers.
@@ -283,7 +285,7 @@ ncm2#register_source({source})
     complete_pattern                *ncm2-complete_pattern*
                         An extra |List| of PCRE patterns (python regex),
                         besides complete_length, for auto triggering popup
-                        menu. 
+                        menu.
     matcher             Set this field if you want custom matcher instead of
                         the global |g:ncm2#matcher|.
     filter              Set this field if you want custom filter instead of

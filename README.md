@@ -24,7 +24,9 @@ extensions and programming languages support for NCM2.
 ## Requirements
 
 - `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested
-- `:echo has("python3")` prints 1
+- `:echo has("python3")` prints 1. This is usually set by
+    `python3 -m pip install pynvim` in shell and
+  `let g:python3_host_prog=/path/to/python/executable/` in vimrc.
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
 For vim8 user, read the [nvim-yarp](https://github.com/roxma/nvim-yarp)
@@ -77,7 +79,7 @@ NCM2.**
     "               \ 'ncm2#on_complete#omni', 'csscomplete#CompleteCSS'],
     au User Ncm2Plugin call ncm2#register_source({
             \ 'name' : 'css',
-            \ 'priority': 9, 
+            \ 'priority': 9,
             \ 'subscope_enable': 1,
             \ 'scope': ['css','scss'],
             \ 'mark': 'css',
