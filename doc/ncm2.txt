@@ -146,6 +146,18 @@ g:ncm2#matcher
                             \   {'name': 'abbrfuzzy', 'key': 'menu'},
                             \   {'name': 'prefix', 'key': 'word'},
                             \ ]},
+<            base_min_len    For example, this matcher requires at least 3
+                            characters of user input:
+                            `{'name': 'base_min_len', 'value': 3}`
+            must            And operation for matchers.
+                            The following matcher requires at least 3
+                            characters of user input and then do substrfuzzy
+                            match.  >
+                            {'name': 'must',
+                            \ 'matchers': [
+                            \   {'name': 'base_min_len', 'value': 3},
+                            \   'substrfuzzy',
+                            \ ]},
 <
                                     *g:ncm2#sorter*
 g:ncm2#sorter

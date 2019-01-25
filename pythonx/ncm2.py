@@ -53,7 +53,7 @@ def matcher_get(context, opt=None):
     if 'matcher' in context:
         if opt is None:
             opt = context['matcher']
-    else:
+    elif opt is None:
         # FIXME This is only for backword compability
         opt = context
         context = {}

@@ -435,6 +435,10 @@ class Ncm2Core(Ncm2Base):
         if sctx['lnum'] == 1:
             startccol += sctx.get('scope_ccol', 1) - 1
 
+        # a source uses a matcher that does not support inc_match, in this
+        # case, we need refresh=1
+        refresh = refresh or not sctx.get('inc_match', 1)
+
         matches = self.matches_formalize(sctx, matches)
 
         cache = {}
@@ -448,6 +452,9 @@ class Ncm2Core(Ncm2Base):
         self._matches[name] = cache
 
         self.matches_update_popup(data)
+
+        if refresh and sctx['tick'] != ctx['tick']:
+            self.do_on_complete(data, 0, [name])
 
     def is_kw_typing(self, data, sr, ctx1, ctx2):
         ctx1 = deepcopy(ctx1)
