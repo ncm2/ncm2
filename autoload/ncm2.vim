@@ -370,8 +370,13 @@ func! ncm2#do_auto_trigger()
     call s:try_rnotify('on_complete', 0)
 endfunc
 
-func! ncm2#manual_trigger()
-    call s:try_rnotify('on_complete', 1)
+func! ncm2#manual_trigger(...)
+    call s:try_rnotify('on_complete', 1, a:000)
+    return ''
+endfunc
+
+func! ncm2#force_trigger(...)
+    call s:try_rnotify('on_complete', 2, a:000)
     return ''
 endfunc
 

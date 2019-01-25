@@ -12,8 +12,7 @@ ncm2                                *ncm2*
 3. Vimrc Examples                   |ncm2-vimrc|
 4. Settings                         |ncm2-settings|
 5. API                              |ncm2-API|
-6. Key Mappings                     |ncm2-key|
-7. Autocmds                         |ncm2-autocmd|
+6. Autocmds                         |ncm2-autocmd|
 
 ==============================================================================
 1. Introduction                     *ncm2-introduction*
@@ -196,10 +195,8 @@ g:ncm2#filter
 
                                     *g:ncm2#auto_popup*
 g:ncm2#auto_popup
-            If set to 0, then you have to map the
-            `<Plug>(ncm2_manual_trigger)` key, and use this key to
-            trigger the completion.
-            Default: 1
+            If set to 0, then you have to map the |ncm2#manual_trigger()| key,
+            and use this key to trigger the completion.  Default: 1
 
                                     *g:ncm2#complete_length*
 g:ncm2#complete_length
@@ -215,7 +212,7 @@ g:ncm2#complete_length
                                     *g:ncm2#manual_complete_length*
 g:ncm2#manual_complete_length
             Same as |g:ncm2#complete_length| except that it is used for
-            |<Plug>(ncm2_manual_trigger)|.
+            |ncm2#manual_trigger()|.
             Note that during manual completion, ncm2 looks for the
             complete_length with the following order:
             1. The source's custom manual_complete_length
@@ -245,7 +242,7 @@ ncm2#register_source({source})
                         This field might be displayed in the popup item to
                         indicate the completion source.
     enable              Defaults to 1. If set to 0, it will only be triggered
-                        by `<Plug>(ncm2_manual_trigger)`
+                        by |ncm2#manual_trigger()|
     ready                           *ncm2-ready*
                         Defaults to 1. If your completion engine is a
                         standalone process, you could set this field to 0 on
@@ -284,7 +281,7 @@ ncm2#register_source({source})
                         Function name of the handler for the completion
                         request.
     auto_popup
-                        If 0, only the |<Plug>(ncm2_manual_trigger)| key can
+                        If 0, only the |ncm2#manual_trigger()| key can
                         trigger the completion of this source.
                         Default: 1
     word_pattern                    *ncm2-word_pattern*
@@ -459,16 +456,20 @@ ncm2#blacklist_for_buffer([{list}])
 
     Returns the current completion source blacklist.
 
+                                    *ncm2#manual_trigger()*
+inoremap <your-key> <c-r>=ncm2#manual_trigger(...)<cr>
+    Map this as a key to trigger completion manually.
+
+                                    *ncm2#force_trigger()*
+inoremap <your-key> <c-r>=ncm2#force_trigger(...)<cr>
+    Like |ncm2#manual_trigger()|, but this trigger does not respect
+    |g:ncm2#manual_complete_length|.
+    Use <c-r>=ncm2#force_trigger('ultisnips', 'othersource'...)<cr> to narrow
+    the completion trigger to ultisnips and othersource.
+
+
 ==============================================================================
-6. Key Mappings                     *ncm2-key*
-
-                                    *<Plug>(ncm2_manual_trigger)*
-<Plug>(ncm2_manual_trigger)
-    A key to trigger the completion manually.
-
-
-==============================================================================
-7. Autocmds                         *ncm2-autcmd*
+6. Autocmds                         *ncm2-autcmd*
 
                                     *Ncm2PopupOpen* *Ncm2PopupClose*
 :autocmd User Ncm2PopupOpen

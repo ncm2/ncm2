@@ -277,9 +277,9 @@ class Ncm2Core(Ncm2Base):
         else:
             logger.debug('notifies is empty')
 
-    def on_complete(self, data, manual):
+    def on_complete(self, data, manual, names=None):
 
-        self.do_on_complete(data, manual)
+        self.do_on_complete(data, manual, names)
 
         self.matches_update_popup(data)
 
@@ -326,7 +326,10 @@ class Ncm2Core(Ncm2Base):
                 'source_check_scope ignore <%s> for context scope <%s>', name, ctx['scope'])
             return False
 
+        manual_req = ctx.get('manual', 0)
         pattern_ok = self.check_patterns(data, sr, ctx)
+        if manual_req == 2:
+            pattern_ok = True
 
         cache_still_apply = False
         cache_is_manual = False
@@ -348,7 +351,6 @@ class Ncm2Core(Ncm2Base):
             if nctx['startccol'] == ctx['startccol']:
                 noti_is_manual = nctx.get('manual', 0)
 
-        req_is_manual = ctx.get('manual', 0)
         manual = ctx.get('manual', 0) or cache_is_manual or noti_is_manual
         ctx['manual'] = manual
 
@@ -389,7 +391,7 @@ class Ncm2Core(Ncm2Base):
         need_refresh = False
         if cache:
             need_refresh = cache['refresh']
-            if need_refresh or req_is_manual:
+            if need_refresh or manual_req:
                 # reduce further duplicate notification
                 cache['refresh'] = 0
             elif cache_still_apply:
@@ -398,7 +400,7 @@ class Ncm2Core(Ncm2Base):
                 return False
 
         # we only notify once for each word
-        if noti_still_apply and not req_is_manual and not need_refresh and \
+        if noti_still_apply and not manual_req and not need_refresh and \
                 not noti['refresh']:
             logger.debug('<%s> has been notified, cache %s', name, cache)
             return False
