@@ -3,6 +3,7 @@ import os
 from importlib import import_module
 import logging
 import platform
+import subprocess
 from subprocess import Popen
 from os import path
 import unicodedata
