@@ -299,10 +299,14 @@ func! ncm2#_real_update_matches(ctx, startbcol, matches)
     let s:matches = a:matches
     let s:lnum = a:ctx.lnum
 
-    call ncm2#imode_task('ncm2#_real_popup')
+    call ncm2#_real_popup()
 endfunc
 
 func! ncm2#_real_popup(...)
+    if s:should_skip()
+        return
+    endif
+
     let pos = getcurpos()
     if s:lnum != pos[1]
         let s:lnum = pos[1]
@@ -344,7 +348,7 @@ func! ncm2#auto_trigger()
     let s:auto_trigger_tick = tick
 
     " refresh the popup menu to reduce popup flickering
-    call ncm2#imode_task('ncm2#_real_popup')
+    call ncm2#_real_popup()
 
     if g:ncm2#complete_delay == 0
         call ncm2#do_auto_trigger()
