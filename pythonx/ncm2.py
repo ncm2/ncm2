@@ -90,6 +90,7 @@ class Ncm2Base:
             e = deepcopy(item)
 
         e['icase'] = 1
+        e['equal'] = 1
         if 'menu' not in e or type(e['menu']) != str:
             e['menu'] = ''
         if 'info' not in e or type(e['info']) != str:
