@@ -32,12 +32,19 @@ class Ncm2Core(Ncm2Base):
 
         self._loaded_plugins = {}
 
+	# LSP based completion source does not has word pattern, use defaults
+	# from https://github.com/Microsoft/vscode/blob/2540cbb603f25e5a8f92c8d0657646c77540dfef/src/vs/editor/common/model/wordHelper.ts
+	# for default startccol.
+	# Read https://github.com/roxma/nvim-completion-manager/issues/30 for more info.
         pats = {}
         pats['*'] = r'(-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
         pats['css'] = r'(-?\d*\.\d[\w-]*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
         pats['scss'] = pats['css']
         pats['php'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
         pats['vim'] = r'(-?\d*\.\d\w*)|([^\-\`\~\!\@\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)'
+
+        # allow @varname $varname
+        pats['ruby'] = r'(-?\d*\.\d\w*)|([^\`\~\!\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)'
 
         self._word_patterns = pats
 
