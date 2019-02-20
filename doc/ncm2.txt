@@ -192,6 +192,18 @@ g:ncm2#filter
                             into
                                 `{"word": "foo", "dup": 0}`
                             refer to |complete-items| for more information on "dup" field.
+            "abbr_ellipsis" For example: >
+                                call ncm2#override_source('bufword', {
+                                    \ 'filter': {
+                                    \   'name': 'abbr_ellipsis',
+                                    \   'ellipsis': '..',
+                                    \   'limit': 10}})
+<                            This limits the completion item "abbr" field's
+                            max length to 10.
+                            Before:
+                                `{"word": "123456789012345"}`
+                            After:
+                                `{"word": "123456789012345", "abbr": "1234567890.."}`
 
                                     *g:ncm2#auto_popup*
 g:ncm2#auto_popup
