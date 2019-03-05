@@ -191,7 +191,13 @@ g:ncm2#filter
                                 `{"word": "foo"}`
                             into
                                 `{"word": "foo", "dup": 0}`
-                            refer to |complete-items| for more information on "dup" field.
+                            Note that set_dup uses vim's builtin dedup filter,
+                            which is only based on the "word" field of the
+                            item. Refer to |complete-items| for more
+                            information on "dup" field.
+            "dedup"         Similar to `"filter":{'name':'set_dup','value':0}`
+                            but `"filter": "dedup"` compares the whole item
+                            value for deduplication.
             "abbr_ellipsis" For example: >
                                 call ncm2#override_source('bufword', {
                                     \ 'filter': {
