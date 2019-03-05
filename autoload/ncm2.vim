@@ -386,7 +386,9 @@ endfunc
 
 func! ncm2#_notify_complete(ctx, calls)
     if s:context_tick() != a:ctx.tick
-        call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
+        if !s:should_skip()
+            call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
+        endif
         return
     endif
     for ele in a:calls
@@ -415,6 +417,12 @@ endfunc
 
 func! ncm2#_warmup_sources(ctx, calls)
     if bufnr('%') != a:ctx.bufnr
+        " the user has switched to another buffer
+        return
+    endif
+    if &modifiable == 0
+        " temrinal buffers, and special buffers created by plugins (gina,
+        " fugitive, etc.)
         return
     endif
     for ele in a:calls
