@@ -30,10 +30,10 @@ endfunc
 " omnifunc wrapper
 func! ncm2#on_complete#omni(funcname, ctx)
     " omni function's startbcol is zero based, convert it to one based
-    let startbcol = call(a:funcname, [1,'']) + 1
+    let startbcol = s:call_omnifunc(a:funcname, 1,'') + 1
     let typed = strpart(getline('.'), 0, col('.')-1)
     let base = typed[startbcol - 1: ]
-    let matches = call(a:funcname, [0, base])
+    let matches = s:call_omnifunc(a:funcname, 0, base)
     let refresh = 0
     if type(matches) == v:t_dict
         let refresh = get(matches, 'refresh', '') == 'always' ? 1: 0
@@ -55,3 +55,16 @@ func! ncm2#on_complete#omni(funcname, ctx)
     call ncm2#complete(a:ctx, startccol, matches, refresh)
 endfunc
 
+func! s:call_omnifunc(omnifunc, ...) abort
+    let cursor = getpos('.')
+    try
+        return call(a:omnifunc, a:000)
+    finally
+        if cursor != getpos('.')
+            " :help E839, E840
+            " The function is allowed to move the cursor, it is restored afterwards.
+            " The function is not allowed to move to another window or delete text.
+            call setpos('.', cursor)
+        endif
+    endtry
+endfunc
