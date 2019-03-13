@@ -430,6 +430,11 @@ class Ncm2Core(Ncm2Base):
             logger.debug('%s cache is newer, %s', name, cache)
             return
 
+        # cleanup the notified entry once we get 'ncm2#complete' results
+        noti = self._notified.get(name, None)
+        if noti and sctx['context_id'] >= noti['context']['context_id']:
+            del self._notified[name]
+
         # be careful when completion matches context is dated
         if sctx['tick'] != ctx['tick']:
             if not self.is_kw_typing(data, sr, sctx, ctx):
