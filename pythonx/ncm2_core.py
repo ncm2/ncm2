@@ -177,54 +177,6 @@ class Ncm2Core(Ncm2Base):
             ctx['time'] = time.time()
             return ctx
 
-    def on_complete_done(self, data, completed):
-        logger.info('on_complete_done')
-
-        # is completed item from ncm2
-        try:
-            completed['user_data'] = json.loads(completed['user_data'])
-            ud = completed['user_data']
-            if not ud.get('ncm2', 0):
-                logger.debug(
-                    'This is not completed by ncm2, ncm2==0, ud: %s', ud)
-                return
-        except Exception as ex:
-            logger.debug('This is not completed by ncm2, %s', ex)
-            return
-
-        name = ud['source']
-
-        sr = data['sources'].get(name, None)
-        if not sr:
-            logger.error('the source does not exist')
-            return
-
-        if not sr.get('on_completed', None):
-            logger.debug(
-                'the source does not have on_completed handler, %s', sr)
-            return
-
-        root_ctx = data['context']
-        root_ctx['manual'] = 0
-
-        # regenerate contexts for this source
-        contexts = self.detect_subscopes(data)
-        for ctx in contexts:
-            ctx = deepcopy(ctx)
-            ctx['source'] = name
-            ctx['matcher'] = self.matcher_opt_get(data, sr)
-            if not self.source_check_scope(sr, ctx, contexts):
-                continue
-            self.check_patterns(data, sr, ctx)
-            ctx['time'] = time.time()
-            ctx['event'] = 'on_completed'
-            self.notify('ncm2#_notify_completed',
-                        root_ctx,
-                        name,
-                        ctx,
-                        completed)
-            return
-
     def on_notify_dated(self, data, _, failed_notifies=[]):
         for ele in failed_notifies:
             name = ele['name']
@@ -890,7 +842,6 @@ load_plugin = ncm2_core.load_plugin
 load_python = ncm2_core.load_python
 on_warmup = ncm2_core.on_warmup
 on_notify_dated = ncm2_core.on_notify_dated
-on_complete_done = ncm2_core.on_complete_done
 get_context = ncm2_core.get_context
 
 __all__ = events
