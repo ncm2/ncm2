@@ -234,8 +234,20 @@ func! ncm2#complete(ctx, startccol, matches, ...)
             \   refresh)
 endfunc
 
+func! ncm2#complete_resolve(ctx, item)
+    if has_key(a:ctx, 'on_complete_resolved')
+        call call(a:ctx.on_complete_resolved, [a:ctx, a:item])
+    endif
+endfunc
+
+func! ncm2#complete_context_dated(ctx)
+    return a:ctx.context_id < get(s:completion_notified, a:ctx.source, 0)
+endfunc
+
 func! ncm2#context_dated(ctx)
-    return a:ctx.context_id < get(s:completion_notified, a:ctx.source.name, 0)
+    " TODO remove deprecated function
+    call s:core.error('deprecated function ncm2#context_dated called by source ' . string(a:ctx.source))
+    return ncm2#complete_context_dated(a:ctx)
 endfunc
 
 func! ncm2#menu_selected()

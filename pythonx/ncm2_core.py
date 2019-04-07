@@ -169,7 +169,7 @@ class Ncm2Core(Ncm2Base):
         contexts = self.detect_subscopes(data)
         for ctx in contexts:
             ctx = deepcopy(ctx)
-            ctx['source'] = sr
+            ctx['source'] = name
             ctx['matcher'] = self.matcher_opt_get(data, sr)
             if not self.source_check_scope(sr, ctx, contexts):
                 continue
@@ -211,7 +211,7 @@ class Ncm2Core(Ncm2Base):
         contexts = self.detect_subscopes(data)
         for ctx in contexts:
             ctx = deepcopy(ctx)
-            ctx['source'] = sr
+            ctx['source'] = name
             ctx['matcher'] = self.matcher_opt_get(data, sr)
             if not self.source_check_scope(sr, ctx, contexts):
                 continue
@@ -258,7 +258,7 @@ class Ncm2Core(Ncm2Base):
 
                 ctx = deepcopy(tmp_ctx)
                 ctx['early_cache'] = False
-                ctx['source'] = sr
+                ctx['source'] = name
                 ctx['matcher'] = self.matcher_opt_get(data, sr)
 
                 if not self.check_source_notify(data, sr, ctx, contexts):
@@ -417,7 +417,7 @@ class Ncm2Core(Ncm2Base):
         ctx = data['context']
         self.cache_cleanup_check(ctx)
 
-        name = sctx['source']['name']
+        name = sctx['source']
 
         sources = self.get_filtered_sources(data)
         sr = sources.get(name, None)

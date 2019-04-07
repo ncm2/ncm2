@@ -111,7 +111,7 @@ class Ncm2Base:
             e['user_data'] = {}
 
         ud = e['user_data']
-        ud['source'] = ctx['source']['name']
+        ud['source'] = ctx['source']
         ud['ncm2'] = 1
         return e
 
@@ -211,7 +211,7 @@ class Ncm2Source(Ncm2Base):
         # only checks when we receives a context that seems old
         now = time.time()
         if now >= context['time'] + 0.5:
-            return not self.nvim.call('ncm2#context_dated', context)
+            return not self.nvim.call('ncm2#complete_context_dated', context)
         else:
             return True
 
