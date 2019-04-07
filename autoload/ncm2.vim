@@ -83,10 +83,6 @@ func! ncm2#disable_for_buffer()
 endfunc
 
 func! s:on_complete_done()
-    if empty(v:completed_item) || !has_key(v:completed_item, 'user_data')
-        return
-    endif
-    call s:try_rnotify('on_complete_done', v:completed_item)
 endfunc
 
 func! s:cache_cleanup()
@@ -504,7 +500,7 @@ func! ncm2#_hook_for_subscope_detectors()
     else
         let Hook = {d -> extend(d, {"lines":getline(1, '$')}, "force")}
     endif
-    let events = ['on_complete', 'get_context', 'on_warmup', 'on_complete_done']
+    let events = ['on_complete', 'get_context', 'on_warmup']
     call ncm2#hook_coredata(0, events, 'subscope_detectors', Hook)
 endfunc
 
