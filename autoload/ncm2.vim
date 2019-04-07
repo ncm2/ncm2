@@ -256,6 +256,24 @@ func! ncm2#menu_selected()
     return pumvisible() && !empty(v:completed_item)
 endfunc
 
+func! ncm2#completed_item()
+    let item = copy(v:completed_item)
+    if empty(item)
+        return {}
+    endif
+    let ud = {}
+    silent! let ud = json_decode(v:completed_item.user_data)
+    if empty(ud) || type(ud) != v:t_dict
+        return {}
+    endif
+    let item.user_data = ud
+    if get(ud, 'ncm2', 0)
+        return item
+    else
+        return {}
+    endif
+endfunc
+
 func! ncm2#lock(name)
     let s:lock[a:name] = 1
 endfunc
