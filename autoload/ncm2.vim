@@ -19,6 +19,7 @@ call s:opt('ncm2#sorter', 'abbrfuzzy')
 call s:opt('ncm2#filter', [])
 call s:opt('ncm2#popup_limit', -1)
 call s:opt('ncm2#total_popup_limit', -1)
+call s:opt('ncm2#auto_extra_text_edits', 1)
 
 inoremap <silent> <Plug>(ncm2_auto_trigger)      <c-r>=ncm2#auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <c-r>=ncm2#skip_auto_trigger()<cr>
@@ -83,6 +84,36 @@ func! ncm2#disable_for_buffer()
 endfunc
 
 func! s:on_complete_done()
+    let item = ncm2#completed_item()
+    if empty(item)
+        return
+    endif
+    let ctx = s:context()
+    let name = item.user_data.source
+    if !has_key(s:sources, name)
+        call ncm2#_do_extra_text_edits(ctx, item)
+    endif
+    let sr = s:sources[name]
+    if has_key(sr, 'on_complete_resolve')
+        let ctx.on_complete_resolved = 'ncm2#_do_extra_text_edits'
+        call call(sr.on_complete_resolve, [ctx, item])
+    else
+        call ncm2#_do_extra_text_edits(ctx, item)
+    endif
+endfunc
+
+func! ncm2#_do_extra_text_edits(ctx, item)
+    if a:ctx.tick != ncm2#context_tick()
+        return
+    endif
+
+    " if g:ncm2#auto_extra_text_edits
+    " endif
+
+    " TODO expand snippet, but how to transfer the resolved item to the expand
+    " key ?
+    "
+    " call ncm2#confirm_snippet_expand ???
 endfunc
 
 func! s:cache_cleanup()
