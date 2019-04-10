@@ -1,8 +1,8 @@
 import re
 
-chcmp_smartcase = lambda a,b: a==b if a.isupper() else a==b.lower()
-chcmp_case = lambda a,b: a==b
-chcmp_icase = lambda a,b: a.lower()==b.lower()
+chcmp_smartcase = lambda a,b: a == b if a.isupper() else a == b.lower()
+chcmp_case = lambda a,b: a == b
+chcmp_icase = lambda a,b: a.lower() == b.lower()
 
 def get_abbrev(s):
     res = []
