@@ -101,7 +101,7 @@ func! s:cache_matches_cleanup()
     let s:startbcol = 1
 endfunc
 
-func! s:context_tick()
+func! ncm2#context_tick()
     " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
     " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
     " position to filter the requests.
@@ -123,7 +123,7 @@ func! s:context()
                 \ 'scope': &filetype,
                 \ 'filepath': expand('%:p'),
                 \ 'typed': strpart(getline('.'), 0, pos[2]-1),
-                \ 'tick': s:context_tick(),
+                \ 'tick': ncm2#context_tick(),
                 \ 'context_id': s:context_id,
                 \ 'mode': mode()
                 \ }
@@ -278,7 +278,7 @@ func! s:popup_timed(_)
 endfunc
 
 func! ncm2#_real_update_matches(ctx, startbcol, matches)
-    if s:context_tick() != a:ctx.tick
+    if ncm2#context_tick() != a:ctx.tick
         return
     endif
 
@@ -341,7 +341,7 @@ func! ncm2#skip_auto_trigger()
 endfunc
 
 func! ncm2#auto_trigger()
-    let tick = s:context_tick()
+    let tick = ncm2#context_tick()
     if tick == s:auto_trigger_tick
         return ''
     endif
@@ -385,7 +385,7 @@ func! ncm2#force_trigger(...)
 endfunc
 
 func! ncm2#_notify_complete(ctx, calls)
-    if s:context_tick() != a:ctx.tick
+    if ncm2#context_tick() != a:ctx.tick
         if !s:should_skip()
             call s:try_rnotify('on_notify_dated', a:ctx, a:calls)
         endif

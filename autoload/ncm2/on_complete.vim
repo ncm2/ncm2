@@ -2,7 +2,7 @@
 " ensure latest context
 func! ncm2#on_complete#context_ensure(fn, ...) dict
     let ctx = a:000[-1]
-    if ncm2#context_dated(ctx)
+    if ncm2#context_tick() != ctx.tick
         call ncm2#complete(ctx, ctx.startccol, [], 1)
         return
     endif
