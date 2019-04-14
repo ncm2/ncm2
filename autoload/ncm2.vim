@@ -25,6 +25,10 @@ inoremap <silent> <Plug>(ncm2_auto_trigger)      <c-r>=ncm2#auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <c-r>=ncm2#skip_auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_manual_trigger)    <c-r>=ncm2#manual_trigger()<cr>
 
+imap <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
+map <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
+cmap <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
+
 inoremap <Plug>(ncm2_c_e) <C-E>
 
 let s:core = yarp#py3('ncm2_core')
@@ -46,6 +50,7 @@ let s:context_tick_extra = 0
 let s:context_id = 0
 let s:completion_notified = {}
 let s:coredata_hooks = {}
+let s:popup_open = 0
 
 augroup ncm2_hooks
     au!
@@ -86,8 +91,14 @@ endfunc
 func! s:on_complete_done()
     let item = ncm2#completed_item()
     if empty(item)
+        if s:popup_open
+            call feedkeys("\<Plug>(_ncm2_check_popup_close)", 'i')
+        endif
         return
     endif
+
+    call ncm2#_check_popup_close()
+
     let ctx = s:context()
     let name = item.user_data.source
     if !has_key(s:sources, name)
@@ -334,22 +345,17 @@ func! s:popup_timed(_)
     call call('ncm2#_real_update_matches', s:popup_timer_args)
 endfunc
 
+func! ncm2#_check_popup_close()
+    if s:popup_open && !pumvisible()
+        silent doau <nomodeline> User Ncm2PopupClose
+        let s:popup_open = 0
+    endif
+    return ''
+endfunc
+
 func! ncm2#_real_update_matches(ctx, startbcol, matches)
     if ncm2#context_tick() != a:ctx.tick
         return
-    endif
-
-    " The popup is expected to be opened while it has been closed
-    if !empty(s:matches) && !pumvisible()
-        if empty(v:completed_item)
-            " the user closed the popup with <c-e>
-            " TODO suppress future completion unless another word started
-            call s:cache_matches_cleanup()
-            return
-        else
-            " this should have been handled in CompleteDone, but we have newer
-            " matches now. It's ok to proceed
-        endif
     endif
 
     let s:startbcol = a:startbcol
@@ -361,6 +367,11 @@ endfunc
 
 func! ncm2#_real_popup(...)
     if s:should_skip()
+        return
+    endif
+
+    if s:popup_open != pumvisible()
+        call s:cache_matches_cleanup()
         return
     endif
 
@@ -383,10 +394,10 @@ func! ncm2#_real_popup(...)
         if pumvisible()
             call feedkeys("\<Plug>(ncm2_c_e)", "mi")
         endif
-        silent doau <nomodeline> User Ncm2PopupClose
         return ''
     endif
 
+    let s:popup_open = 1
     silent doau <nomodeline> User Ncm2PopupOpen
     call complete(s:startbcol, s:matches)
     return ''
@@ -628,9 +639,19 @@ func! s:should_skip()
     return !get(b:,'ncm2_enable',0) || &paste || !empty(s:lock) || mode()!='i'
 endfunc
 
-" insert mode task, only invoked when waiting for input
+func! ncm2#on_waiting_input(fn, ...)
+    let args = a:000
+    " The callback is only invoked when Vim is waiting for input.
+    call timer_start(0, function('s:do_on_waiting_input', [a:fn, args]))
+endfunc
+
+func! s:do_on_waiting_input(fn, args, timer)
+    call call(a:fn, a:args)
+endfunc
+
 func! ncm2#imode_task(fn, ...)
     let args = a:000
+    " The callback is only invoked when Vim is waiting for input.
     call timer_start(0, function('s:do_imode_task', [a:fn, args]))
 endfunc
 
