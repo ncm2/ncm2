@@ -29,7 +29,9 @@ imap <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
 map <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
 cmap <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
 
-inoremap <Plug>(ncm2_c_e) <C-E>
+" FIXME Sometimes it needs some extra dummy keys <c-r>=<cr> to close to popup,
+" I don't know why, it's probably a bug of neovim
+inoremap <silent> <Plug>(ncm2_c_e) <c-e><c-r>=<cr>
 
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
