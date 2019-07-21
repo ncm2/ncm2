@@ -412,7 +412,7 @@ ncm2#context_dated({context})
                                     *ncm2#complete()*
 ncm2#complete({context}, {startccol}, {matches}[, {refresh}])
     Call this function to trigger the to feed completions to ncm2.
-    {context} is an arugment passed to the |ncm2-on_complete| handler. Do not
+    {context} is an argument passed to the |ncm2-on_complete| handler. Do not
     change the contents. It is important for synchronization.
     {startccol} is similar to the `startcol` argument of the |complete()|
     function. However, startccol is counted by characters instead of by bytes.
