@@ -25,10 +25,6 @@ inoremap <silent> <Plug>(ncm2_auto_trigger)      <c-r>=ncm2#auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <c-r>=ncm2#skip_auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_manual_trigger)    <c-r>=ncm2#manual_trigger()<cr>
 
-imap <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
-map <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
-cmap <silent> <expr> <Plug>(_ncm2_check_popup_close) ncm2#_check_popup_close()
-
 " FIXME Sometimes it needs some extra dummy keys <c-r>=<backspace> to close to popup,
 " I don't know why, it's probably a bug of neovim
 " <c-r>=<cr> instead of <c-e><c-r>=<backspace> may cause wierd line break
@@ -50,11 +46,11 @@ let s:matches = []
 let s:subscope_detectors = {}
 let s:auto_trigger_tick = []
 let s:skip_context_id = 0
-let s:context_tick_extra = 0
 let s:context_id = 0
 let s:completion_notified = {}
 let s:coredata_hooks = {}
 let s:popup_open = 0
+let s:popup_close_tick = []
 
 augroup ncm2_hooks
     au!
@@ -70,7 +66,7 @@ func! ncm2#enable_for_buffer()
 
     augroup ncm2_buf_hooks
         au! * <buffer>
-        au InsertEnter,InsertLeave <buffer> call s:cache_cleanup()
+        au InsertEnter,InsertLeave <buffer> call s:on_insert_enter()
         au BufEnter <buffer> call s:on_warmup()
         if exists('##TextChangedP')
             au TextChangedI,TextChangedP <buffer> call ncm2#auto_trigger()
@@ -96,7 +92,8 @@ func! s:on_complete_done()
     let item = ncm2#completed_item()
     if empty(item)
         if s:popup_open
-            call feedkeys("\<Plug>(_ncm2_check_popup_close)", 'i')
+            " check after ncm2#auto_trigger() -> ncm2#_real_popup()
+            call ncm2#imode_task('ncm2#_check_popup_close')
         endif
         return
     endif
@@ -131,9 +128,10 @@ func! ncm2#_do_extra_text_edits(ctx, item)
     " call ncm2#confirm_snippet_expand ???
 endfunc
 
-func! s:cache_cleanup()
+func! s:on_insert_enter()
     call s:cache_matches_cleanup()
     let s:auto_trigger_tick  = []
+    let s:popup_close_tick = []
     call s:try_rnotify('cache_cleanup')
 endfunc
 
@@ -147,7 +145,7 @@ func! ncm2#context_tick()
     " FIXME b:changedtick ticks when <c-y> is typed.  curswant of
     " getcurpos() also ticks sometimes after <c-y> is typed. Use cursor
     " position to filter the requests.
-    return [getcurpos()[0:2], s:context_tick_extra]
+    return getcurpos()[0:2]
 endfunc
 
 func! s:context()
@@ -353,6 +351,7 @@ func! ncm2#_check_popup_close()
     if s:popup_open && !pumvisible()
         silent doau <nomodeline> User Ncm2PopupClose
         let s:popup_open = 0
+        let s:popup_close_tick = ncm2#context_tick()
     endif
     return ''
 endfunc
@@ -374,8 +373,8 @@ func! ncm2#_real_popup(...)
         return
     endif
 
-    if s:popup_open != pumvisible()
-        call s:cache_matches_cleanup()
+    " If popup menu is closed by user
+    if !s:popup_open && s:popup_close_tick == ncm2#context_tick()
         return
     endif
 
