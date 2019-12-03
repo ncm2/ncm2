@@ -25,11 +25,7 @@ inoremap <silent> <Plug>(ncm2_auto_trigger)      <c-r>=ncm2#auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_skip_auto_trigger) <c-r>=ncm2#skip_auto_trigger()<cr>
 inoremap <silent> <Plug>(ncm2_manual_trigger)    <c-r>=ncm2#manual_trigger()<cr>
 
-" FIXME Sometimes it needs some extra dummy keys <c-r>=<backspace> to close to popup,
-" I don't know why, it's probably a bug of neovim
-" <c-r>=<cr> instead of <c-e><c-r>=<backspace> may cause wierd line break
-" issues sometimes, I don't know why either.
-inoremap <silent> <Plug>(ncm2_c_e) <c-e><c-r>=<backspace>
+inoremap <silent> <expr> <Plug>(ncm2_c_e) (pumvisible() ? "\<c-e>" : '')
 
 let s:core = yarp#py3('ncm2_core')
 let s:core.on_load = 'ncm2#_core_started'
@@ -50,6 +46,7 @@ let s:context_id = 0
 let s:completion_notified = {}
 let s:coredata_hooks = {}
 let s:popup_open = 0
+let s:popup_closed_by_user = 0
 let s:popup_close_tick = []
 
 augroup ncm2_hooks
@@ -69,10 +66,10 @@ func! ncm2#enable_for_buffer()
         au InsertEnter,InsertLeave <buffer> call s:on_insert_enter()
         au BufEnter <buffer> call s:on_warmup()
         if exists('##TextChangedP')
-            au TextChangedI,TextChangedP <buffer> call ncm2#auto_trigger()
+            au TextChangedI,TextChangedP <buffer> call ncm2#imode_task('ncm2#auto_trigger')
             au InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
         else
-            au TextChangedI <buffer> call ncm2#auto_trigger()
+            au TextChangedI <buffer> call ncm2#imode_task('ncm2#auto_trigger')
             au InsertCharPre,InsertEnter <buffer> call ncm2#imode_task('ncm2#auto_trigger')
         endif
         au CompleteDone <buffer> call s:on_complete_done()
@@ -89,16 +86,12 @@ func! ncm2#disable_for_buffer()
 endfunc
 
 func! s:on_complete_done()
+    call ncm2#imode_task('ncm2#_check_popup_close')
+
     let item = ncm2#completed_item()
     if empty(item)
-        if s:popup_open
-            " check after ncm2#auto_trigger() -> ncm2#_real_popup()
-            call ncm2#imode_task('ncm2#_check_popup_close')
-        endif
         return
     endif
-
-    call ncm2#_check_popup_close()
 
     let ctx = s:context()
     let name = item.user_data.source
@@ -348,10 +341,17 @@ func! s:popup_timed(_)
 endfunc
 
 func! ncm2#_check_popup_close()
+    " Defer the check for ncm2#auto_trigger
+    if ncm2#context_tick() != s:auto_trigger_tick
+        call ncm2#imode_task('ncm2#_check_popup_close')
+        return ''
+    endif
     if s:popup_open && !pumvisible()
         silent doau <nomodeline> User Ncm2PopupClose
         let s:popup_open = 0
+        let s:popup_closed_by_user = !empty(s:matches)
         let s:popup_close_tick = ncm2#context_tick()
+        call s:cache_matches_cleanup()
     endif
     return ''
 endfunc
@@ -374,7 +374,7 @@ func! ncm2#_real_popup(...)
     endif
 
     " If popup menu is closed by user
-    if !s:popup_open && s:popup_close_tick == ncm2#context_tick()
+    if !s:popup_open && s:popup_closed_by_user && s:popup_close_tick == ncm2#context_tick()
         return
     endif
 
@@ -394,7 +394,7 @@ func! ncm2#_real_popup(...)
     if empty(s:matches)
         " this enables the vanilla <c-n> and <c-p> keys behavior when
         " there's no popup
-        if pumvisible()
+        if pumvisible() && s:popup_open
             call feedkeys("\<Plug>(ncm2_c_e)", "mi")
         endif
         return ''
@@ -685,3 +685,7 @@ call ncm2#insert_mode_only_key('<Plug>(ncm2_skip_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_auto_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_manual_trigger)')
 call ncm2#insert_mode_only_key('<Plug>(ncm2_c_e)')
+
+" func! s:dbg(str)
+"     echom a:str . ' ' . json_encode(ncm2#context_tick())
+" endfunc
