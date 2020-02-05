@@ -48,6 +48,7 @@ let s:coredata_hooks = {}
 let s:popup_open = 0
 let s:popup_closed_by_user = 0
 let s:popup_close_tick = []
+let s:popup_close_check_state = 0
 
 augroup ncm2_hooks
     au!
@@ -342,10 +343,15 @@ endfunc
 
 func! ncm2#_check_popup_close()
     " Defer the check for ncm2#auto_trigger
-    if ncm2#context_tick() != s:auto_trigger_tick
+    if ncm2#context_tick() != s:auto_trigger_tick && !s:popup_close_check_state
+        let s:popup_close_check_state = 1
         call ncm2#imode_task('ncm2#_check_popup_close')
         return ''
     endif
+    " s:popup_close_check_state to prevent infinite ncm2#_check_popup_close
+    " when s:auto_trigger_tick cannot be updated
+    let s:popup_close_check_state = 0
+
     if s:popup_open && !pumvisible()
         silent doau <nomodeline> User Ncm2PopupClose
         let s:popup_open = 0
