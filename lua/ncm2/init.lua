@@ -1,28 +1,19 @@
-local function on_completion_result(context, err, _, result, prefix)
+local function on_completion_result(context, err, _, result)
     if err or not result then
         return
     end
 
-    local matches = vim.lsp.util.text_document_completion_list_to_complete_items(result, prefix)
+    local matches = vim.lsp.util.text_document_completion_list_to_complete_items(result, context.base)
     vim.api.nvim_call_function('ncm2#complete', {context, context.startccol, matches})
 end
 
 local function on_complete_lsp(context)
-    -- adapted version of lsp.omnifunc function from neovim repo
-    -- https://github.com/neovim/neovim/blob/master/runtime/lua/vim/lsp.lua
-
-    local pos = vim.api.nvim_win_get_cursor(0)
-    local line = vim.api.nvim_get_current_line()
-    local line_to_cursor = line:sub(1, pos[2])
-    local textMatch = vim.fn.match(line_to_cursor, '\\k*$')
-    local prefix = line_to_cursor:sub(textMatch+1)
-
     vim.lsp.buf_request(
         context.bufnr,
         'textDocument/completion',
         vim.lsp.util.make_position_params(),
         function(err, _, result)
-            on_completion_result(context, err, _, result, prefix)
+            on_completion_result(context, err, _, result)
         end
     )
 end
