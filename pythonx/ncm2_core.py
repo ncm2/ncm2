@@ -527,6 +527,11 @@ class Ncm2Core(Ncm2Base):
             if not pat.startswith("^"):
                 pat = '.*' + pat
 
+            # We need to escape any trailing backslashes, or it looks like we're trying to escape
+            # the end of a pattern
+            if pat.endswith('\\'):
+              pat = pat + '\\'
+
             matched = re.search(pat, typed)
             if matched and matched.end() >= len(typed) - len(ctx['base']):
                 ctx['match_end'] = matched.end()
