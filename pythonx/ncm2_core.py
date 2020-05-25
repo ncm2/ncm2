@@ -529,7 +529,13 @@ class Ncm2Core(Ncm2Base):
 
             # We need to escape any trailing backslashes, or it looks like we're trying to escape
             # the end of a pattern
-            if pat.endswith('\\'):
+            pat_trailing_backslashes = 0
+            for c in reversed(pat):
+              if c != '\\':
+                break
+
+              pat_trailing_backslashes += 1
+            if pat_trailing_backslashes % 2 != 0:
               pat = pat + '\\'
 
             matched = re.search(pat, typed)
