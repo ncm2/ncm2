@@ -94,6 +94,8 @@ func! s:on_complete_done()
         return
     endif
 
+    call ncm2#_check_popup_close()
+
     let ctx = s:context()
     let name = item.user_data.source
     if !has_key(s:sources, name)
