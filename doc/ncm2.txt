@@ -487,7 +487,7 @@ inoremap <your-key> <c-r>=ncm2#force_trigger(...)<cr>
 
 
 ==============================================================================
-6. Autocmds                         *ncm2-autcmd*
+6. Autocmds                         *ncm2-autocmd*
 
                                     *Ncm2PopupOpen* *Ncm2PopupClose*
 :autocmd User Ncm2PopupOpen
