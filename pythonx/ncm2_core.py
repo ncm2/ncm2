@@ -246,8 +246,7 @@ class Ncm2Core(Ncm2Base):
         warmups = []
 
         sources = self.get_filtered_sources(data, names)
-
-        names = names or list(sources.keys())
+        names = list(sources.keys())
 
         contexts = self.detect_subscopes(data)
         for ctx_idx, tmp_ctx in enumerate(contexts):
