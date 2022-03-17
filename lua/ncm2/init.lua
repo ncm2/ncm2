@@ -12,7 +12,7 @@ local function on_complete_lsp(context)
         context.bufnr,
         'textDocument/completion',
         vim.lsp.util.make_position_params(),
-        function(err, _, result)
+        function(err, result, _)
             on_completion_result(context, err, _, result)
         end
     )
