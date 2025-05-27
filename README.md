@@ -29,11 +29,37 @@ extensions and programming languages support for NCM2.
   `let g:python3_host_prog=/path/to/python/executable/` in vimrc.
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
-For vim8 user, read the [nvim-yarp](https://github.com/roxma/nvim-yarp)
-README. **Note that vim8 support is simply a bonus. It's not the goal of
-NCM2.**
-
 ## Install
+
+For [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+```lua
+return {
+  -- requirements
+  { "roxma/nvim-yarp" },
+
+  {
+    "ncm2/ncm2",
+    config = function()
+      vim.opt.completeopt = { "noinsert", "menuone", "noselect" }
+
+      vim.api.nvim_create_autocmd({'BufEnter'}, {
+        pattern = {'*'},
+        callback = function(ev)
+          vim.call('ncm2#enable_for_buffer')
+        end
+      })
+    end,
+  },
+
+  -- NOTE: you need to install completion sources to get completions. Check
+  -- our wiki page for a list of sources: https://github.com/ncm2/ncm2/wiki
+  { 'ncm2/ncm2-bufword' },
+  { 'ncm2/ncm2-path' },
+}
+```
+
+For [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
     " assuming you're using vim-plug: https://github.com/junegunn/vim-plug
