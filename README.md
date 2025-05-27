@@ -1,8 +1,6 @@
 ## Introduction
 
-NCM2, formerly known as
-[nvim-completion-manager](https://github.com/roxma/nvim-completion-manager),
-is a slim, fast and hackable completion framework for neovim.
+Ncm2 is a slim, async and hackable completion framework for neovim.
 
 Main features:
 
@@ -23,10 +21,7 @@ extensions and programming languages support for NCM2.
 
 ## Requirements
 
-- `:echo has("nvim-0.2.2")` prints 1. Older versions has not been tested
-- `:echo has("python3")` prints 1. This is usually set by
-    `python3 -m pip install pynvim` in shell and
-  `let g:python3_host_prog=/path/to/python/executable/` in vimrc.
+- [pynvim](https://github.com/neovim/pynvim)
 - Plugin [nvim-yarp](https://github.com/roxma/nvim-yarp)
 
 ## Install
