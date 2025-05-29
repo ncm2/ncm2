@@ -440,7 +440,7 @@ func! ncm2#auto_trigger()
     " refresh the popup menu to reduce popup flickering
     call ncm2#_real_popup()
 
-    if g:ncm2#complete_delay == 0
+    if g:ncm2#complete_delay == 0 || pumvisible()
         call ncm2#do_auto_trigger()
     else
         if s:complete_timer
