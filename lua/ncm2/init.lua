@@ -4,7 +4,7 @@ local function on_completion_result(context, err, _, result)
     end
 
     local matches = vim.lsp.util.text_document_completion_list_to_complete_items(result, context.base)
-    vim.api.nvim_call_function('ncm2#complete', {context, context.startccol, matches})
+    vim.api.nvim_call_function('ncm2#complete', {context, context.startccol, matches, 1})
 end
 
 local function on_complete_lsp(context)
