@@ -2,7 +2,6 @@ if get(g:,'ncm2_loaded','0')
     finish
 endif
 let g:ncm2_loaded = 1
-let s:ncm2_completeopt_warning = 0
 
 func! s:opt(name, default)
     let val = get(g:, a:name, a:default)
@@ -62,16 +61,6 @@ func! ncm2#enable_for_buffer()
         return
     endif
     let b:ncm2_enable = 1
-
-    setlocal completeopt+=menuone
-
-    if (-1 == stridx(&completeopt, 'noselect')) && (-1 == stridx(&completeopt, 'noinsert'))
-      setlocal completeopt+=noinsert
-      if s:ncm2_completeopt_warning == 0
-        echom '[ncm2] setlocal completeopt+=noinsert'
-        let s:ncm2_completeopt_warning = 1
-      endif
-    endif
 
     augroup ncm2_buf_hooks
         au! * <buffer>
